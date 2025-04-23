@@ -1,0 +1,1 @@
+This directory contains image assets for The People's Elbow website.
