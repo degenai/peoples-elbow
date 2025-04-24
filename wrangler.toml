@@ -1,9 +1,3 @@
-[host_form_worker]
-name = "host-form-worker"
+name = "peoples-elbow-workers"
+compatibility_date = "2025-04-24"
 main = "./workers/host-form-worker.js"
-compatibility_date = "2025-04-24"
-
-[contact_form_worker]
-name = "contact-form-worker"
-main = "./workers/contact-form-worker.js"
-compatibility_date = "2025-04-24"
