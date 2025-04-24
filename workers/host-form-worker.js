@@ -17,6 +17,24 @@ export default {
     if (request.method === 'OPTIONS') {
       return handleCors();
     }
+    
+    // Check if database is accessible
+    if (env && env.FORMS_DB) {
+      console.log('Database binding found:', env.FORMS_DB);
+      
+      // Try to query tables
+      try {
+        const tables = await env.FORMS_DB.prepare(
+          "SELECT name FROM sqlite_master WHERE type='table';"
+        ).all();
+        console.log('Available tables:', tables);
+      } catch (error) {
+        console.error('Error checking tables:', error);
+      }
+    } else {
+      console.error('No database binding found');
+    }
+    
     return handleRequest(request, env);
   }
 }
@@ -202,7 +220,8 @@ async function sendEmail(to, subject, body) {
       body: JSON.stringify({
         personalizations: [{ to: [{ email: to }] }],
         from: { 
-          email: 'forms@peoples-elbow.com', 
+          // Use workers.dev domain which is pre-authorized
+          email: 'no-reply@peoples-elbow.workers.dev', 
           name: 'The People\'s Elbow Forms' 
         },
         subject,
