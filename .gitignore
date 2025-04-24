@@ -1,0 +1,33 @@
+# The People's Elbow .gitignore
+
+# Private strategy documents
+agenthandoff.md
+**/agenthandoff.md
+feature_wishlist.md
+**/feature_wishlist.md
+
+# System and editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*~
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Build directories
+dist/
+build/
+out/
+.next/
