@@ -21,17 +21,107 @@ document.addEventListener('DOMContentLoaded', function() {
     if (hostForm) {
         hostForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            alert('Thank you for your interest in hosting The People\'s Elbow! This form is not yet connected to a backend. We\'ll implement this functionality soon.');
-            hostForm.reset();
+            
+            // Show loading state
+            const submitButton = hostForm.querySelector('button[type="submit"]');
+            const originalButtonText = submitButton.textContent;
+            submitButton.textContent = 'Sending...';
+            submitButton.disabled = true;
+            
+            // Create FormData object
+            const formData = new FormData(hostForm);
+            
+            // Send to Cloudflare Worker
+            fetch('https://host-form-worker.peoples-elbow.workers.dev', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Show success message
+                if (data.success) {
+                    showFormMessage(hostForm, data.message, 'success');
+                    hostForm.reset();
+                } else {
+                    showFormMessage(hostForm, data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showFormMessage(hostForm, 'There was an error sending your request. Please try again later.', 'error');
+            })
+            .finally(() => {
+                // Restore button state
+                submitButton.textContent = originalButtonText;
+                submitButton.disabled = false;
+            });
         });
     }
     
     if (contactForm) {
         contactForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            alert('Thank you for your message! This form is not yet connected to a backend. We\'ll implement this functionality soon.');
-            contactForm.reset();
+            
+            // Show loading state
+            const submitButton = contactForm.querySelector('button[type="submit"]');
+            const originalButtonText = submitButton.textContent;
+            submitButton.textContent = 'Sending...';
+            submitButton.disabled = true;
+            
+            // Create FormData object
+            const formData = new FormData(contactForm);
+            
+            // Send to Cloudflare Worker
+            fetch('https://contact-form-worker.peoples-elbow.workers.dev', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Show success message
+                if (data.success) {
+                    showFormMessage(contactForm, data.message, 'success');
+                    contactForm.reset();
+                } else {
+                    showFormMessage(contactForm, data.message, 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showFormMessage(contactForm, 'There was an error sending your message. Please try again later.', 'error');
+            })
+            .finally(() => {
+                // Restore button state
+                submitButton.textContent = originalButtonText;
+                submitButton.disabled = false;
+            });
         });
+    }
+    
+    // Helper function to show form messages
+    function showFormMessage(form, message, type) {
+        // Remove any existing message
+        const existingMessage = form.querySelector('.form-message');
+        if (existingMessage) {
+            existingMessage.remove();
+        }
+        
+        // Create message element
+        const messageElement = document.createElement('div');
+        messageElement.className = `form-message ${type}`;
+        messageElement.textContent = message;
+        
+        // Insert after the submit button
+        const submitButton = form.querySelector('button[type="submit"]');
+        submitButton.parentNode.insertBefore(messageElement, submitButton.nextSibling);
+        
+        // Remove message after 5 seconds if it's a success message
+        if (type === 'success') {
+            setTimeout(() => {
+                messageElement.classList.add('fade-out');
+                setTimeout(() => messageElement.remove(), 500);
+            }, 5000);
+        }
     }
     
     // Smooth scrolling for anchor links

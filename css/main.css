@@ -428,6 +428,31 @@ textarea {
     resize: vertical;
 }
 
+/* Form Message Styling */
+.form-message {
+    margin-top: var(--space-md);
+    padding: var(--space-sm) var(--space-md);
+    border-radius: 4px;
+    font-weight: bold;
+}
+
+.form-message.success {
+    background-color: rgba(0, 105, 55, 0.1);
+    color: var(--pe-green);
+    border-left: 3px solid var(--pe-green);
+}
+
+.form-message.error {
+    background-color: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+    border-left: 3px solid #dc3545;
+}
+
+.form-message.fade-out {
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
 /* Impact Section */
 .impact {
     padding: var(--space-xl) 0;
