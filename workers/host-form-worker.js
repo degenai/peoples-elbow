@@ -201,9 +201,16 @@ async function sendEmail(to, subject, body) {
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
         personalizations: [{ to: [{ email: to }] }],
-        from: { email: 'forms@peoples-elbow.com', name: 'The People\'s Elbow Forms' },
+        from: { 
+          email: 'forms@peoples-elbow.com', 
+          name: 'The People\'s Elbow Forms' 
+        },
         subject,
-        content: [{ type: 'text/plain', value: body }]
+        content: [{ type: 'text/plain', value: body }],
+        headers: {
+          // These help with deliverability
+          'X-MC-REPLYTO': 'info@peoples-elbow.com'
+        }
       })
     });
     
