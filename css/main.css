@@ -597,8 +597,9 @@ footer {
 }
 
 .site-disclaimer a {
-    color: var(--pe-gold);
+    color: #FFD700; /* Brighter gold for better contrast */
     text-decoration: underline;
+    font-weight: bold;
     transition: color 0.3s ease;
 }
 

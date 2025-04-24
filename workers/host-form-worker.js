@@ -1,13 +1,31 @@
 /**
  * The People's Elbow - Host Connection Form Worker
  * 
- * This Cloudflare Worker handles the host connection form submissions,
- * sending the data via email to The People's Elbow team.
+ * This Cloudflare Worker handles both host connection and contact form submissions,
+ * processing the data and responding with success/error messages.
  */
 
 addEventListener('fetch', event => {
+  // Handle CORS preflight requests
+  if (event.request.method === 'OPTIONS') {
+    return event.respondWith(handleCors());
+  }
   event.respondWith(handleRequest(event.request))
 })
+
+/**
+ * Handle CORS preflight requests
+ */
+function handleCors() {
+  return new Response(null, {
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+      'Access-Control-Max-Age': '86400',
+    }
+  });
+}
 
 /**
  * Handle the request
@@ -19,9 +37,28 @@ async function handleRequest(request) {
     return new Response('Method not allowed', { status: 405 })
   }
 
-  // Get the form data
-  const formData = await request.formData()
-  
+  try {
+    // Get the form data
+    const formData = await request.formData()
+    
+    // Determine which form was submitted based on field names
+    const isHostForm = formData.has('venue-name');
+    
+    if (isHostForm) {
+      return handleHostForm(formData);
+    } else {
+      return handleContactForm(formData);
+    }
+  } catch (error) {
+    console.error('Error processing request:', error);
+    return errorResponse('There was an error processing your request. Please try again later.');
+  }
+}
+
+/**
+ * Handle host connection form submissions
+ */
+async function handleHostForm(formData) {
   // Extract form fields
   const venueName = formData.get('venue-name')
   const contactName = formData.get('contact-name')
@@ -31,13 +68,7 @@ async function handleRequest(request) {
   
   // Validate required fields
   if (!venueName || !contactName || !contactEmail || !venueType) {
-    return new Response(JSON.stringify({
-      success: false,
-      message: 'Please fill in all required fields'
-    }), {
-      headers: { 'Content-Type': 'application/json' },
-      status: 400
-    })
+    return errorResponse('Please fill in all required fields', 400);
   }
   
   // Format the email content
@@ -53,54 +84,72 @@ async function handleRequest(request) {
     ${message}
   `
   
-  try {
-    // Send email using Cloudflare Email Workers (you'll need to set this up)
-    await sendEmail({
-      to: 'peoples.elbow.massage@gmail.com',
-      from: 'host-requests@peoples-elbow.com',
-      subject: `New Host Request: ${venueName}`,
-      text: emailContent
-    })
-    
-    // Return success response
-    return new Response(JSON.stringify({
-      success: true,
-      message: 'Your hosting request has been sent! We\'ll be in touch soon.'
-    }), {
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': 'https://peoples-elbow.com'
-      }
-    })
-  } catch (error) {
-    // Return error response
-    return new Response(JSON.stringify({
-      success: false,
-      message: 'There was an error sending your request. Please try again later.'
-    }), {
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': 'https://peoples-elbow.com'
-      },
-      status: 500
-    })
-  }
+  // Log the submission for now (until email is set up)
+  console.log('Host Form Submission:', emailContent);
+  
+  // Return success response
+  return successResponse('Your hosting request has been received! We\'ll be in touch soon.');
 }
 
 /**
- * Send an email using Cloudflare Email Workers
- * Note: This function requires setting up Cloudflare Email Workers
+ * Handle contact form submissions
  */
-async function sendEmail({ to, from, subject, text }) {
-  // This is a placeholder for the actual email sending logic
-  // You'll need to replace this with Cloudflare's Email Workers or another email service
+async function handleContactForm(formData) {
+  // Extract form fields
+  const name = formData.get('name')
+  const email = formData.get('email')
+  const message = formData.get('contact-message') || 'No message provided'
   
-  // For now, we'll log the email content for testing
-  console.log('Email Content:', { to, from, subject, text })
+  // Validate required fields
+  if (!name || !email || !message) {
+    return errorResponse('Please fill in all required fields', 400);
+  }
   
-  // In a real implementation, you would make an API call to an email service
-  // This could be Cloudflare Email Workers, SendGrid, Mailgun, etc.
+  // Format the email content
+  const emailContent = `
+    New Contact Form Submission
+
+    Name: ${name}
+    Email: ${email}
+    
+    Message:
+    ${message}
+  `
   
-  // Return success for now
-  return true
+  // Log the submission for now (until email is set up)
+  console.log('Contact Form Submission:', emailContent);
+  
+  // Return success response
+  return successResponse('Your message has been received! We\'ll get back to you soon.');
+}
+
+/**
+ * Create a success response
+ */
+function successResponse(message) {
+  return new Response(JSON.stringify({
+    success: true,
+    message: message
+  }), {
+    headers: {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*'
+    }
+  });
+}
+
+/**
+ * Create an error response
+ */
+function errorResponse(message, status = 500) {
+  return new Response(JSON.stringify({
+    success: false,
+    message: message
+  }), {
+    headers: {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*'
+    },
+    status: status
+  });
 }
