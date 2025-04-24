@@ -213,23 +213,31 @@ async function sendEmail(to, subject, body) {
     // Log email details for debugging
     console.log('Sending email:', { to, subject });
     
-    // Send via Mailchannels API
+    // Send via Mailchannels API - using the recommended approach from docs
     const response = await fetch('https://api.mailchannels.net/tx/v1/send', {
       method: 'POST',
-      headers: { 'content-type': 'application/json' },
+      headers: { 
+        'content-type': 'application/json',
+      },
       body: JSON.stringify({
-        personalizations: [{ to: [{ email: to }] }],
-        from: { 
-          // Use workers.dev domain which is pre-authorized
-          email: 'no-reply@peoples-elbow.workers.dev', 
-          name: 'The People\'s Elbow Forms' 
+        personalizations: [{
+          to: [{ email: to, name: 'The People\'s Elbow Admin' }],
+          dkim_domain: 'peoples-elbow.com',
+          dkim_selector: 'mailchannels'
+        }],
+        from: {
+          email: 'forms@peoples-elbow.com',
+          name: 'The People\'s Elbow Forms'
         },
-        subject,
-        content: [{ type: 'text/plain', value: body }],
-        headers: {
-          // These help with deliverability
-          'X-MC-REPLYTO': 'info@peoples-elbow.com'
-        }
+        reply_to: {
+          email: 'info@peoples-elbow.com',
+          name: 'The People\'s Elbow'
+        },
+        subject: subject,
+        content: [{
+          type: 'text/plain',
+          value: body
+        }]
       })
     });
     
