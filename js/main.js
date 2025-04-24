@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const contactForm = document.getElementById('contact-form');
     
     if (hostForm) {
-        hostForm.addEventListener('submit', function(e) {
+        hostForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             
             // Show loading state
@@ -28,16 +28,17 @@ document.addEventListener('DOMContentLoaded', function() {
             submitButton.textContent = 'Sending...';
             submitButton.disabled = true;
             
-            // Create FormData object
-            const formData = new FormData(hostForm);
-            
-            // Send to Cloudflare Worker
-            fetch('https://host-form-worker.peoples-elbow.workers.dev', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
+            try {
+                // Create FormData object
+                const formData = new FormData(hostForm);
+                
+                // Send to Cloudflare Worker
+                const response = await fetch('https://peoples-elbow.alex-adamczyk.workers.dev', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                
                 // Show success message
                 if (data.success) {
                     showFormMessage(hostForm, data.message, 'success');
@@ -45,16 +46,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else {
                     showFormMessage(hostForm, data.message, 'error');
                 }
-            })
-            .catch(error => {
+            } catch (error) {
                 console.error('Error:', error);
                 showFormMessage(hostForm, 'There was an error sending your request. Please try again later.', 'error');
-            })
-            .finally(() => {
+            } finally {
                 // Restore button state
                 submitButton.textContent = originalButtonText;
                 submitButton.disabled = false;
-            });
+            }
         });
     }
     
@@ -72,7 +71,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const formData = new FormData(contactForm);
             
             // Send to Cloudflare Worker
-            fetch('https://contact-form-worker.peoples-elbow.workers.dev', {
+            fetch('https://peoples-elbow.alex-adamczyk.workers.dev', {
                 method: 'POST',
                 body: formData
             })
