@@ -1,10 +1,11 @@
 /**
- * The People's Elbow - Host Connection Form Worker
+ * The People's Elbow - Form Handler Worker
  * 
- * This Cloudflare Worker handles both host connection and contact form submissions,
- * processing the data and responding with success/error messages.
+ * Handles form submissions, stores data in D1 database,
+ * and sends email notifications
  */
 
+// Main handler for all incoming requests
 addEventListener('fetch', event => {
   // Handle CORS preflight requests
   if (event.request.method === 'OPTIONS') {
@@ -28,10 +29,11 @@ function handleCors() {
 }
 
 /**
- * Handle the request
+ * Main request handler
  * @param {Request} request
+ * @param {Env} env - Environment containing D1 bindings
  */
-async function handleRequest(request) {
+async function handleRequest(request, env) {
   // Only allow POST requests
   if (request.method !== 'POST') {
     return new Response('Method not allowed', { status: 405 })
@@ -45,9 +47,9 @@ async function handleRequest(request) {
     const isHostForm = formData.has('venue-name');
     
     if (isHostForm) {
-      return handleHostForm(formData);
+      return handleHostForm(formData, env);
     } else {
-      return handleContactForm(formData);
+      return handleContactForm(formData, env);
     }
   } catch (error) {
     console.error('Error processing request:', error);
@@ -57,8 +59,10 @@ async function handleRequest(request) {
 
 /**
  * Handle host connection form submissions
+ * @param {FormData} formData
+ * @param {Env} env - Environment containing D1 bindings
  */
-async function handleHostForm(formData) {
+async function handleHostForm(formData, env) {
   // Extract form fields
   const venueName = formData.get('venue-name')
   const contactName = formData.get('contact-name')
@@ -84,17 +88,43 @@ async function handleHostForm(formData) {
     ${message}
   `
   
-  // Log the submission for now (until email is set up)
-  console.log('Host Form Submission:', emailContent);
-  
-  // Return success response
-  return successResponse('Your hosting request has been received! We\'ll be in touch soon.');
+  try {
+    // Get current date/time as ISO string
+    const createdAt = new Date().toISOString();
+    
+    // 1. Store in D1 database
+    if (env && env.FORMS_DB) {
+      await env.FORMS_DB.prepare(
+        `INSERT INTO host_submissions (venue_name, contact_name, contact_email, venue_type, message, created_at) 
+         VALUES (?, ?, ?, ?, ?, ?)`
+      )
+      .bind(venueName, contactName, contactEmail, venueType, message, createdAt)
+      .run();
+    } else {
+      console.warn('D1 database not available');
+    }
+    
+    // 2. Send email notification
+    await sendEmail(
+      'peoples.elbow.massage@gmail.com', 
+      `New Host Request: ${venueName}`,
+      emailContent
+    );
+    
+    // Return success response
+    return successResponse('Your hosting request has been received! We\'ll be in touch soon.');
+  } catch (error) {
+    console.error('Error processing host form:', error);
+    return errorResponse('There was an error processing your request. Please try again later.');
+  }
 }
 
 /**
  * Handle contact form submissions
+ * @param {FormData} formData
+ * @param {Env} env - Environment containing D1 bindings
  */
-async function handleContactForm(formData) {
+async function handleContactForm(formData, env) {
   // Extract form fields
   const name = formData.get('name')
   const email = formData.get('email')
@@ -116,11 +146,72 @@ async function handleContactForm(formData) {
     ${message}
   `
   
-  // Log the submission for now (until email is set up)
-  console.log('Contact Form Submission:', emailContent);
-  
-  // Return success response
-  return successResponse('Your message has been received! We\'ll get back to you soon.');
+  try {
+    // Get current date/time as ISO string
+    const createdAt = new Date().toISOString();
+    
+    // 1. Store in D1 database
+    if (env && env.FORMS_DB) {
+      await env.FORMS_DB.prepare(
+        `INSERT INTO contact_submissions (name, email, message, created_at) 
+         VALUES (?, ?, ?, ?)`
+      )
+      .bind(name, email, message, createdAt)
+      .run();
+    } else {
+      console.warn('D1 database not available');
+    }
+    
+    // 2. Send email notification
+    await sendEmail(
+      'peoples.elbow.massage@gmail.com', 
+      `New Contact Form Message from ${name}`,
+      emailContent
+    );
+    
+    // Return success response
+    return successResponse('Your message has been received! We\'ll get back to you soon.');
+  } catch (error) {
+    console.error('Error processing contact form:', error);
+    return errorResponse('There was an error sending your message. Please try again later.');
+  }
+}
+
+/**
+ * Send email using Mailchannels API (free with Cloudflare Workers)
+ * @param {string} to - Recipient email address
+ * @param {string} subject - Email subject
+ * @param {string} body - Email body content
+ */
+async function sendEmail(to, subject, body) {
+  try {
+    // Log email details for debugging
+    console.log('Sending email:', { to, subject });
+    
+    // Send via Mailchannels API
+    const response = await fetch('https://api.mailchannels.net/tx/v1/send', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        personalizations: [{ to: [{ email: to }] }],
+        from: { email: 'forms@peoples-elbow.com', name: 'The People\'s Elbow Forms' },
+        subject,
+        content: [{ type: 'text/plain', value: body }]
+      })
+    });
+    
+    // Handle response
+    if (response.status >= 200 && response.status < 300) {
+      console.log('Email sent successfully!');
+      return true;
+    } else {
+      console.error('Error sending email:', await response.text());
+      return false;
+    }
+  } catch (error) {
+    console.error('Exception sending email:', error);
+    return false;
+  }
 }
 
 /**
