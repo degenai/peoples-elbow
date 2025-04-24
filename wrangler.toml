@@ -4,6 +4,6 @@ main = "./workers/host-form-worker.js"
 
 # D1 Database binding
 [[d1_databases]]
-name = "FORMS_DB"
+binding = "FORMS_DB" # This field was missing before
 database_name = "peoples-elbow-forms"
 database_id = "3587acfa-1da5-4c4f-ac73-33308f01bb4c"

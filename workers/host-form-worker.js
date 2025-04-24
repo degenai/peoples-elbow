@@ -5,14 +5,21 @@
  * and sends email notifications
  */
 
-// Main handler for all incoming requests
-addEventListener('fetch', event => {
-  // Handle CORS preflight requests
-  if (event.request.method === 'OPTIONS') {
-    return event.respondWith(handleCors());
+/**
+ * Main handler for all incoming requests
+ * @param {Request} request
+ * @param {Env} env - Environment containing D1 bindings
+ * @param {ExecutionContext} ctx - Worker execution context
+ */
+export default {
+  async fetch(request, env, ctx) {
+    // Handle CORS preflight requests
+    if (request.method === 'OPTIONS') {
+      return handleCors();
+    }
+    return handleRequest(request, env);
   }
-  event.respondWith(handleRequest(event.request))
-})
+}
 
 /**
  * Handle CORS preflight requests
