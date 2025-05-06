@@ -5,6 +5,9 @@
  * and sends email notifications
  */
 
+// Import statements for Workers functionality
+import { EmailMessage } from 'cloudflare:email';
+
 /**
  * Main handler for all incoming requests
  * @param {Request} request
@@ -133,7 +136,8 @@ async function handleHostForm(formData, env) {
     await sendEmail(
       'peoples.elbow.massage@gmail.com', 
       `New Host Request: ${venueName}`,
-      emailContent
+      emailContent,
+      env
     );
     
     // Return success response
@@ -191,7 +195,8 @@ async function handleContactForm(formData, env) {
     await sendEmail(
       'peoples.elbow.massage@gmail.com', 
       `New Contact Form Message from ${name}`,
-      emailContent
+      emailContent,
+      env
     );
     
     // Return success response
@@ -203,56 +208,57 @@ async function handleContactForm(formData, env) {
 }
 
 /**
- * Send email using Mailchannels API (free with Cloudflare Workers)
- * @param {string} to - Recipient email address
+ * Send email using Cloudflare's sendEmail binding
+ * @param {string} to - Recipient email address (must be pre-verified in Email Routing)
  * @param {string} subject - Email subject
  * @param {string} body - Email body content
+ * @param {Object} env - Environment with MAIL binding
  */
-async function sendEmail(to, subject, body) {
+async function sendEmail(to, subject, body, env) {
   try {
     // Log email details for debugging
     console.log('Sending email:', { to, subject });
     
-    // For now, just log success and return - skip actual email sending
-    // until we can properly debug the MailChannels integration
-    console.log('Email would have been sent to:', to);
-    console.log('Email subject:', subject);
-    console.log('Email body:', body);
-    
-    // Return success without actually sending the email
-    return true;
-    
-    /*
-    // This section is for future use when we solve the email auth issue
-    const response = await fetch('https://api.mailchannels.net/tx/v1/send', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({
-        personalizations: [
-          {
-            to: [{ email: to }],
-          },
-        ],
-        from: { 
-          email: 'noreply@peoples-elbow.workers.dev',
-          name: 'The People\'s Elbow Forms' 
-        },
-        subject: subject,
-        content: [{ type: 'text/plain', value: body }],
-      }),
-    });
-    
-    // Handle response
-    if (response.status >= 200 && response.status < 300) {
-      console.log('Email sent successfully!');
-      return true;
-    } else {
-      console.error('Error sending email:', await response.text());
+    // Check if the MAIL binding exists
+    if (!env || !env.MAIL) {
+      console.error('Email binding not available');
       return false;
     }
-    */
+    
+    try {
+      // Create a properly formatted raw email with headers
+      const fromEmail = 'forms@peoples-elbow.com';
+      const date = new Date().toUTCString();
+      const messageId = `<${Date.now()}.${Math.random().toString(36).substring(2)}@peoples-elbow.com>`;
+      
+      // Format email with proper headers and MIME format
+      const rawEmail = [
+        `From: The People's Elbow <${fromEmail}>`,
+        `To: <${to}>`,
+        `Subject: ${subject}`,
+        'MIME-Version: 1.0',
+        'Content-Type: text/plain; charset=utf-8',
+        `Date: ${date}`,
+        `Message-ID: ${messageId}`,
+        '',  // Empty line to separate headers from body
+        body
+      ].join('\r\n');
+      
+      // Create an EmailMessage with the raw email format
+      const message = new EmailMessage(
+        fromEmail,  // From address (must use your domain)
+        to,         // To address (must be verified in Email Routing)
+        rawEmail    // Raw email with headers and content
+      );
+      
+      // Send the email using the binding
+      await env.MAIL.send(message);
+      console.log('Email sent successfully!');
+      return true;
+    } catch (emailError) {
+      console.error('Error details from email send:', emailError);
+      return false;
+    }
   } catch (error) {
     console.error('Exception sending email:', error);
     return false;
