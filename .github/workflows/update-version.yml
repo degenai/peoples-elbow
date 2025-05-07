@@ -1,0 +1,35 @@
+name: Update Version Data
+
+on:
+  push:
+    branches:
+      - main  # Or your default branch name
+    paths-ignore:
+      - 'js/version-data.js'  # Prevent infinite loops
+
+jobs:
+  update-version:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Need full history for commit count
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      
+      - name: Generate version data
+        run: |
+          node generate-version-data.js
+      
+      - name: Commit and push if changed
+        run: |
+          git config --global user.name 'GitHub Action Bot'
+          git config --global user.email 'action@github.com'
+          git add js/version-data.js
+          git diff --quiet && git diff --staged --quiet || git commit -m "chore: update version data [skip ci]"
+          git push

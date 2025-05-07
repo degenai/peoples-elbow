@@ -197,6 +197,35 @@ nav ul li a:hover::after {
     width: 100%;
 }
 
+.version-badge {
+    position: absolute;
+    right: 70px;
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    border: 1px solid #CE9C00;
+    transition: all 0.3s ease;
+}
+
+.version-badge a {
+    color: #CE9C00;
+    text-decoration: none;
+    font-weight: bold;
+    font-family: 'Bangers', cursive;
+    letter-spacing: 1px;
+}
+
+.version-badge:hover {
+    background-color: #CE9C00;
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.version-badge:hover a {
+    color: #000;
+}
+
 .menu-toggle {
     display: none;
     font-size: 1.5rem;

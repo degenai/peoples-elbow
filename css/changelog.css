@@ -1,0 +1,363 @@
+/* 
+* The People's Elbow - Changelog Styles
+* These styles are for the changelog/update log page
+*/
+
+.changelog-hero {
+    background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('../images/ring-bg.png');
+    background-size: cover;
+    background-position: center;
+    color: #fff;
+    text-align: center;
+    padding: 4rem 2rem;
+    margin-bottom: 2rem;
+    position: relative;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.changelog-hero h1 {
+    font-family: 'Bangers', cursive;
+    font-size: 3.5rem;
+    margin-bottom: 0.5rem;
+    text-shadow: 3px 3px 0 #CE9C00, 5px 5px 0 rgba(0, 0, 0, 0.5);
+    letter-spacing: 2px;
+}
+
+.changelog-hero h2 {
+    font-family: 'Bangers', cursive;
+    font-size: 1.8rem;
+    margin-bottom: 2rem;
+    color: #CE9C00;
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.8);
+}
+
+.changelog-hero i {
+    margin-left: 0.5rem;
+}
+
+#current-version {
+    display: inline-block;
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 0.75rem 1.5rem;
+    border-radius: 50px;
+    border: 2px solid #CE9C00;
+    margin-top: 1rem;
+}
+
+.version-label {
+    font-weight: bold;
+    margin-right: 0.5rem;
+}
+
+.version-number {
+    font-family: 'Bangers', cursive;
+    font-size: 1.5rem;
+    color: #CE9C00;
+}
+
+.timeline-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* Code tag styling */
+.code-tag {
+    font-family: monospace;
+    background-color: rgba(0, 0, 0, 0.1);
+    color: #CE9C00;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 0.9em;
+    border: 1px solid rgba(206, 156, 0, 0.3);
+    box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.1);
+    white-space: nowrap;
+}
+
+.timeline-intro {
+    text-align: center;
+    margin-bottom: 3rem;
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+.timeline {
+    position: relative;
+    padding: 2rem 0;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    height: 100%;
+    width: 4px;
+    background: #CE9C00;
+    left: 50%;
+    transform: translateX(-50%);
+    top: 0;
+}
+
+.timeline-item {
+    margin-bottom: 4rem;
+    position: relative;
+    width: 100%;
+}
+
+.timeline-item:nth-child(odd) .timeline-content {
+    margin-left: auto;
+    margin-right: 60px;
+    text-align: right;
+}
+
+.timeline-item:nth-child(even) .timeline-content {
+    margin-right: auto;
+    margin-left: 60px;
+}
+
+.timeline-item:nth-child(odd) .timeline-dot {
+    right: -42px;
+}
+
+.timeline-item:nth-child(even) .timeline-dot {
+    left: -42px;
+}
+
+.timeline-content {
+    background: #fff;
+    border-radius: 8px;
+    padding: 1.5rem;
+    width: calc(50% - 2rem);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+    border-left: 5px solid #d0d0d0;
+    transition: all 0.3s ease;
+    overflow: visible; /* Ensure expanded content can flow outside */
+}
+
+.timeline-content:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Color-coding based on commit type */
+.timeline-content.feat {
+    border-left-color: #4CAF50; /* Green for features */
+}
+
+.timeline-content.fix {
+    border-left-color: #F44336; /* Red for fixes */
+}
+
+.timeline-content.docs {
+    border-left-color: #2196F3; /* Blue for documentation */
+}
+
+.timeline-content.refactor {
+    border-left-color: #FF9800; /* Orange for refactoring */
+}
+
+.timeline-content.style {
+    border-left-color: #9C27B0; /* Purple for style changes */
+}
+
+.timeline-content.chore {
+    border-left-color: #607D8B; /* Blue-grey for chores */
+}
+
+.timeline-dot {
+    width: 24px;
+    height: 24px;
+    background-color: #CE9C00;
+    border-radius: 50%;
+    position: absolute;
+    top: 1.5rem;
+    z-index: 1;
+    box-shadow: 0 0 0 4px rgba(206, 156, 0, 0.3);
+}
+
+.timeline-date {
+    font-size: 0.9rem;
+    color: #888;
+    margin-bottom: 0.5rem;
+}
+
+.timeline-version {
+    font-family: 'Bangers', cursive;
+    font-size: 1.5rem;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.timeline-tag {
+    display: inline-block;
+    background-color: #CE9C00;
+    color: #fff;
+    font-weight: bold;
+    font-size: 0.75rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 50px;
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+}
+
+.timeline-message {
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+    cursor: pointer;
+    position: relative;
+    transition: color 0.3s ease, background-color 0.3s ease;
+    font-weight: bold;
+    padding: 4px 8px;
+    margin-left: -8px;
+    border-radius: 4px;
+}
+
+.timeline-message:hover {
+    background-color: rgba(206, 156, 0, 0.1);
+}
+
+.timeline-message:hover {
+    color: #CE9C00;
+}
+
+.message-toggle {
+    display: inline-block;
+    margin-left: 6px;
+    color: #CE9C00;
+    transition: transform 0.3s ease;
+}
+
+.message-toggle i {
+    font-size: 14px;
+}
+
+.timeline-full-message {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.8s ease, opacity 0.5s ease, padding 0.5s ease;
+    opacity: 0;
+    padding: 0;
+    margin-bottom: 0;
+    font-size: 0.95rem;
+    line-height: 1.6; /* Increased line-height for better readability */
+    color: #333; /* Darker text for better contrast */
+    border-left: 4px solid rgba(206, 156, 0, 0.5); /* More visible border */
+    background-color: rgba(206, 156, 0, 0.08);
+    border-radius: 0 4px 4px 0;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.timeline-full-message.show {
+    max-height: 2000px; /* Further increased for extremely long messages */
+    opacity: 1;
+    padding: 16px 20px;
+    margin: 10px 0;
+    white-space: pre-line; /* Preserve line breaks better */
+    text-align: left; /* Ensure text alignment is always left */
+    width: calc(100% + 20px); /* Make it slightly wider than the container */
+    margin-left: -10px; /* Offset the extra width */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); /* Add subtle shadow for depth */
+}
+
+/* Error message */
+.timeline-error {
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.05);
+    padding: 2rem;
+    border-radius: 8px;
+    margin: 2rem auto;
+    max-width: 600px;
+}
+
+.timeline-error i {
+    font-size: 3rem;
+    color: #CE9C00;
+    margin-bottom: 1rem;
+    display: block;
+}
+
+.timeline-error p {
+    font-size: 1.2rem;
+    color: #666;
+}
+
+/* Loading animation */
+.loading-ring {
+    display: inline-block;
+    position: relative;
+    width: 80px;
+    height: 80px;
+    margin: 0 auto;
+}
+
+.loading-ring div {
+    box-sizing: border-box;
+    display: block;
+    position: absolute;
+    width: 64px;
+    height: 64px;
+    margin: 8px;
+    border: 8px solid #CE9C00;
+    border-radius: 50%;
+    animation: loading-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+    border-color: #CE9C00 transparent transparent transparent;
+}
+
+.loading-ring div:nth-child(1) {
+    animation-delay: -0.45s;
+}
+
+.loading-ring div:nth-child(2) {
+    animation-delay: -0.3s;
+}
+
+.loading-ring div:nth-child(3) {
+    animation-delay: -0.15s;
+}
+
+@keyframes loading-ring {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.loading-message {
+    text-align: center;
+    margin-top: 1rem;
+    font-family: 'Bangers', cursive;
+    color: #666;
+    font-size: 1.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .changelog-hero h1 {
+        font-size: 2.5rem;
+    }
+    
+    .changelog-hero h2 {
+        font-size: 1.4rem;
+    }
+    
+    .timeline::before {
+        left: 30px;
+    }
+    
+    .timeline-item:nth-child(odd) .timeline-content,
+    .timeline-item:nth-child(even) .timeline-content {
+        margin-left: 60px;
+        margin-right: auto;
+        text-align: left;
+        width: calc(100% - 75px);
+    }
+    
+    .timeline-item:nth-child(odd) .timeline-dot,
+    .timeline-item:nth-child(even) .timeline-dot {
+        left: 18px;
+        right: auto;
+    }
+}

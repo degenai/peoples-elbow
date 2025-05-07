@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The People's Elbow | Update Log</title>
+    <meta name="description" content="The People's Elbow - Version history and update log showing the continuous development of this mutual aid project.">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/changelog.css">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Google Fonts - Comic style for superhero theme -->
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Open+Sans:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <img src="images/logo.png" alt="The People's Elbow Logo" class="main-logo">
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html#mission">Mission</a></li>
+                <li><a href="index.html#services">Services</a></li>
+                <li><a href="index.html#host">Host Connection</a></li>
+                <li><a href="index.html#impact">Community Impact</a></li>
+                <li><a href="index.html#locations">Locations</a></li>
+                <li><a href="index.html#contact">Contact</a></li>
+            </ul>
+            <div class="menu-toggle">
+                <i class="fas fa-bars"></i>
+            </div>
+        </nav>
+    </header>
+    
+    <main>
+        <section class="changelog-hero">
+            <h1>THE PEOPLE'S CHANGELOG <i class="fas fa-code-branch"></i></h1>
+            <h2>"OH MY GOD! IS THAT... YES! THE PEOPLE'S ELBOW IS ENTERING THE DEVELOPMENT RING WITH A STEEL CHAIR FULL OF COMMITS!"</h2>
+            <div id="current-version">
+                <span class="version-label">Current Version:</span> 
+                <span id="version-number" class="version-number">Loading...</span>
+            </div>
+        </section>
+
+        <section class="timeline-container">
+            <div class="timeline-intro">
+                <p>This page tracks the development history of The People's Elbow website. Each version represents improvements to our mutual aid project. The timeline below shows what changed, when it changed, and why. Click any update to see the full details.</p>
+            </div>
+            
+            <div id="commit-timeline" class="timeline">
+                <div class="loading-ring">
+                    <div></div><div></div><div></div><div></div>
+                </div>
+                <p class="loading-message">Loading the battle history...</p>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>The People's Elbow</h3>
+                <p>Mutual aid massage powered by community support.</p>
+            </div>
+            <div class="footer-section">
+                <h3>Connect</h3>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fas fa-envelope"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-disclaimer">
+            <p>This site is built from scratch with mutual aid principles. Expect bugs! Please report them to <a href="mailto:bugs@peoples-elbow.com">bugs@peoples-elbow.com</a></p>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 The People's Elbow. Built with <span class="heart-icon">&hearts;</span> for the community.</p>
+            <p>Site version: <a href="changelog.html"><span id="footer-version-number">Loading...</span></a></p>
+        </div>
+    </footer>
+
+    <script src="js/main.js"></script>
+    <script src="js/version-data.js"></script>
+    <script src="js/changelog.js"></script>
+</body>
+</html>
