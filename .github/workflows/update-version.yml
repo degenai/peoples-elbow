@@ -11,9 +11,34 @@ on:
 permissions:
   contents: write  # Explicit permission to write to repository
 
+# Special condition to prevent loops and apply changes properly
 jobs:
-  update-version:
+  check_changes:
     runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ steps.filter.outputs.should_run }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+      - id: filter
+        name: Check if version-data.js was the only file changed
+        run: |
+          git fetch origin
+          CHANGED_FILES=$(git diff --name-only HEAD^ HEAD || echo "Unable to determine changed files")
+          echo "Changed files: $CHANGED_FILES"
+          if [[ "$CHANGED_FILES" == "js/version-data.js" || ("$CHANGED_FILES" =~ "js/version-data.js" && $(echo "$CHANGED_FILES" | wc -l) -eq 1) ]]; then
+            echo "Only version-data.js was changed, skipping to prevent loops"
+            echo "should_run=false" >> $GITHUB_OUTPUT
+          else
+            echo "Changes include files other than version-data.js"
+            echo "should_run=true" >> $GITHUB_OUTPUT
+          fi
+          
+  update-version:
+    needs: check_changes
+    runs-on: ubuntu-latest
+    if: ${{ needs.check_changes.outputs.should_run != 'false' }}
     
     steps:
       - name: Checkout code
