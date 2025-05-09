@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Page Not Found | The People's Elbow</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Montserrat:wght@400;700&display=swap">
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <style>
+        .error-container {
+            text-align: center;
+            padding: 4rem 2rem;
+            min-height: 70vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .error-code {
+            font-family: 'Bangers', cursive;
+            font-size: 8rem;
+            color: #CE9C00;
+            text-shadow: 4px 4px 0 #000;
+            margin: 0;
+            line-height: 1;
+        }
+        
+        .error-title {
+            font-family: 'Bangers', cursive;
+            font-size: 3rem;
+            margin: 1rem 0;
+            color: #333;
+        }
+        
+        .error-message {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 2rem auto;
+        }
+        
+        .error-image {
+            max-width: 100%;
+            height: auto;
+            margin: 2rem 0;
+            border: 5px solid #CE9C00;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .home-button {
+            display: inline-block;
+            background-color: #CE9C00;
+            color: white;
+            font-family: 'Bangers', cursive;
+            font-size: 1.5rem;
+            padding: 0.5rem 2rem;
+            border-radius: 5px;
+            text-decoration: none;
+            margin-top: 2rem;
+            transition: all 0.3s ease;
+        }
+        
+        .home-button:hover {
+            background-color: #333;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <div class="header-container">
+            <div class="logo">
+                <a href="index.html">
+                    <img src="images/peoples-elbow-logo.png" alt="The People's Elbow Logo">
+                </a>
+            </div>
+            <nav class="main-nav">
+                <button class="menu-toggle" aria-label="Toggle Menu">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </button>
+                <ul class="nav-list">
+                    <li><a href="index.html#mission">Mission</a></li>
+                    <li><a href="index.html#services">Services</a></li>
+                    <li><a href="index.html#host-connection">Host Connection</a></li>
+                    <li><a href="index.html#community-impact">Community Impact</a></li>
+                    <li><a href="index.html#locations">Locations</a></li>
+                    <li><a href="index.html#contact">Contact</a></li>
+                    <li><a href="changelog.html" class="version-badge">v<span id="version-number">...</span></a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="error-container">
+            <h1 class="error-code">404</h1>
+            <h2 class="error-title">Technicality No Down Boo Over!</h2>
+            <img src="images/404-technicality.jpg" alt="404 Error" class="error-image">
+            <p class="error-message">The page you're looking for has been pinned to the mat or might have tapped out. Let's get you back in the ring!</p>
+            <a href="index.html" class="home-button">Back to Home</a>
+        </div>
+    </main>
+
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <h3>The People's Elbow</h3>
+                    <p>Mutual aid massage powered by community support.</p>
+                </div>
+                <div class="footer-connect">
+                    <h3>Connect</h3>
+                    <a href="mailto:peoples.elbow.massage@gmail.com">peoples.elbow.massage@gmail.com</a>
+                    <a href="https://www.instagram.com/peoples_elbow_massage/" target="_blank">@peoples_elbow_massage</a>
+                </div>
+            </div>
+            <div class="footer-disclaimer">
+                <p>This website is built from scratch with mutual aid principles. Expect bugs! Please report them to <a href="mailto:bugs@peoples-elbow.com">bugs@peoples-elbow.com</a></p>
+                <p>&copy; 2025 The People's Elbow. Built with ♥ for the community.</p>
+                <p>Site version: <a href="changelog.html">v<span class="version-number">...</span></a></p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/version-data.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        // Update version number if available
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.PEOPLES_ELBOW_VERSION_DATA) {
+                const versionElements = document.querySelectorAll('.version-number, #version-number');
+                versionElements.forEach(el => {
+                    el.textContent = window.PEOPLES_ELBOW_VERSION_DATA.version;
+                });
+            }
+        });
+    </script>
+</body>
+</html>
