@@ -1,11 +1,12 @@
 name: Update Version Data
 
 on:
-  push:
+  workflow_run:
+    workflows: ["pages-build-deployment"]
+    types:
+      - completed
     branches:
       - main  # Or your default branch name
-    paths-ignore:
-      - 'js/version-data.js'  # Prevent infinite loops
 
 permissions:
   contents: write  # Explicit permission to write to repository
