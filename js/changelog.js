@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
      * Sets the version number on the page
      */
     function setVersionNumber(version) {
+        // Update specific elements if they exist
         if (versionNumberElement) {
             versionNumberElement.textContent = version;
         }
@@ -27,6 +28,12 @@ document.addEventListener('DOMContentLoaded', function() {
         if (footerVersionElement) {
             footerVersionElement.textContent = version;
         }
+        
+        // Also update any other version elements with class version-number
+        const allVersionElements = document.querySelectorAll('.version-number, #header-version-number');
+        allVersionElements.forEach(element => {
+            element.textContent = version;
+        });
     }
     
     /**

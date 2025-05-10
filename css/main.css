@@ -197,23 +197,42 @@ nav ul li a:hover::after {
     width: 100%;
 }
 
+nav ul li.version-badge a {
+    color: var(--pe-green);
+    font-weight: bold;
+    font-size: 0.75rem;
+    text-decoration: none;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+}
+
+.version-badge .version-prefix {
+    font-size: 0.6rem;
+    font-weight: 900;
+    opacity: 0.8;
+}
+
 .version-badge {
     position: absolute;
     right: 70px;
-    background-color: rgba(0, 0, 0, 0.2);
-    padding: 3px 8px;
+    top: 0;
+    min-width: 120px;
+    height: 35px;
+    background-color: var(--pe-gold);
     border-radius: 20px;
-    font-size: 0.75rem;
-    border: 1px solid #CE9C00;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     transition: all 0.3s ease;
-}
-
-.version-badge a {
-    color: #CE9C00;
-    text-decoration: none;
-    font-weight: bold;
-    font-family: 'Bangers', cursive;
-    letter-spacing: 1px;
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 0 12px;
+    border: 2px solid var(--pe-green);
+    white-space: nowrap;
+    overflow: visible;
 }
 
 .version-badge:hover {
