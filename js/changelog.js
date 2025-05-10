@@ -24,13 +24,20 @@ document.addEventListener('DOMContentLoaded', function() {
         const versionData = window.PEOPLES_ELBOW_VERSION_DATA;
         console.log('Version data found:', versionData.version);
         console.log('Commits found:', versionData.commits.length);
-        
+
         // Set the version number
         setVersionNumber(versionData.version);
+
+        // Filter out merge commits
+        const filteredCommits = versionData.commits.filter(commit => {
+            return !commit.subject.startsWith('Merge branch');
+        });
         
+        console.log('Filtered out merge commits. Remaining:', filteredCommits.length);
+
         // Display the commit history
         try {
-            displayCommitHistory(versionData.commits);
+            displayCommitHistory(filteredCommits);
             console.log('Commit history displayed successfully');
         } catch (e) {
             console.error('Error displaying commit history:', e);
@@ -46,6 +53,12 @@ document.addEventListener('DOMContentLoaded', function() {
         // Show a message in the timeline
         showErrorMessage('Version data not available. Please check the browser console for errors.');
     }
+    
+
+    
+    /**
+     * Shows an error message in the timeline
+     */
     
     /**
      * Sets the version number on the page
