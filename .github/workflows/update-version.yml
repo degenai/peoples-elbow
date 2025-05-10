@@ -25,13 +25,20 @@ jobs:
         name: Check if version-data.js was the only file changed
         run: |
           git fetch origin
-          CHANGED_FILES=$(git diff --name-only HEAD^ HEAD || echo "Unable to determine changed files")
-          echo "Changed files: $CHANGED_FILES"
-          if [[ "$CHANGED_FILES" == "js/version-data.js" || ("$CHANGED_FILES" =~ "js/version-data.js" && $(echo "$CHANGED_FILES" | wc -l) -eq 1) ]]; then
-            echo "Only version-data.js was changed, skipping to prevent loops"
+          # Print commits for debugging
+          echo "Last few commits:"
+          git log -n 3 --oneline
+          
+          # Get the commit message of the latest commit
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+          echo "Latest commit message: $COMMIT_MSG"
+          
+          # Only skip if the commit message contains our marker
+          if [[ "$COMMIT_MSG" == *"update version data [skip ci]"* ]]; then
+            echo "This is an automated version update, skipping to prevent loops"
             echo "should_run=false" >> $GITHUB_OUTPUT
           else
-            echo "Changes include files other than version-data.js"
+            echo "This is a regular commit, running version update"
             echo "should_run=true" >> $GITHUB_OUTPUT
           fi
           
