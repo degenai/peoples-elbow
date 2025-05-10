@@ -1,0 +1,107 @@
+# DISABLED - Now using simpler update-version-only.yml workflow instead
+# name: Build, Version and Deploy
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'js/version-data.js'  # Prevent infinite loops when only version data changes
+
+permissions:
+  contents: write  # Explicit permission to write to repository
+  pages: write     # Permission to deploy to Pages
+  id-token: write  # Permission for Pages deployment
+
+# Allow only one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  # First job: Update version data
+  update-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version_updated: ${{ steps.version_check.outputs.updated }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Need full history for commit count
+      
+      # Check if this is already a version update commit
+      - name: Check commit type
+        id: commit_check
+        run: |
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+          echo "Latest commit message: $COMMIT_MSG"
+          if [[ "$COMMIT_MSG" == *"update version data [skip ci]"* ]]; then
+            echo "This is an automated version update, skipping version update"
+            echo "should_update=false" >> $GITHUB_OUTPUT
+          else
+            echo "This is a regular commit, updating version data"
+            echo "should_update=true" >> $GITHUB_OUTPUT
+          fi
+          
+      - name: Setup Node.js
+        if: steps.commit_check.outputs.should_update != 'false'
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      
+      - name: Generate version data
+        if: steps.commit_check.outputs.should_update != 'false'
+        run: node generate-version-data.js
+      
+      - name: Check if version was updated
+        id: version_check
+        run: |
+          if [[ $(git status --porcelain js/version-data.js | wc -l) -gt 0 ]]; then
+            echo "Version data was updated"
+            echo "updated=true" >> $GITHUB_OUTPUT
+          else
+            echo "No changes to version data"
+            echo "updated=false" >> $GITHUB_OUTPUT
+          fi
+        
+      - name: Commit and push if changed
+        if: steps.version_check.outputs.updated == 'true'
+        run: |
+          git config --global user.name 'GitHub Action Bot'
+          git config --global user.email 'action@github.com'
+          git add js/version-data.js
+          git commit -m "chore: update version data [skip ci]"
+          git push
+  
+  # Second job: Build and deploy Pages
+  build-and-deploy:
+    needs: update-version
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: main  # Explicitly use main to get the latest (including any version updates)
+      
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+        
+      - name: Build with Jekyll
+        uses: actions/jekyll-build-pages@v1
+        with:
+          source: ./
+          destination: ./_site
+      
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v2  # Updated from v1 to v2
+        with:
+          path: ./_site
+        
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v3  # Updated from v2 to v3
