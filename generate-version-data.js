@@ -9,11 +9,27 @@ const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-// Get current commit count for version number
+// Get current commit count for version number (excluding merge and skip-ci commits)
 function getCommitCount() {
     try {
-        const commitCount = execSync('git rev-list --count HEAD').toString().trim();
-        return commitCount;
+        // Count only meaningful commits (no merges, no skip-ci)
+        // This is a bit more complex, so we'll do it in multiple steps
+        
+        // First get all non-merge commits
+        const allNonMergeCommits = execSync('git rev-list --no-merges HEAD').toString().trim().split('\n');
+        
+        // Now filter out the skip-ci commits
+        const meaningfulCommitCount = allNonMergeCommits.filter(hash => {
+            try {
+                const commitSubject = execSync(`git log --format=%s -n 1 ${hash}`).toString().trim();
+                return !commitSubject.includes('[skip ci]');
+            } catch (e) {
+                // If there's an error, just include the commit
+                return true;
+            }
+        }).length;
+        
+        return meaningfulCommitCount.toString();
     } catch (error) {
         console.error('Error getting commit count:', error.message);
         return '0';
@@ -31,11 +47,10 @@ function getCommitHistory(count = 20) {
         const gitLogCommand = `git log --pretty=format:"%h|%ad|%s" --date=short -n ${count}`;
         const commitLog = execSync(gitLogCommand).toString();
         
-        // Process each commit to get summary and full message
-        const commits = commitLog.split('\n').map((line, index) => {
+        // First pass: create basic commit objects without version calculation
+        const rawCommits = commitLog.split('\n').map((line, index) => {
             const [shortHash, date, subject] = line.split('|');
             const fullHash = hashes[index];
-            const commitCount = getCommitCount() - index;
             
             // Get the full commit message for this hash
             let fullMessage = '';
@@ -47,12 +62,48 @@ function getCommitHistory(count = 20) {
                 fullMessage = subject; // Fallback to subject if there's an error
             }
             
+            // Determine commit type
+            const isMergeCommit = subject.startsWith('Merge branch');
+            const isSkipCiCommit = subject.includes('[skip ci]');
+            const shouldSkipVersionIncrement = isMergeCommit || isSkipCiCommit;
+            
             return {
                 hash: shortHash,
                 date,
-                subject,  // Just the first line (the subject)
-                message: fullMessage, // The full commit message including body
-                version: commitCount.toString()
+                subject,
+                message: fullMessage,
+                isMergeCommit,
+                isSkipCiCommit,
+                shouldSkipVersionIncrement
+            };
+        });
+        
+        // Get total meaningful commit count from git
+        const totalMeaningfulCommits = parseInt(getCommitCount());
+        
+        // Second pass: calculate versions properly
+        let nonMergeCount = 0;
+        let previousVersion = totalMeaningfulCommits.toString();
+        
+        // Apply version numbers (with correct handling of skipped commits)
+        const commits = rawCommits.map((commit, index) => {
+            let version;
+            
+            if (!commit.shouldSkipVersionIncrement) {
+                // This is a meaningful commit that increments version
+                version = (totalMeaningfulCommits - nonMergeCount).toString();
+                previousVersion = version;
+                nonMergeCount++;
+            } else {
+                // For commits that don't increment version, use previous version
+                // If this is the first commit (unlikely), use the total count
+                version = index === 0 ? totalMeaningfulCommits.toString() : previousVersion;
+            }
+            
+            return {
+                ...commit,
+                version,
+                isVersionIncrementing: !commit.shouldSkipVersionIncrement
             };
         });
         
