@@ -5,45 +5,77 @@
  */
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Add debug info
+    console.log('Changelog script running');
+    
     // Elements we'll be updating
     const timelineElement = document.getElementById('commit-timeline');
     const versionNumberElement = document.getElementById('version-number');
     const footerVersionElement = document.getElementById('footer-version-number');
-    const headerVersionElement = document.getElementById('header-version-number');
+    
+    // Debug element existence
+    console.log('Timeline element found:', timelineElement ? 'Yes' : 'No');
+    console.log('Version number element found:', versionNumberElement ? 'Yes' : 'No');
+    console.log('Footer version element found:', footerVersionElement ? 'Yes' : 'No');
     
     // Check if we have version data available
     if (window.PEOPLES_ELBOW_VERSION_DATA) {
         // We have real data from git
         const versionData = window.PEOPLES_ELBOW_VERSION_DATA;
+        console.log('Version data found:', versionData.version);
+        console.log('Commits found:', versionData.commits.length);
         
         // Set the version number
         setVersionNumber(versionData.version);
         
         // Display the commit history
-        displayCommitHistory(versionData.commits);
+        try {
+            displayCommitHistory(versionData.commits);
+            console.log('Commit history displayed successfully');
+        } catch (e) {
+            console.error('Error displaying commit history:', e);
+            showErrorMessage('Error displaying commits: ' + e.message);
+        }
     } else {
         // Fallback in case version data isn't available
-        console.warn('Version data not found. Run generate-version-data.js to create version data.');
+        console.error('Version data not found. Is version-data.js loaded?');
         
         // Set a fallback version
         setVersionNumber('?');
         
         // Show a message in the timeline
-        showErrorMessage('Version data not available. Please run the version data generator script.');
+        showErrorMessage('Version data not available. Please check the browser console for errors.');
     }
     
     /**
      * Sets the version number on the page
      */
     function setVersionNumber(version) {
+        // Set version in main display
         if (versionNumberElement) {
             versionNumberElement.textContent = version;
+            console.log('Updated main version number display');
+        } else {
+            console.warn('Main version number element not found');
         }
+        
+        // Set version in footer
         if (footerVersionElement) {
             footerVersionElement.textContent = version;
+            console.log('Updated footer version number');
+        } else {
+            console.warn('Footer version number element not found');
         }
-        if (headerVersionElement) {
-            headerVersionElement.textContent = version;
+
+        // Update any other version elements with class .version-number
+        try {
+            document.querySelectorAll('.version-number').forEach(el => {
+                if (el !== versionNumberElement && el !== footerVersionElement) {
+                    el.textContent = version;
+                }
+            });
+        } catch (e) {
+            console.warn('Error updating other version elements:', e);
         }
     }
     
