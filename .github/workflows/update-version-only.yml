@@ -40,34 +40,70 @@ jobs:
         with:
           node-version: '18'
           
-      # THIS IS THE KEY FIX - Pre-generate version info before the main script
-      - name: Pre-process commit count for current commit
+      # THIS IS THE KEY FIX - A simpler approach to force the correct version number
+      - name: Create version check script
         if: steps.commit_check.outputs.should_update != 'false'
         run: |
           # Get raw commit count including the current commit
           TOTAL_COMMITS=$(git rev-list --count HEAD)
-          
-          # Save to a temporary file to be used by the version generator
-          echo "$TOTAL_COMMITS" > .current-commit-count
-          
-          # Debug output
           echo "Total commits (including current): $TOTAL_COMMITS"
-          echo "Saved current commit count for version generation"
-      
-      # Modified generate-version-data.js will read from .current-commit-count if it exists
-      - name: Update generate-version-data.js to be aware of current commit
-        if: steps.commit_check.outputs.should_update != 'false'
-        run: |
-          # Add code to read from the commit count file if it exists
-          sed -i '/function getCommitCount/a\  // Check for pre-counted commit value that includes current commit\n  try {\n    const preCountedCommits = require(\'fs\').readFileSync(\'.current-commit-count\', \'utf8\').trim();\n    if (preCountedCommits && !isNaN(parseInt(preCountedCommits))) {\n      console.log(`Using pre-counted commit value: ${preCountedCommits}`);\n      return parseInt(preCountedCommits);\n    }\n  } catch (e) {\n    console.log("No pre-counted commit value found, calculating normally");\n  }' generate-version-data.js
+          
+          # Create a separate, simpler script to just force the version number
+          cat > fix-version.js << 'EOL'
+          // Simple script to ensure version number matches commit count
+          const fs = require('fs');
+          
+          try {
+            // Get the total commits from command line argument
+            const correctVersion = process.argv[2];
+            console.log(`Setting version to match total commit count: ${correctVersion}`);
+            
+            // Read the current version data file
+            const versionDataPath = 'js/version-data.js';
+            const fileContent = fs.readFileSync(versionDataPath, 'utf8');
+            
+            // Extract the JSON part
+            const match = fileContent.match(/window\.PEOPLES_ELBOW_VERSION_DATA = (\{[\s\S]*?\});/);
+            if (!match) {
+              throw new Error('Could not parse version data file');
+            }
+            
+            // Parse and update the version
+            const versionData = JSON.parse(match[1]);
+            const oldVersion = versionData.version;
+            versionData.version = correctVersion;
+            
+            // Generate the new file content
+            const newContent = fileContent.replace(
+              /window\.PEOPLES_ELBOW_VERSION_DATA = \{[\s\S]*?\};/,
+              `window.PEOPLES_ELBOW_VERSION_DATA = ${JSON.stringify(versionData, null, 2)};`
+            );
+            
+            // Write the updated file
+            fs.writeFileSync(versionDataPath, newContent);
+            console.log(`Updated version from ${oldVersion} to ${correctVersion}`);
+          } catch (error) {
+            console.error('Error updating version:', error);
+            process.exit(1);
+          }
+          EOL
+          
+          echo "Created version fix script"
+          cat fix-version.js
       
       - name: Generate version data
         if: steps.commit_check.outputs.should_update != 'false'
         run: |
-          # Run with extra debugging
-          echo "Running version data generation with current commit awareness"
+          # Run the standard version generation first 
+          echo "Running standard version data generation"
           node generate-version-data.js
-          echo "Version data generation complete"
+          echo "Standard version data generation complete"
+          
+          # Now run our fix script to ensure correct version number
+          echo "Running version fix to ensure correct count"
+          TOTAL_COMMITS=$(git rev-list --count HEAD)
+          node fix-version.js "$TOTAL_COMMITS"
+          echo "Version fix complete - version should now be $TOTAL_COMMITS"
       
       - name: Check if version was updated
         id: version_check
