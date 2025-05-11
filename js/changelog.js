@@ -80,7 +80,13 @@ document.addEventListener('DOMContentLoaded', function() {
      */
     function cleanCommitMessage(message) {
         if (!message) return '';
-        return message.replace(/^[a-z]+(\\([^)]*\\))?:\\s*/i, '');
+        // First remove conventional commit prefix
+        let cleaned = message.replace(/^[a-z]+(\([^)]*\))?:\s*/i, '');
+        // Remove trailing backslashes that might cause display issues
+        cleaned = cleaned.replace(/\\+$/g, '');
+        // Clean up any double quotes that might be escaped incorrectly
+        cleaned = cleaned.replace(/\\+"/g, '"');
+        return cleaned;
     }
     
     /**
@@ -92,7 +98,23 @@ document.addEventListener('DOMContentLoaded', function() {
         timelineElement.innerHTML = '';
         const fragment = document.createDocumentFragment();
         
+        // Keep track of displayed versions to avoid showing duplicates with formatting issues
+        const displayedVersions = new Set();
+        
         commits.forEach((commit, index) => {
+            // Keep basic duplicate version filtering
+            // This is mainly for history entries with the same version number
+            // but only if they're not the commit that actually incremented the version
+            
+            // Check for duplicate versions - only show the first occurrence of each version
+            // (but always show version-incrementing commits)
+            if (!commit.isVersionIncrementing && displayedVersions.has(commit.version)) {
+                console.log('Skipping duplicate version:', commit.version, commit.hash);
+                return;
+            }
+            
+            // Track this version as displayed
+            displayedVersions.add(commit.version);
             try {
                 // Create timeline item
                 const timelineItem = document.createElement('div');
@@ -120,7 +142,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Add version
                 const timelineVersion = document.createElement('div');
                 timelineVersion.className = 'timeline-version';
-                timelineVersion.textContent = `Version ${commit.version}`;
+                timelineVersion.textContent = `BUILD ${commit.version}`;
                 
                 // Add type tag
                 const timelineTag = document.createElement('div');
@@ -187,23 +209,98 @@ document.addEventListener('DOMContentLoaded', function() {
     if (window.PEOPLES_ELBOW_VERSION_DATA) {
         const versionData = window.PEOPLES_ELBOW_VERSION_DATA;
         console.log('Version data found:', versionData.version);
-        console.log('Commits found:', versionData.commits ? versionData.commits.length : 0);
+        console.log('Total commits:', versionData.commits ? versionData.commits.length : 0);
 
         // Set version
         setVersionNumber(versionData.version);
 
-        // Filter merge commits
-        const filteredCommits = versionData.commits.filter(commit => {
-            return !commit.subject || !commit.subject.startsWith('Merge branch');
+        // Track filtered commits for debugging
+        const filtered = {
+            versionUpdates: 0,
+            mergeCommits: 0,
+            skipCiCommits: 0,
+            malformedEntries: 0,
+            keptCommits: 0
+        };
+
+        // Debug output of all commits before filtering
+        console.log('\n--- COMMIT FILTERING DETAILS ---');
+        console.log('All commits before filtering:');
+        versionData.commits.forEach((commit, i) => {
+            console.log(`[${i}] Version ${commit.version}: ${commit.subject} (${commit.date})`);
         });
         
-        console.log('Filtered commits:', filteredCommits.length);
-
-        // Use timeout for better performance
+        // Filter out noise commits: merge commits, version updates, etc.
+        const filteredCommits = versionData.commits.filter(commit => {
+            // Skip merge commits
+            if (commit.subject && commit.subject.startsWith('Merge branch')) {
+                console.log(`Filtering out merge commit: ${commit.subject}`);
+                filtered.mergeCommits++;
+                return false;
+            }
+            
+            // Skip version data updates
+            if (commit.subject && commit.subject.includes('update version data')) {
+                console.log(`Filtering out version update: ${commit.subject}`);
+                filtered.versionUpdates++;
+                return false;
+            }
+            
+            // Skip commits with [skip ci] tag entirely from the display
+            if (commit.isSkipCiCommit) {
+                console.log(`Filtering out skip-ci commit: ${commit.subject}`);
+                filtered.skipCiCommits++;
+                return false;
+            }
+            
+            // Skip any malformed entries
+            if (commit.subject && commit.subject.includes('\\\'')) {
+                console.log(`Filtering out malformed entry: ${commit.subject}`);
+                filtered.malformedEntries++;
+                return false;
+            }
+            
+            // Keep all other commits
+            filtered.keptCommits++;
+            return true;
+        });
+        
+        // Detailed filtering summary
+        console.log('\n--- FILTERING SUMMARY ---');
+        console.log(`Total commits before filtering: ${versionData.commits.length}`);
+        console.log(`Version updates filtered: ${filtered.versionUpdates}`);
+        console.log(`Merge commits filtered: ${filtered.mergeCommits}`);
+        console.log(`Skip-CI commits filtered: ${filtered.skipCiCommits}`);
+        console.log(`Malformed entries filtered: ${filtered.malformedEntries}`);
+        console.log(`Commits kept: ${filtered.keptCommits}`);
+        console.log(`Total commits displayed: ${filteredCommits.length}`);
+        console.log('--- END OF FILTERING REPORT ---\n');
+        
+        // Fix any formatting issues in commit messages
+        const correctedCommits = filteredCommits.map(commit => {
+            // Make a copy of the commit to avoid modifying the original
+            const fixedCommit = {...commit};
+            
+            // Fix Development Ring formatting issue with trailing backslash
+            if (fixedCommit.subject && fixedCommit.subject.includes('rename to " Development Ring')) {
+                fixedCommit.subject = fixedCommit.subject.replace('rename to " Development Ring', 'rename to "Development Ring"');
+                console.log(`Fixed formatting issue in: ${commit.subject} -> ${fixedCommit.subject}`);
+            }
+            
+            return fixedCommit;
+        });
+        
+        // Log filtered and corrected commits that will be displayed
+        console.log('Commits after filtering and corrections:');
+        correctedCommits.forEach((commit, i) => {
+            console.log(`[${i}] Version ${commit.version}: ${commit.subject} (${commit.date})`);
+        });
+        
+        // Use timeout for better performance and display the corrected commits
         setTimeout(() => {
             try {
-                displayCommitHistory(filteredCommits);
-                console.log('Timeline displayed successfully');
+                displayCommitHistory(correctedCommits);
+                console.log('Timeline displayed successfully with corrected commits');
             } catch (error) {
                 console.error('Display error:', error);
                 showErrorMessage('Error: ' + error.message);

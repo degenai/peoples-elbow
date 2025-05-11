@@ -9,20 +9,51 @@ const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
-// Get current commit count for version number (excluding merge and skip-ci commits)
+/**
+ * Sanitizes a string for safe inclusion in JSON
+ * Handles quotes, backslashes, and other special characters
+ */
+function sanitizeForJSON(str) {
+    if (!str) return '';
+    
+    // Replace any escaped backslashes with a single backslash
+    str = str.replace(/\\+/g, '\\');
+    
+    // Make sure quotes are properly escaped
+    str = str.replace(/\\"/g, '"').replace(/"/g, '\"');
+    
+    // Clean up any trailing backslashes that might cause issues
+    str = str.replace(/\\+$/g, '');
+    
+    return str;
+}
+
+// Get current commit count for version number (excluding noise commits)
 function getCommitCount() {
     try {
-        // Count only meaningful commits (no merges, no skip-ci)
+        // Count only meaningful commits
         // This is a bit more complex, so we'll do it in multiple steps
         
         // First get all non-merge commits
         const allNonMergeCommits = execSync('git rev-list --no-merges HEAD').toString().trim().split('\n');
         
-        // Now filter out the skip-ci commits
+        // Now filter out noise commits (skip-ci and version updates)
         const meaningfulCommitCount = allNonMergeCommits.filter(hash => {
             try {
                 const commitSubject = execSync(`git log --format=%s -n 1 ${hash}`).toString().trim();
-                return !commitSubject.includes('[skip ci]');
+                
+                // Skip commits with [skip ci] tag
+                if (commitSubject.includes('[skip ci]')) {
+                    return false;
+                }
+                
+                // Skip version update commits
+                if (commitSubject.includes('update version data')) {
+                    return false;
+                }
+                
+                // Include all other commits
+                return true;
             } catch (e) {
                 // If there's an error, just include the commit
                 return true;
@@ -36,8 +67,8 @@ function getCommitCount() {
     }
 }
 
-// Get recent commit history
-function getCommitHistory(count = 20) {
+// Get commit history - load all commits
+function getCommitHistory(count = 100) {  // Increased from 20 to 100 to capture full history
     try {
         // First get the hashes to use for the full messages
         const gitHashCommand = `git log --pretty=format:"%H" -n ${count}`;
@@ -49,7 +80,10 @@ function getCommitHistory(count = 20) {
         
         // First pass: create basic commit objects without version calculation
         const rawCommits = commitLog.split('\n').map((line, index) => {
-            const [shortHash, date, subject] = line.split('|');
+            const parts = line.split('|');
+            const shortHash = parts[0];
+            const date = parts[1];
+            let subject = parts[2]; // Use let instead of const to allow modification
             const fullHash = hashes[index];
             
             // Get the full commit message for this hash
@@ -61,6 +95,10 @@ function getCommitHistory(count = 20) {
                 console.error(`Error getting full message for ${shortHash}:`, err.message);
                 fullMessage = subject; // Fallback to subject if there's an error
             }
+            
+            // Sanitize the subject and message to prevent malformed JSON issues
+            subject = sanitizeForJSON(subject);
+            fullMessage = sanitizeForJSON(fullMessage);
             
             // Determine commit type
             const isMergeCommit = subject.startsWith('Merge branch');
@@ -147,6 +185,30 @@ window.PEOPLES_ELBOW_VERSION_DATA = ${JSON.stringify(versionData, null, 2)};
     console.log(`Version data generated successfully!`);
     console.log(`Current version: ${commitCount}`);
     console.log(`File saved to: ${outputPath}`);
+    
+    // Add diagnostic info to check how far back commit history goes
+    try {
+        // Count all meaningful commits (no noise)
+        const rawCommitCount = execSync('git rev-list --count HEAD').toString().trim();
+        const totalNonMergeCommits = execSync('git rev-list --no-merges --count HEAD').toString().trim();
+        
+        // Get earliest commit
+        const oldestCommit = execSync('git log --format="%h %s" --reverse --max-count=1').toString().trim();
+        
+        // Get the version numbers of the earliest commits
+        const oldestCommits = execSync('git log --format="%h %s" --reverse --max-count=10').toString().trim();
+        
+        console.log('\n--- DIAGNOSTIC COMMIT INFORMATION ---');
+        console.log(`Total commits in repo: ${rawCommitCount}`);
+        console.log(`Non-merge commits: ${totalNonMergeCommits}`);
+        console.log(`Current filtered version: ${commitCount}`);
+        console.log(`Oldest commit: ${oldestCommit}`);
+        console.log('\nOldest 10 commits:');
+        console.log(oldestCommits);
+        console.log('--- END DIAGNOSTIC INFO ---');
+    } catch (error) {
+        console.error('Error getting diagnostic info:', error.message);
+    }
 }
 
 // Run the generator
