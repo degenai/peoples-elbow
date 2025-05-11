@@ -87,5 +87,26 @@
     <script src="js/main.js"></script>
     <script src="js/version-data.js"></script>
     <script src="js/changelog.js"></script>
+    <script>
+      // Force-check version display
+      document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+          console.log('FORCE VERSION CHECK');
+          console.log('Current version in HTML:', document.getElementById('version-number').textContent);
+          console.log('Version in data:', window.PEOPLES_ELBOW_VERSION_DATA ? window.PEOPLES_ELBOW_VERSION_DATA.version : 'Not loaded');
+          
+          // Force update if needed
+          if (window.PEOPLES_ELBOW_VERSION_DATA && document.getElementById('version-number')) {
+            document.getElementById('version-number').textContent = window.PEOPLES_ELBOW_VERSION_DATA.version;
+            console.log('Forced version update to:', window.PEOPLES_ELBOW_VERSION_DATA.version);
+            
+            // Update all version elements
+            document.querySelectorAll('.version-number, #footer-version-number, #header-version-number').forEach(function(el) {
+              el.textContent = window.PEOPLES_ELBOW_VERSION_DATA.version;
+            });
+          }
+        }, 1000); // Check after 1 second
+      });
+    </script>
 </body>
 </html>

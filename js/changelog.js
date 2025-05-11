@@ -6,6 +6,7 @@
 
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Changelog script running');
+    console.log('BUILD VERSION DIRECT CHECK: ' + (window.PEOPLES_ELBOW_VERSION_DATA ? window.PEOPLES_ELBOW_VERSION_DATA.version : 'NOT LOADED YET'));
     
     // Elements we'll be updating
     const timelineElement = document.getElementById('commit-timeline');
@@ -20,17 +21,28 @@ document.addEventListener('DOMContentLoaded', function() {
      * Sets the version number on the page
      */
     function setVersionNumber(version) {
+        console.log('Setting version number to:', version);
+        
         // Update specific elements if they exist
         if (versionNumberElement) {
             versionNumberElement.textContent = version;
+            // Add a flash effect to show the update happened
+            versionNumberElement.style.transition = 'color 0.3s';
+            versionNumberElement.style.color = '#ffcc00';
+            setTimeout(() => versionNumberElement.style.color = '', 1000);
+        } else {
+            console.error('Version number element not found!');
         }
         
         if (footerVersionElement) {
             footerVersionElement.textContent = version;
+        } else {
+            console.error('Footer version element not found!');
         }
         
         // Also update any other version elements with class version-number
         const allVersionElements = document.querySelectorAll('.version-number, #header-version-number');
+        console.log('Found', allVersionElements.length, 'version elements to update');
         allVersionElements.forEach(element => {
             element.textContent = version;
         });
@@ -205,13 +217,29 @@ document.addEventListener('DOMContentLoaded', function() {
         timelineElement.appendChild(fragment);
     }
     
+    // Immediately set version if data is available
+    function trySetVersionImmediately() {
+        if (window.PEOPLES_ELBOW_VERSION_DATA && window.PEOPLES_ELBOW_VERSION_DATA.version) {
+            console.log('Setting version immediately to:', window.PEOPLES_ELBOW_VERSION_DATA.version);
+            setVersionNumber(window.PEOPLES_ELBOW_VERSION_DATA.version);
+            return true;
+        }
+        return false;
+    }
+    
+    // Try to set version immediately, without waiting for all the rendering
+    if (!trySetVersionImmediately()) {
+        console.warn('Could not set version immediately, will retry in 100ms');
+        setTimeout(trySetVersionImmediately, 100);
+    }
+    
     // Process version data
     if (window.PEOPLES_ELBOW_VERSION_DATA) {
         const versionData = window.PEOPLES_ELBOW_VERSION_DATA;
         console.log('Version data found:', versionData.version);
         console.log('Total commits:', versionData.commits ? versionData.commits.length : 0);
 
-        // Set version
+        // Set version again to ensure it's displayed
         setVersionNumber(versionData.version);
 
         // Track filtered commits for debugging
