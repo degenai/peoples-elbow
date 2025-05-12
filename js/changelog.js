@@ -1,7 +1,10 @@
 /**
  * The People's Elbow - Development Ring JavaScript
  * This script loads git commit data and displays it as an update timeline.
- * It also displays the current version based on commit count.
+ * It also displays the current build number based on meaningful commits.
+ * 
+ * The timeline shows a curated history of meaningful changes to the site,
+ * filtering out automated updates and other noise commits.
  */
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -63,28 +66,36 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     /**
-     * Extracts the commit type from the commit message
+     * Extracts the commit type from the commit message for display
+     * Uses the same type mapping as the version generator
      */
     function getCommitType(message) {
-        if (!message) return null;
+        if (!message) return 'UPDATE'; // Default type
         
+        // Map conventional commit prefixes to UI-friendly tags
         const typePatterns = {
-            'feat': 'feat',
-            'feature': 'feat',
-            'fix': 'fix',
-            'docs': 'docs',
-            'style': 'style',
-            'refactor': 'refactor',
-            'chore': 'chore'
+            'feat': 'FEATURE',
+            'feature': 'FEATURE',
+            'fix': 'FIX',
+            'docs': 'DOCS',
+            'style': 'STYLE',
+            'refactor': 'REFACTOR',
+            'perf': 'PERFORMANCE',
+            'test': 'TEST',
+            'build': 'BUILD',
+            'security': 'SECURITY',
+            'update': 'UPDATE'
         };
         
+        // Check for conventional commit format: type(scope): message
         for (const [pattern, type] of Object.entries(typePatterns)) {
             if (message.match(new RegExp(`^${pattern}(\\([^)]*\\))?:`, 'i'))) {
                 return type;
             }
         }
         
-        return null;
+        // Default to UPDATE for older commits without conventional format
+        return 'UPDATE';
     }
     
     /**
@@ -110,104 +121,91 @@ document.addEventListener('DOMContentLoaded', function() {
         timelineElement.innerHTML = '';
         const fragment = document.createDocumentFragment();
         
-        // Keep track of displayed versions to avoid showing duplicates with formatting issues
-        const displayedVersions = new Set();
+        console.log(`Displaying ${commits.length} commits in timeline`);
         
         commits.forEach((commit, index) => {
-            // Keep basic duplicate version filtering
-            // This is mainly for history entries with the same version number
-            // but only if they're not the commit that actually incremented the version
-            
-            // Check for duplicate versions - only show the first occurrence of each version
-            // (but always show version-incrementing commits)
-            if (!commit.isVersionIncrementing && displayedVersions.has(commit.version)) {
-                console.log('Skipping duplicate version:', commit.version, commit.hash);
-                return;
-            }
-            
-            // Track this version as displayed
-            displayedVersions.add(commit.version);
             try {
-                // Create timeline item
+                // Create the timeline item
                 const timelineItem = document.createElement('div');
                 timelineItem.className = 'timeline-item';
                 
-                // Create dot
-                const timelineDot = document.createElement('div');
-                timelineDot.className = 'timeline-dot';
+                // Add the date indicator
+                const dateElement = document.createElement('div');
+                dateElement.className = 'timeline-date';
+                dateElement.textContent = commit.date;
                 
-                // Create content container
-                const timelineContent = document.createElement('div');
-                timelineContent.className = 'timeline-content';
+                // Add the version indicator
+                const versionElement = document.createElement('div');
+                versionElement.className = 'timeline-version';
+                versionElement.textContent = `BUILD ${commit.version}`;
                 
-                // Add type class
-                const commitType = getCommitType(commit.message);
-                if (commitType) {
-                    timelineContent.classList.add(commitType);
-                }
+                // Get commit type tag - use the type directly if available from the generator
+                // or compute it from the subject line
+                let commitType = commit.commitType || getCommitType(commit.subject);
                 
-                // Add date
-                const timelineDate = document.createElement('div');
-                timelineDate.className = 'timeline-date';
-                timelineDate.textContent = commit.date;
+                // Add the type tag
+                const typeElement = document.createElement('div');
+                typeElement.className = `timeline-tag ${commitType.toLowerCase()}`;
+                typeElement.textContent = commitType;
                 
-                // Add version
-                const timelineVersion = document.createElement('div');
-                timelineVersion.className = 'timeline-version';
-                timelineVersion.textContent = `BUILD ${commit.version}`;
+                // Clean up the commit message for display
+                const messageText = cleanCommitMessage(commit.subject);
                 
-                // Add type tag
-                const timelineTag = document.createElement('div');
-                timelineTag.className = 'timeline-tag';
-                timelineTag.textContent = commitType || 'update';
+                // Add the commit content
+                const contentElement = document.createElement('div');
+                contentElement.className = 'timeline-content';
+                contentElement.textContent = messageText;
                 
-                // Add message subject
-                const timelineMessage = document.createElement('div');
-                timelineMessage.className = 'timeline-message';
-                timelineMessage.textContent = cleanCommitMessage(commit.subject || commit.message.split('\\n')[0]);
+                // Add the indicator dot
+                const indicatorElement = document.createElement('div');
+                indicatorElement.className = 'timeline-indicator';
                 
-                // Create container for full message
-                const fullMessageContainer = document.createElement('div');
-                fullMessageContainer.className = 'timeline-full-message';
+                // Make the item expandable to show full message
+                timelineItem.addEventListener('click', function() {
+                    // Toggle expanded class
+                    if (timelineItem.classList.contains('expanded')) {
+                        timelineItem.classList.remove('expanded');
+                        contentElement.textContent = messageText;
+                    } else {
+                        timelineItem.classList.add('expanded');
+                        // Show the full commit message when expanded
+                        let fullMessage = commit.message;
+                        
+                        // Format sections if they exist (WHAT:, WHY:, TECHNICAL:)
+                        const sections = [
+                            { name: 'WHAT:', regex: /\bWHAT:\s*([\s\S]*?)(?=\b(WHY:|TECHNICAL:|$))/i },
+                            { name: 'WHY:', regex: /\bWHY:\s*([\s\S]*?)(?=\b(TECHNICAL:|$))/i },
+                            { name: 'TECHNICAL:', regex: /\bTECHNICAL:\s*([\s\S]*?)$/i }
+                        ];
+                        
+                        let formattedMessage = messageText;
+                        let hasDetails = false;
+                        
+                        // Extract and format sections if they exist
+                        sections.forEach(section => {
+                            const match = fullMessage.match(section.regex);
+                            if (match && match[1].trim()) {
+                                hasDetails = true;
+                                formattedMessage += `\n\n<strong>${section.name}</strong>\n${match[1].trim()}`;
+                            }
+                        });
+                        
+                        // If no structured sections were found, just show the raw message
+                        if (!hasDetails && fullMessage !== messageText) {
+                            formattedMessage = fullMessage;
+                        }
+                        
+                        contentElement.innerHTML = formattedMessage.replace(/\n/g, '<br>');
+                    }
+                });
                 
-                // Get full message
-                const fullMessage = commit.message || '';
-                const firstLine = commit.subject || fullMessage.split('\\n')[0];
+                // Assemble the timeline item
+                timelineItem.appendChild(dateElement);
+                timelineItem.appendChild(versionElement);
+                timelineItem.appendChild(typeElement);
+                timelineItem.appendChild(contentElement);
+                timelineItem.appendChild(indicatorElement);
                 
-                // Process other lines
-                const otherLines = fullMessage.split('\\n')
-                    .filter(line => line !== firstLine && line.trim() !== '')
-                    .map(line => line.trim())
-                    .join('<br>');
-                
-                fullMessageContainer.innerHTML = otherLines;
-                
-                // Add toggle if there's more content
-                if (fullMessageContainer.innerHTML.trim() !== '') {
-                    const toggleIndicator = document.createElement('span');
-                    toggleIndicator.className = 'message-toggle';
-                    toggleIndicator.innerHTML = '<i class="fas fa-angle-down"></i>';
-                    timelineMessage.appendChild(toggleIndicator);
-                    
-                    timelineMessage.addEventListener('click', function() {
-                        fullMessageContainer.classList.toggle('show');
-                        toggleIndicator.querySelector('i').classList.toggle('fa-angle-down');
-                        toggleIndicator.querySelector('i').classList.toggle('fa-angle-up');
-                    });
-                }
-                
-                // Assemble item
-                timelineContent.appendChild(timelineDate);
-                timelineContent.appendChild(timelineVersion);
-                timelineContent.appendChild(timelineTag);
-                timelineContent.appendChild(timelineMessage);
-                
-                if (fullMessageContainer.innerHTML.trim() !== '') {
-                    timelineContent.appendChild(fullMessageContainer);
-                }
-                
-                timelineItem.appendChild(timelineDot);
-                timelineItem.appendChild(timelineContent);
                 fragment.appendChild(timelineItem);
             } catch (error) {
                 console.error(`Error processing commit ${index}:`, error);
@@ -215,6 +213,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         timelineElement.appendChild(fragment);
+        console.log('Timeline display complete with', commits.length, 'entries');
     }
     
     // Immediately set version if data is available

@@ -39,72 +39,20 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18'
-          
-      # THIS IS THE KEY FIX - A simpler approach to force the correct version number
-      - name: Create version check script
-        if: steps.commit_check.outputs.should_update != 'false'
-        run: |
-          # Get raw commit count including the current commit, but only on main branch
-          TOTAL_COMMITS=$(git rev-list --count main)
-          echo "Total commits (including current): $TOTAL_COMMITS"
-          
-          # Create a separate, simpler script to just force the version number
-          cat > fix-version.js << 'EOL'
-          // Simple script to ensure version number matches commit count
-          const fs = require('fs');
-          
-          try {
-            // Get the total commits from command line argument
-            const correctVersion = process.argv[2];
-            console.log(`Setting version to match total commit count: ${correctVersion}`);
-            
-            // Read the current version data file
-            const versionDataPath = 'js/version-data.js';
-            const fileContent = fs.readFileSync(versionDataPath, 'utf8');
-            
-            // Extract the JSON part
-            const match = fileContent.match(/window\.PEOPLES_ELBOW_VERSION_DATA = (\{[\s\S]*?\});/);
-            if (!match) {
-              throw new Error('Could not parse version data file');
-            }
-            
-            // Parse and update the version
-            const versionData = JSON.parse(match[1]);
-            const oldVersion = versionData.version;
-            versionData.version = correctVersion;
-            
-            // Generate the new file content
-            const newContent = fileContent.replace(
-              /window\.PEOPLES_ELBOW_VERSION_DATA = \{[\s\S]*?\};/,
-              `window.PEOPLES_ELBOW_VERSION_DATA = ${JSON.stringify(versionData, null, 2)};`
-            );
-            
-            // Write the updated file
-            fs.writeFileSync(versionDataPath, newContent);
-            console.log(`Updated version from ${oldVersion} to ${correctVersion}`);
-          } catch (error) {
-            console.error('Error updating version:', error);
-            process.exit(1);
-          }
-          EOL
-          
-          echo "Created version fix script"
-          cat fix-version.js
       
+      # Run our improved version data generator that handles counting correctly
       - name: Generate version data
         if: steps.commit_check.outputs.should_update != 'false'
         run: |
-          # Run the standard version generation first 
-          echo "Running standard version data generation"
+          # Our improved generator now handles all filtering and counting properly
+          echo "Running version data generation with proper filtering"
           node generate-version-data.js
-          echo "Standard version data generation complete"
           
-          # Now run our fix script to ensure correct version number
-          echo "Running version fix to ensure correct count"
-          TOTAL_COMMITS=$(git rev-list --count main)
-          node fix-version.js "$TOTAL_COMMITS"
-          echo "Version fix complete - version should now be $TOTAL_COMMITS"
+          # Show the version number for the logs
+          VERSION=$(grep -o '"version": "[0-9]*"' js/version-data.js | grep -o '[0-9]*')
+          echo "Generated version data with build number: $VERSION"
       
+      # Check if the version data file was changed
       - name: Check if version was updated
         id: version_check
         if: steps.commit_check.outputs.should_update != 'false'
@@ -114,13 +62,14 @@ jobs:
             echo "updated=true" >> $GITHUB_OUTPUT
             
             # Log the new version number for debugging
-            NEW_VERSION=$(grep -o '"version": "[0-9]*"' js/version-data.js | grep -o '[0-9]*')
-            echo "New version number: $NEW_VERSION"
+            VERSION=$(grep -o '"version": "[0-9]*"' js/version-data.js | grep -o '[0-9]*')
+            echo "New build number: $VERSION"
           else
             echo "No changes to version data"
             echo "updated=false" >> $GITHUB_OUTPUT
           fi
         
+      # Commit and push the updated version data file
       - name: Commit and push if changed
         if: steps.commit_check.outputs.should_update != 'false' && steps.version_check.outputs.updated == 'true'
         run: |
