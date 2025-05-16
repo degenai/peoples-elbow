@@ -99,9 +99,57 @@ typeElement.textContent = commitType;
 4. **Enhanced Error Handling**: Robust error reporting helped identify edge cases
 5. **Clean Data Generation**: Better sanitization prevents display issues in your UI
 
+### Recent Improvements (May 2025)
+
+We've made several key improvements to address the remaining issues with our Development Ring:
+
+1. **Version Calculation Alignment**: Fixed the issue where the global version number didn't match the timeline versions by using the same counting logic everywhere.
+
+```javascript
+// Count all meaningful commits (ones we want to include in version numbering)
+const meaningfulCommits = commits.filter(c => !c.shouldSkipVersionIncrement);
+
+// The highest build number should be one less than the total meaningful commits
+// This is because we start from Build 0, so 47 meaningful commits = Build 46 as highest version
+const highestBuildNumber = meaningfulCommits.length > 0 ? (meaningfulCommits.length - 1).toString() : "0";
+```
+
+2. **Timeline Display Restoration**: Restored the refined styling of our timeline while preserving the improved commit filtering:
+
+```javascript
+// Create proper timeline structure with dots and content containers
+const timelineItem = document.createElement('div');
+timelineItem.className = 'timeline-item';
+
+// Create dot (important for styling)
+const timelineDot = document.createElement('div');
+timelineDot.className = 'timeline-dot';
+
+// Create content container with commit type styling
+const timelineContent = document.createElement('div');
+timelineContent.className = 'timeline-content';
+if (commitType) {
+    timelineContent.classList.add(commitType.toLowerCase());
+}
+```
+
+3. **Duplicate Version Filtering**: Added a mechanism to prevent duplicate version numbers in the timeline, making it cleaner and more accurate:
+
+```javascript
+// Track versions we've already displayed (avoid duplicates)
+const displayedVersions = new Set();
+
+// Check for duplicate versions - only show the first occurrence of each version
+// (but always show version-incrementing commits)
+if (!commit.isVersionIncrementing && displayedVersions.has(commit.version)) {
+    console.log('Skipping duplicate version:', commit.version, commit.hash);
+    return;
+}
+```
+
 ### Future Plans
 
-Our Development Ring now shows a clean, consistent history of the project's evolution, with accurate build numbers that tell the real story of our progress. We still have room to improve:
+With these improvements, our Development Ring now shows a clean, consistent history of the project's evolution, with accurate build numbers that tell the real story of our progress. We still have room to improve:
 
 - [ ] Update early commit messages to provide more detailed descriptions for the timeline
 - [ ] Add visual indicators for different commit types (icons next to tags)

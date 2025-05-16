@@ -178,11 +178,16 @@ function getCommitHistory(count = 500) {  // Increased count to capture more his
         const totalMeaningfulCommits = meaningfulCommits.length;
         
         // Build a version map for quick lookup
+        // We need to start from the oldest (lowest number) to newest (highest number)
+        // This makes the oldest commit "Build 0" and newest "Build 46"
         const versionMap = {};
-        meaningfulCommits.forEach((commit, index) => {
-            // Oldest commit is index 0 (build 0), newest is highest number
+        meaningfulCommits.reverse().forEach((commit, index) => {
+            // Important: We reverse the array to start from the oldest commit
+            // This ensures the oldest commit is Build 0, and newest is highest number
             versionMap[commit.hash] = index.toString();
         });
+        // Put the array back in original order for the rest of processing
+        meaningfulCommits.reverse();
         
         // Apply version numbers to all commits
         const commits = rawCommits.map(commit => {
@@ -268,9 +273,19 @@ function generateVersionDataFile() {
     // Then get the full commit history with appropriate filtering
     const commits = getCommitHistory();
     
-    // Create version data object
+    // Count all meaningful commits (ones we want to include in version numbering)
+    const meaningfulCommits = commits.filter(c => !c.shouldSkipVersionIncrement);
+    
+    // The highest build number should be one less than the total meaningful commits
+    // This is because we start from Build 0, so 47 meaningful commits = Build 46 as highest version
+    const highestBuildNumber = meaningfulCommits.length > 0 ? (meaningfulCommits.length - 1).toString() : "0";
+    
+    // Log the version calculation for debugging
+    console.log(`Filtered ${commits.length} total commits down to ${meaningfulCommits.length} meaningful commits`);
+    console.log(`Setting global version to ${highestBuildNumber} (${meaningfulCommits.length} meaningful commits - 1)`);
+    
     const versionData = {
-        version: commitCount,
+        version: highestBuildNumber,
         lastUpdated: new Date().toISOString(),
         commits: commits
     };
