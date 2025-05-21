@@ -182,16 +182,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 let bodyToDisplay = '';
                 // Assuming commit.subject is the first line and commit.message is the full message.
-                // Extract the body by removing the subject and handling leading newlines/whitespace.
+                // commit.message from version-data.js will have literal '\\n' for newlines due to JSON.stringify.
                 if (commit.message && typeof commit.subject === 'string' && commit.message.startsWith(commit.subject)) {
                     const subjectLength = commit.subject.length;
                     let potentialBody = commit.message.substring(subjectLength);
-                    // Remove leading newlines or whitespace that might separate subject from body
-                    potentialBody = potentialBody.replace(/^[\n\s]+/, ''); 
+                    // Remove leading escaped newlines (\\n) or whitespace characters.
+                    potentialBody = potentialBody.replace(/^(?:\\n|\s)+/, ''); 
                     
                     if (potentialBody) {
-                        // Convert all newlines in the body to <br> tags
-                        bodyToDisplay = potentialBody.replace(/\n/g, '<br>');
+                        // Convert all escaped newlines (\\n) in the body to <br> tags.
+                        bodyToDisplay = potentialBody.replace(/\\n/g, '<br>');
                         
                         // Bold known section headers (WHAT:, WHY:, TECHNICAL:)
                         const sectionHeadersRegex = /\b(WHAT:|WHY:|TECHNICAL:)\b/g;
@@ -199,7 +199,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 } else if (commit.message) { 
                     // Fallback if subject isn't clearly part of message, or if only body is in commit.message
-                    bodyToDisplay = commit.message.replace(/\n/g, '<br>');
+                    // Convert all escaped newlines (\\n) to <br> tags.
+                    bodyToDisplay = commit.message.replace(/\\n/g, '<br>');
                     const sectionHeadersRegex = /\b(WHAT:|WHY:|TECHNICAL:)\b/g;
                     bodyToDisplay = bodyToDisplay.replace(sectionHeadersRegex, '<strong>$1</strong>');
                 }
