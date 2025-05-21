@@ -51,30 +51,37 @@ function sanitizeForJSON(str) {
  */
 function isMeaningfulCommit(commitSubject) {
     if (!commitSubject) return false;
+    commitSubject = commitSubject.trim(); // Trim the subject line
+
+    const lowerSubject = commitSubject.toLowerCase(); // For case-insensitive checks on exclusions
+
+    // Explicitly exclude these types of commits first
+    // These checks are case-insensitive for robustness
+    if (lowerSubject.includes('[skip ci]')) return false;
+    if (lowerSubject.includes('update version data')) return false;
+    if (lowerSubject.startsWith('merge pull request')) return false; // Common for GitHub PR merges
+    if (lowerSubject.startsWith('revert')) return false; // Reverts are often noise for versioning
     
-    // Explicitly exclude these types of commits
-    if (commitSubject.includes('[skip ci]')) return false;
-    if (commitSubject.includes('update version data')) return false;
-    if (commitSubject.startsWith('Merge branch')) return false;
-    
-    // Include commits with these conventional commit prefixes
+    // `git log` often outputs 'Merge branch ...' with that exact casing for direct merges
+    if (commitSubject.startsWith('Merge branch')) return false; 
+
+    // Define meaningful conventional commit prefixes (case-insensitive for matching)
+    // Added 'ci' and 'chore' as they can be significant.
     const meaningfulPrefixes = [
         'feat', 'feature', 'fix', 'docs', 'style', 'refactor',
-        'perf', 'test', 'build', 'security', 'update'
+        'perf', 'test', 'build', 'ci', 'chore', 'security', 'update'
     ];
-    
-    // Check for conventional commit format: type(scope): message
+
+    // Check if the subject starts with "prefix:" or "prefix(scope):"
     for (const prefix of meaningfulPrefixes) {
-        // Match both with and without scope: feat: or feat(scope):
-        if (commitSubject.match(new RegExp(`^${prefix}(\\([^)]*\\))?:`, 'i'))) {
+        if (lowerSubject.match(new RegExp(`^${prefix}(\\(.*\\))?:`))) {
             return true;
         }
     }
-    
-    // For older commits or those without conventional format
-    // We'll count them as meaningful if they don't match our exclusion rules
-    // This ensures early commits still count in the version number
-    return true;
+
+    // If none of the above, it's not considered a primary meaningful commit for versioning.
+    // This makes the definition of "meaningful" much stricter.
+    return false;
 }
 
 /**
@@ -113,13 +120,13 @@ function getCommitCount() {
  */
 function getCommitHistory(count = 500) {  // Increased count to capture more history
     try {
-        // First get the full hashes to use for detailed messages
-        const gitHashCommand = `git log --pretty=format:"%H" main -n ${count}`;
+        // First get the full hashes to use for detailed messages (oldest to newest)
+        const gitHashCommand = `git log --pretty=format:"%H" --reverse main -n ${count}`;
         const hashes = execSync(gitHashCommand).toString().split('\n');
         console.log(`Retrieved ${hashes.length} commit hashes from git log`);
         
-        // Now get the summary info (hash|date|subject line)
-        const gitLogCommand = `git log --pretty=format:"%h|%ad|%s" --date=short main -n ${count}`;
+        // Now get the summary info (hash|date|subject line) (oldest to newest)
+        const gitLogCommand = `git log --pretty=format:"%h|%ad|%s" --date=short --reverse main -n ${count}`;
         const commitLog = execSync(gitLogCommand).toString();
         const commitLines = commitLog.split('\n');
         console.log(`Retrieved ${commitLines.length} commit log entries`);
@@ -157,6 +164,9 @@ function getCommitHistory(count = 500) {  // Increased count to capture more his
             // Extract commit type for use in UI tagging
             const commitType = getCommitTypeForUI(subject);
             
+            // Get short commit type for CSS styling
+            const shortType = getShortCommitType(subject);
+            
             return {
                 hash: shortHash,
                 date,
@@ -164,6 +174,7 @@ function getCommitHistory(count = 500) {  // Increased count to capture more his
                 message: fullMessage,
                 isMergeCommit,
                 isSkipCiCommit,
+                shortType,
                 shouldSkipVersionIncrement,
                 commitType
             };
@@ -257,6 +268,38 @@ function getCommitTypeForUI(subject) {
     
     // Default to UPDATE for commits without conventional prefix
     return 'UPDATE';
+}
+
+/**
+ * Gets the short conventional commit type (e.g., 'feat', 'fix') from commit message
+ * This is used for specific CSS class targeting.
+ */
+function getShortCommitType(subject) {
+    if (!subject) return 'update'; // Default short type
+    const lowerSubject = subject.toLowerCase().trim();
+
+    const shortTypePatterns = [
+        'feat', 'feature', // 'feature' maps to 'feat' for class name
+        'fix',
+        'docs',
+        'style',
+        'refactor',
+        'perf',
+        'test',
+        'build',
+        'ci',
+        'chore',
+        'security',
+        'update'
+    ];
+
+    for (const pattern of shortTypePatterns) {
+        if (lowerSubject.match(new RegExp(`^${pattern}(\\([^)]*\\))?:`))) {
+            if (pattern === 'feature') return 'feat'; // Normalize 'feature' to 'feat'
+            return pattern;
+        }
+    }
+    return 'update'; // Default if no conventional prefix found
 }
 
 /**
