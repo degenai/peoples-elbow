@@ -192,13 +192,11 @@ function getCommitHistory(count = 500) {  // Increased count to capture more his
         // We need to start from the oldest (lowest number) to newest (highest number)
         // This makes the oldest commit "Build 0" and newest "Build 46"
         const versionMap = {};
-        meaningfulCommits.reverse().forEach((commit, index) => {
-            // Important: We reverse the array to start from the oldest commit
-            // This ensures the oldest commit is Build 0, and newest is highest number
+        meaningfulCommits.forEach((commit, index) => { // Iterate oldest-to-newest
+            // meaningfulCommits is already oldest-to-newest.
+            // This ensures the oldest meaningful commit gets version "0".
             versionMap[commit.hash] = index.toString();
         });
-        // Put the array back in original order for the rest of processing
-        meaningfulCommits.reverse();
         
         // Apply version numbers to all commits
         const commits = rawCommits.map(commit => {
@@ -314,23 +312,23 @@ function generateVersionDataFile() {
     const commitCount = getCommitCount();
     
     // Then get the full commit history with appropriate filtering
-    const commits = getCommitHistory();
+    const commitsFromHistory = getCommitHistory(); // This is oldest-to-newest
     
     // Count all meaningful commits (ones we want to include in version numbering)
-    const meaningfulCommits = commits.filter(c => !c.shouldSkipVersionIncrement);
+    const meaningfulCommitsForCount = commitsFromHistory.filter(c => !c.shouldSkipVersionIncrement);
     
     // The highest build number should be one less than the total meaningful commits
     // This is because we start from Build 0, so 47 meaningful commits = Build 46 as highest version
-    const highestBuildNumber = meaningfulCommits.length > 0 ? (meaningfulCommits.length - 1).toString() : "0";
+    const highestBuildNumber = meaningfulCommitsForCount.length > 0 ? (meaningfulCommitsForCount.length - 1).toString() : "0";
     
     // Log the version calculation for debugging
-    console.log(`Filtered ${commits.length} total commits down to ${meaningfulCommits.length} meaningful commits`);
-    console.log(`Setting global version to ${highestBuildNumber} (${meaningfulCommits.length} meaningful commits - 1)`);
+    console.log(`Filtered ${commitsFromHistory.length} total commits down to ${meaningfulCommitsForCount.length} meaningful commits`);
+    console.log(`Setting global version to ${highestBuildNumber} (${meaningfulCommitsForCount.length} meaningful commits - 1)`);
     
     const versionData = {
         version: highestBuildNumber,
         lastUpdated: new Date().toISOString(),
-        commits: commits
+        commits: commitsFromHistory.slice().reverse() // Create a reversed copy (newest-to-oldest) for the output
     };
     
     // Convert to JavaScript variable assignment
@@ -354,8 +352,8 @@ window.PEOPLES_ELBOW_VERSION_DATA = ${JSON.stringify(versionData, null, 2)};
     // Final output summary
     console.log('\n=== VERSION DATA GENERATED SUCCESSFULLY ===');
     console.log(`Current build: ${commitCount}`);
-    console.log(`Meaningful commits tracked: ${commits.filter(c => !c.shouldSkipVersionIncrement).length}`);
-    console.log(`Total commits processed: ${commits.length}`);
+    console.log(`Meaningful commits tracked: ${meaningfulCommitsForCount.length}`);
+    console.log(`Total commits processed: ${commitsFromHistory.length}`);
     console.log(`File saved to: ${outputPath}`);
     
     // Add detailed diagnostic info
