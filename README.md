@@ -75,3 +75,20 @@ This project embodies mutual aid principles. Feel free to adapt and reuse with a
 Alex - License #MT013193 - info@peoples-elbow.com
 
 Project Link: [https://github.com/degenai/peoples-elbow](https://github.com/degenai/peoples-elbow)
+
+## Automated Conflict Resolution for `js/version-data.js`
+
+This project uses a custom Git merge driver to automatically resolve merge conflicts that can occur on the auto-generated `js/version-data.js` file. This file is updated based on the Git commit history and is prone to conflicts during merges (e.g., when merging `main` into a feature branch).
+
+To enable this automated conflict resolution in your local repository clone, you need to configure the merge driver by running the following commands in your terminal from the root of the project:
+
+```bash
+git config --local merge.generated.name "Regenerate version-data.js"
+git config --local merge.generated.driver "node generate-version-data.js && git add js/version-data.js"
+```
+
+**Explanation:**
+*   The `.gitattributes` file in this repository tells Git to use a merge strategy named `generated` for `js/version-data.js`.
+*   The commands above define what the `generated` strategy does: it runs the `node generate-version-data.js` script to rebuild the file based on the current (merged) commit history and then stages the result, thereby resolving the conflict.
+
+Setting this up will streamline your development workflow by handling these specific conflicts automatically.
