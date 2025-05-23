@@ -97,6 +97,13 @@ jobs:
           echo "New HEAD after checkout: $(git rev-parse HEAD)"
           echo "Latest commit: $(git log -1 --oneline)"
           echo "Version in version-data.js: $(grep -o '"version": "[0-9]*"' js/version-data.js || echo 'Not found')"
+      
+      # Regenerate version-data.js to ensure it includes all commits up to this point
+      - name: Regenerate version data with latest commits
+        run: |
+          echo "Regenerating version-data.js to include all commits..."
+          node generate-version-data.js
+          echo "New version in version-data.js: $(grep -o '"version": "[0-9]*"' js/version-data.js || echo 'Not found')"
           
       - name: Setup Pages
         uses: actions/configure-pages@v4

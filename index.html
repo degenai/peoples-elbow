@@ -266,7 +266,11 @@
     </footer>
 
     <script src="js/main.js"></script>
-    <script src="js/version-data.js"></script>
-    <script src="js/changelog.js"></script>
+    <script>
+        // Add timestamp to prevent caching
+        const timestamp = Date.now();
+        document.write(`<script src="js/version-data.js?v=${timestamp}"><\/script>`);
+        document.write(`<script src="js/changelog.js?v=${timestamp}"><\/script>`);
+    </script>
 </body>
 </html>
