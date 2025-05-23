@@ -85,8 +85,20 @@
     </footer>
 
     <script src="js/main.js"></script>
-    <script src="js/version-data.js"></script>
-    <script src="js/changelog.js"></script>
+    <script>
+        // Add cache-busting timestamp to force reload of version data
+        const versionScript = document.createElement('script');
+        versionScript.src = `js/version-data.js?v=${Date.now()}`;
+        
+        // Load changelog.js after version-data.js is loaded
+        versionScript.onload = function() {
+            const changelogScript = document.createElement('script');
+            changelogScript.src = 'js/changelog.js';
+            document.body.appendChild(changelogScript);
+        };
+        
+        document.body.appendChild(versionScript);
+    </script>
     <script>
       // Force-check version display
       document.addEventListener('DOMContentLoaded', function() {
