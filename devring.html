@@ -124,7 +124,26 @@
                     `;
                 });
                 html += '</ul>';
-                html += `<p style="text-align: center; color: #666;">Generated: ${new Date(data.generated).toLocaleString()}</p>`;
+                
+                // Show when it was generated in a user-friendly format
+                const generatedDate = new Date(data.generated);
+                const now = new Date();
+                const diffMs = now - generatedDate;
+                const diffMins = Math.floor(diffMs / 60000);
+                let timeAgo = '';
+                
+                if (diffMins < 1) {
+                    timeAgo = 'just now';
+                } else if (diffMins === 1) {
+                    timeAgo = '1 minute ago';
+                } else if (diffMins < 60) {
+                    timeAgo = `${diffMins} minutes ago`;
+                } else {
+                    const diffHours = Math.floor(diffMins / 60);
+                    timeAgo = diffHours === 1 ? '1 hour ago' : `${diffHours} hours ago`;
+                }
+                
+                html += `<p style="text-align: center; color: #666;">Generated: ${timeAgo}</p>`;
                 
                 contentDiv.innerHTML = html;
                 
