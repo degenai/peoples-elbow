@@ -86,13 +86,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: main  # Always get the latest main branch (including version updates)
-          fetch-depth: 0
+          fetch-depth: 0  # Get full history
           
-      # Ensure we have the absolute latest commit including any just pushed
-      - name: Pull latest changes
+      # Critical: Get the version update commit that was just pushed
+      - name: Get latest including version update
         run: |
-          git pull origin main --rebase
+          echo "Current HEAD before fetch: $(git rev-parse HEAD)"
+          git fetch origin main
+          git checkout origin/main
+          echo "New HEAD after checkout: $(git rev-parse HEAD)"
           echo "Latest commit: $(git log -1 --oneline)"
           echo "Version in version-data.js: $(grep -o '"version": "[0-9]*"' js/version-data.js || echo 'Not found')"
           
