@@ -99,6 +99,35 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v4
         
+      # Debug: Show what version we're about to deploy
+      - name: Verify version before deployment
+        run: |
+          echo "=== DEPLOYMENT DEBUG INFO ==="
+          echo "Current directory: $(pwd)"
+          echo "Git status:"
+          git status
+          echo ""
+          echo "Latest 3 commits:"
+          git log --oneline -3
+          echo ""
+          echo "Version in js/version-data.js:"
+          grep -o '"version": "[0-9]*"' js/version-data.js || echo 'Version not found!'
+          echo ""
+          echo "First few lines of version-data.js:"
+          head -20 js/version-data.js
+          echo ""
+          echo "File modification time:"
+          ls -la js/version-data.js
+          echo "=== END DEBUG INFO ==="
+          
+      # Force GitHub Pages to rebuild by updating a timestamp
+      - name: Force rebuild with timestamp
+        run: |
+          echo "Last deployed: $(date -u +'%Y-%m-%d %H:%M:%S UTC')" > .last-deploy
+          echo "Version deployed: $(grep -o '"version": "[0-9]*"' js/version-data.js | grep -o '[0-9]*')" >> .last-deploy
+          echo "Commit deployed: $(git rev-parse HEAD)" >> .last-deploy
+          cat .last-deploy
+        
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
