@@ -87,6 +87,14 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: main  # Always get the latest main branch (including version updates)
+          fetch-depth: 0
+          
+      # Ensure we have the absolute latest commit including any just pushed
+      - name: Pull latest changes
+        run: |
+          git pull origin main --rebase
+          echo "Latest commit: $(git log -1 --oneline)"
+          echo "Version in version-data.js: $(grep -o '"version": "[0-9]*"' js/version-data.js || echo 'Not found')"
           
       - name: Setup Pages
         uses: actions/configure-pages@v4
