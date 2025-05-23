@@ -44,6 +44,20 @@ jobs:
           echo "Changelog generated with $(grep -c '"version":' js/changelog-data.json) commits"
           echo "Latest version: $(grep -m1 '"version":' js/changelog-data.json | grep -o '[0-9]*')"
       
+      - name: Verify generated files
+        run: |
+          echo "Checking generated files..."
+          echo "version-data.js:"
+          ls -la js/version-data.js
+          head -5 js/version-data.js
+          echo ""
+          echo "changelog-data.json:"
+          ls -la js/changelog-data.json
+          head -5 js/changelog-data.json
+          echo ""
+          echo "Generated timestamp in changelog:"
+          grep generated js/changelog-data.json | head -1
+      
       - name: Setup Pages
         uses: actions/configure-pages@v4
       
