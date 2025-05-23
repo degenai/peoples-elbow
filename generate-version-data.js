@@ -90,9 +90,9 @@ function isMeaningfulCommit(commitSubject) {
  */
 function getCommitCount() {
     try {
-        // Get all commits on the main branch
-        const allCommits = execSync('git rev-list main').toString().trim().split('\n');
-        console.log(`Total raw commits on main branch: ${allCommits.length}`);
+        // Get all commits on the current HEAD
+        const allCommits = execSync('git rev-list HEAD').toString().trim().split('\n');
+        console.log(`Total raw commits on HEAD: ${allCommits.length}`);
         
         // Filter to only meaningful commits
         const meaningfulCommits = allCommits.filter(hash => {
@@ -121,12 +121,12 @@ function getCommitCount() {
 function getCommitHistory(count = 500) {  // Increased count to capture more history
     try {
         // First get the full hashes to use for detailed messages (oldest to newest)
-        const gitHashCommand = `git log --pretty=format:"%H" --reverse main -n ${count}`;
+        const gitHashCommand = `git log --pretty=format:"%H" --reverse HEAD -n ${count}`;
         const hashes = execSync(gitHashCommand).toString().split('\n');
         console.log(`Retrieved ${hashes.length} commit hashes from git log`);
         
         // Now get the summary info (hash|date|subject line) (oldest to newest)
-        const gitLogCommand = `git log --pretty=format:"%h|%ad|%s" --date=short --reverse main -n ${count}`;
+        const gitLogCommand = `git log --pretty=format:"%h|%ad|%s" --date=short --reverse HEAD -n ${count}`;
         const commitLog = execSync(gitLogCommand).toString();
         const commitLines = commitLog.split('\n');
         console.log(`Retrieved ${commitLines.length} commit log entries`);
@@ -359,8 +359,8 @@ window.PEOPLES_ELBOW_VERSION_DATA = ${JSON.stringify(versionData, null, 2)};
     // Add detailed diagnostic info
     try {
         // Count commits in different ways for verification
-        const rawMainCommits = execSync('git rev-list --count main').toString().trim();
-        const totalNonMergeCommits = execSync('git rev-list --no-merges --count main').toString().trim();
+        const rawHeadCommits = execSync('git rev-list --count HEAD').toString().trim();
+        const totalNonMergeCommits = execSync('git rev-list --no-merges --count HEAD').toString().trim();
         
         // Get information about the oldest commits
         const oldestCommit = execSync('git log --format="%h %s" --reverse --max-count=1').toString().trim();
@@ -370,7 +370,7 @@ window.PEOPLES_ELBOW_VERSION_DATA = ${JSON.stringify(versionData, null, 2)};
         const newestCommits = execSync('git log --format="%h %s" --max-count=5').toString().trim();
         
         console.log('\n=== DIAGNOSTIC COMMIT INFORMATION ===');
-        console.log(`Raw commits on main branch: ${rawMainCommits}`);
+        console.log(`Raw commits on HEAD: ${rawHeadCommits}`);
         console.log(`Non-merge commits: ${totalNonMergeCommits}`);
         console.log(`Meaningful commits (filtered): ${commitCount}`);
         console.log(`\nOldest commit: ${oldestCommit}`);
@@ -384,7 +384,7 @@ window.PEOPLES_ELBOW_VERSION_DATA = ${JSON.stringify(versionData, null, 2)};
         // Show different counts side by side for easy comparison
         console.log('\n=== VERSION COUNT COMPARISON ===');
         console.log('| TOTAL RAW | NON-MERGE | MEANINGFUL |');
-        console.log(`|    ${rawMainCommits.padEnd(7)} |   ${totalNonMergeCommits.padEnd(8)} |    ${commitCount.padEnd(8)} |`);
+        console.log(`|    ${rawHeadCommits.padEnd(7)} |   ${totalNonMergeCommits.padEnd(8)} |    ${commitCount.padEnd(8)} |`);
         console.log('=== END DIAGNOSTIC INFO ===');
     } catch (error) {
         console.error('Error getting diagnostic info:', error.message);
