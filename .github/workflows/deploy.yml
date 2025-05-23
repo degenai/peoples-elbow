@@ -1,18 +1,26 @@
-name: Update Version Data and Deploy
+name: Build and Deploy
 
 on:
   push:
     branches:
       - main
-    paths-ignore:
-      - 'js/version-data.js'  # Prevent loops when only version data changes
 
 permissions:
-  contents: write  # Permission to write to repository
+  contents: write
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
 
 jobs:
+  # First job: Update version data
   update-version:
     runs-on: ubuntu-latest
+    outputs:
+      version_updated: ${{ steps.version_check.outputs.updated }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -25,58 +33,69 @@ jobs:
         run: |
           COMMIT_MSG=$(git log -1 --pretty=%B)
           echo "Latest commit message: $COMMIT_MSG"
-          if [[ "$COMMIT_MSG" == *"update version data [skip ci]"* ]]; then
-            echo "This is an automated version update, skipping"
+          if [[ "$COMMIT_MSG" == *"update version data [skip ci]"* ]] || [[ "$COMMIT_MSG" == *"[skip ci]"* ]]; then
+            echo "This is an automated commit or skip ci, skipping"
             echo "should_update=false" >> $GITHUB_OUTPUT
           else
             echo "This is a regular commit, updating version data"
             echo "should_update=true" >> $GITHUB_OUTPUT
           fi
       
-      # Skip the rest if this is already a version update commit
       - name: Setup Node.js
         if: steps.commit_check.outputs.should_update != 'false'
         uses: actions/setup-node@v3
         with:
           node-version: '18'
       
-      # Run our improved version data generator that handles counting correctly
       - name: Generate version data
         if: steps.commit_check.outputs.should_update != 'false'
         run: |
-          # Our improved generator now handles all filtering and counting properly
-          echo "Running version data generation with proper filtering"
+          echo "Running version data generation"
           node generate-version-data.js
           
-          # Show the version number for the logs
           VERSION=$(grep -o '"version": "[0-9]*"' js/version-data.js | grep -o '[0-9]*')
           echo "Generated version data with build number: $VERSION"
       
-      # Check if the version data file was changed
       - name: Check if version was updated
         id: version_check
-        if: steps.commit_check.outputs.should_update != 'false'
         run: |
-          if [[ $(git status --porcelain js/version-data.js | wc -l) -gt 0 ]]; then
+          if [[ "${{ steps.commit_check.outputs.should_update }}" != "false" ]] && [[ $(git status --porcelain js/version-data.js | wc -l) -gt 0 ]]; then
             echo "Version data was updated"
             echo "updated=true" >> $GITHUB_OUTPUT
-            
-            # Log the new version number for debugging
             VERSION=$(grep -o '"version": "[0-9]*"' js/version-data.js | grep -o '[0-9]*')
             echo "New build number: $VERSION"
           else
-            echo "No changes to version data"
+            echo "No version update needed"
             echo "updated=false" >> $GITHUB_OUTPUT
           fi
-        
-      # Commit and push the updated version data file
-      - name: Commit and push if changed
-        if: steps.commit_check.outputs.should_update != 'false' && steps.version_check.outputs.updated == 'true'
+      
+      - name: Commit version update
+        if: steps.version_check.outputs.updated == 'true'
         run: |
           git config --global user.name 'GitHub Action Bot'
           git config --global user.email 'action@github.com'
           git add js/version-data.js
           git commit -m "chore: update version data [skip ci]"
           git push
-          # Add a short delay to ensure changes are registered before GitHub Pages builds
-          sleep 5
+
+  # Second job: Deploy to GitHub Pages (runs after version update)
+  deploy:
+    needs: update-version  # This ensures deploy runs AFTER version update
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: main  # Always get the latest main branch (including version updates)
+          
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+        
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: '.'
+          
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
