@@ -88,6 +88,13 @@ jobs:
         with:
           fetch-depth: 0  # Get full history
           
+      # Remove any merge driver configuration that might interfere
+      - name: Disable merge drivers
+        run: |
+          git config --unset-all merge.generated.driver || true
+          git config --unset-all merge.generated.name || true
+          echo "Merge driver configuration removed"
+          
       # Verify what commit we're on
       - name: Verify current state
         run: |
