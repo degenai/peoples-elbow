@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Development Ring - The People's Elbow</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .changelog-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .version-header {
+            background: linear-gradient(45deg, #d4af37, #ffd700);
+            color: #000;
+            padding: 40px 20px;
+            text-align: center;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        .version-number {
+            font-size: 3em;
+            font-weight: bold;
+        }
+        .commit-list {
+            list-style: none;
+            padding: 0;
+        }
+        .commit-item {
+            background: #f8f8f8;
+            border-left: 4px solid #d4af37;
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 5px;
+            transition: transform 0.2s;
+        }
+        .commit-item:hover {
+            transform: translateX(5px);
+        }
+        .commit-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .commit-version {
+            background: #d4af37;
+            color: #000;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .commit-date {
+            color: #666;
+        }
+        .commit-subject {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+        .loading {
+            text-align: center;
+            padding: 50px;
+            font-size: 1.5em;
+        }
+        .error {
+            background: #fee;
+            border: 1px solid #fcc;
+            color: #c00;
+            padding: 20px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="index.html">← Back to Main</a>
+        </nav>
+    </header>
+
+    <main class="changelog-container">
+        <div class="version-header">
+            <h1>DEVELOPMENT RING 💪</h1>
+            <p>"OH MY GOD! IS THAT... YES! THE PEOPLE'S ELBOW IS ENTERING THE DEVELOPMENT RING WITH A STEEL CHAIR FULL OF COMMITS!"</p>
+            <div class="version-number" id="current-version">Loading...</div>
+        </div>
+
+        <div id="changelog-content">
+            <div class="loading">Loading changelog...</div>
+        </div>
+    </main>
+
+    <script>
+        // Simple changelog loader
+        async function loadChangelog() {
+            const contentDiv = document.getElementById('changelog-content');
+            const versionDiv = document.getElementById('current-version');
+            
+            try {
+                // Add cache buster to ensure fresh data
+                const response = await fetch(`js/changelog-data.json?t=${Date.now()}`);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                
+                const data = await response.json();
+                
+                // Update version number
+                const latestVersion = data.commits[0]?.version || 0;
+                versionDiv.textContent = `BUILD ${latestVersion}`;
+                
+                // Build commit list
+                let html = '<ul class="commit-list">';
+                data.commits.forEach(commit => {
+                    html += `
+                        <li class="commit-item">
+                            <div class="commit-header">
+                                <span class="commit-version">v${commit.version}</span>
+                                <span class="commit-date">${commit.date}</span>
+                            </div>
+                            <div class="commit-subject">${escapeHtml(commit.subject)}</div>
+                            ${commit.body ? `<div class="commit-body">${escapeHtml(commit.body)}</div>` : ''}
+                            <div class="commit-hash">Commit: ${commit.hash}</div>
+                        </li>
+                    `;
+                });
+                html += '</ul>';
+                html += `<p style="text-align: center; color: #666;">Generated: ${new Date(data.generated).toLocaleString()}</p>`;
+                
+                contentDiv.innerHTML = html;
+                
+            } catch (error) {
+                contentDiv.innerHTML = `
+                    <div class="error">
+                        <h2>Failed to load changelog</h2>
+                        <p>${error.message}</p>
+                        <p>Please try refreshing the page.</p>
+                    </div>
+                `;
+                versionDiv.textContent = 'ERROR';
+            }
+        }
+        
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+        
+        // Load on page ready
+        loadChangelog();
+    </script>
+</body>
+</html>

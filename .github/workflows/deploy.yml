@@ -37,6 +37,14 @@ jobs:
           node generate-version-data.js
           echo "Version generated: $(grep -o '"version": "[0-9]*"' js/version-data.js | grep -o '[0-9]*')"
       
+      - name: Generate changelog data
+        run: |
+          echo "Generating changelog data..."
+          node generate-changelog.js
+          echo "Changelog generated"
+          echo "Contents of js/changelog-data.json:"
+          cat js/changelog-data.json | head -20
+      
       - name: Setup Pages
         uses: actions/configure-pages@v4
       
