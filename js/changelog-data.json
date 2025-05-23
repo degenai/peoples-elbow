@@ -1,524 +1,545 @@
 {
-  "generated": "2025-05-23T06:14:43.375Z",
-  "totalCommits": 134,
+  "generated": "2025-05-23T06:44:01.346Z",
+  "totalCommits": 77,
   "commits": [
     {
-      "version": 134,
+      "hash": "659d9cd",
+      "date": "2025-05-23",
+      "subject": "fix: Correct version numbering and timestamp display in changelog",
+      "author": "degenai",
+      "version": 77
+    },
+    {
+      "hash": "f9faa63",
+      "date": "2025-05-23",
+      "subject": "fix: Update changelog link to new devring page",
+      "author": "degenai",
+      "version": 76
+    },
+    {
+      "hash": "c2aa6ae",
+      "date": "2025-05-23",
+      "subject": "feat: Rebuild changelog system from scratch with new approach",
+      "author": "degenai",
+      "version": 75
+    },
+    {
       "hash": "c9c027c",
       "date": "2025-05-23",
       "subject": "feat: Simplify deploy workflow to fix version lag",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 74
     },
     {
-      "version": 133,
       "hash": "0f718b4",
       "date": "2025-05-23",
       "subject": "fix: Explicitly unset merge driver config in workflow",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 73
     },
     {
-      "version": 132,
       "hash": "fddd498",
       "date": "2025-05-23",
       "subject": "fix: Disable merge driver that was overwriting regenerated version data",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 72
     },
     {
-      "version": 131,
       "hash": "fec9aa6",
       "date": "2025-05-23",
       "subject": "fix: Remove git add to keep regenerated version-data.js in working directory",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 71
     },
     {
-      "version": 130,
       "hash": "b60c7b4",
       "date": "2025-05-23",
       "subject": "fix: Remove origin/main checkout to use triggering commit HEAD",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 70
     },
     {
-      "version": 129,
       "hash": "3d46a79",
       "date": "2025-05-23",
       "subject": "fix: Use HEAD instead of main to capture current commit in version data",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 69
     },
     {
-      "version": 128,
       "hash": "a980b55",
       "date": "2025-05-22",
       "subject": "fix: Remove automatic version commits to solve persistent -1 lag",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 68
     },
     {
-      "version": 127,
       "hash": "76cee8c",
       "date": "2025-05-22",
       "subject": "fix: Regenerate version-data.js during deploy to include triggering commit",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 67
     },
     {
-      "version": 126,
       "hash": "b0ac152",
       "date": "2025-05-22",
       "subject": "fix: Simplify cache busting and ensure deploy uses latest commit",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 66
     },
     {
-      "version": 125,
       "hash": "e5ca804",
       "date": "2025-05-22",
       "subject": "fix: Force deploy job to checkout latest commit from version update",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 65
     },
     {
-      "version": 124,
       "hash": "43624c2",
       "date": "2025-05-22",
       "subject": "fix: Add cache-busting to changelog page for version-data.js",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 64
     },
     {
-      "version": 123,
       "hash": "6ed86b5",
       "date": "2025-05-22",
       "subject": "fix: Add deployment debugging and force rebuild mechanism",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 63
     },
     {
-      "version": 122,
       "hash": "1dc7772",
       "date": "2025-05-22",
       "subject": "fix: Ensure deploy job pulls latest version updates before deploying",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 62
     },
     {
-      "version": 121,
       "hash": "335a6ec",
       "date": "2025-05-22",
       "subject": "fix: Update GitHub Actions versions to resolve deployment error",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 61
     },
     {
-      "version": 120,
       "hash": "8d521f6",
       "date": "2025-05-22",
       "subject": "fix: Reverse changelog order to show newest commits first",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 60
     },
     {
-      "version": 119,
       "hash": "7012069",
       "date": "2025-05-22",
       "subject": "fix: Replace separate workflows with unified build-deploy pipeline to prevent race conditions",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 59
     },
     {
-      "version": 118,
       "hash": "80b9490",
       "date": "2025-05-22",
       "subject": "fix: Add .nojekyll to prevent Jekyll processing on GitHub Pages",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 58
     },
     {
-      "version": 117,
       "hash": "1004062",
       "date": "2025-05-22",
       "subject": "docs: Document local configuration for js/version-data.js merge driver",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 57
     },
     {
-      "version": 116,
       "hash": "c1f90c4",
       "date": "2025-05-22",
       "subject": "feat: Implement custom Git merge driver for js/version-data.js",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 56
     },
     {
-      "version": 115,
       "hash": "e89b504",
       "date": "2025-05-21",
       "subject": "refactor: remove array reversal and maintain oldest-to-newest commit order",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 55
     },
     {
-      "version": 114,
       "hash": "dd41b21",
       "date": "2025-05-21",
       "subject": "fix(DevRing): Correctly parse escaped newlines in commit messages",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 54
     },
     {
-      "version": 113,
       "hash": "eba3729",
       "date": "2025-05-21",
       "subject": "fix(DevRing): Correct newline and section formatting in expanded commit messages",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 53
     },
     {
-      "version": 112,
       "hash": "05b8587",
       "date": "2025-05-21",
       "subject": "feat(DevRing): Display timeline commits in descending order",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 52
     },
     {
-      "version": 111,
       "hash": "9374700",
       "date": "2025-05-21",
       "subject": "refactor(DevRing): Enhance timeline interactivity, styling, and data consistency",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 51
     },
     {
-      "version": 110,
       "hash": "9712dec",
       "date": "2025-05-16",
       "subject": "fix(devring): align version display and restore timeline styling",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 50
     },
     {
-      "version": 109,
       "hash": "e14e278",
       "date": "2025-05-12",
       "subject": "refactor(version): complete overhaul of Development Ring version system",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 49
     },
     {
-      "version": 108,
       "hash": "3624f2b",
       "date": "2025-05-11",
       "subject": "fix(workflow): correct version counting to use main branch commits only",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 48
     },
     {
-      "version": 107,
       "hash": "53f0aa8",
       "date": "2025-05-11",
       "subject": "fix(workflow): solve version lag by accurately counting current commit",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 47
     },
     {
-      "version": 106,
       "hash": "49e702d",
       "date": "2025-05-11",
       "subject": "fix(workflow): solve persistent version numbering lag by capturing current commit count",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 46
     },
     {
-      "version": 105,
       "hash": "7bb3147",
       "date": "2025-05-11",
       "subject": "fix(version): ensure build version 43 displays correctly with enhanced error handling",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 45
     },
     {
-      "version": 104,
       "hash": "2c3f7e0",
       "date": "2025-05-11",
       "subject": "feat(timeline): enhance Development Ring with complete history and improved filtering",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 44
     },
     {
-      "version": 103,
       "hash": "d7873ab",
       "date": "2025-05-10",
       "subject": "feat: improve version display and prevent merge conflicts",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 43
     },
     {
-      "version": 102,
       "hash": "f73c6a8",
       "date": "2025-05-10",
       "subject": "feat: improve version badge and rename \"Changelog\" to \"Development Ring\"",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 42
     },
     {
-      "version": 101,
       "hash": "a39f1e4",
       "date": "2025-05-10",
       "subject": "refactor: improve changelog with proper versioning and rename to \" Development Ring\\",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 41
     },
     {
-      "version": 100,
       "hash": "3f493ab",
       "date": "2025-05-10",
       "subject": "refactor: improve changelog with proper versioning and rename to \"Development Ring\"",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 40
     },
     {
-      "version": 99,
       "hash": "f863c93",
       "date": "2025-05-10",
       "subject": "fix(changelog): filter out merge commits and improve timeline display",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 39
     },
     {
-      "version": 98,
       "hash": "5a1b1bc",
       "date": "2025-05-10",
       "subject": "fix(changelog): improve timeline script with debug logging",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 38
     },
     {
-      "version": 97,
       "hash": "19da504",
       "date": "2025-05-10",
       "subject": "feat(ci): simplify version update workflow",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 37
     },
     {
-      "version": 96,
       "hash": "6803966",
       "date": "2025-05-10",
       "subject": "fix(ci): update GitHub Actions artifact and deployment versions",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 36
     },
     {
-      "version": 95,
       "hash": "917abae",
       "date": "2025-05-10",
       "subject": "fix(changelog): improve timeline script with debug logging",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 35
     },
     {
-      "version": 94,
       "hash": "4aa2506",
       "date": "2025-05-10",
       "subject": "refactor(ci): implement unified build and version workflow",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 34
     },
     {
-      "version": 93,
       "hash": "c3ccfeb",
       "date": "2025-05-10",
       "subject": "fix(ci): improve workflow version detection logic",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 33
     },
     {
-      "version": 92,
       "hash": "e853d8b",
       "date": "2025-05-10",
       "subject": "docs(changelog): refine project description text",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 32
     },
     {
-      "version": 91,
       "hash": "8d14978",
       "date": "2025-05-09",
       "subject": "docs(ci): add site-wide favicon and document CI/CD workflow lessons",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 31
     },
     {
-      "version": 90,
       "hash": "c378755",
       "date": "2025-05-09",
       "subject": "fix(ci): prevent GitHub Actions infinite loop",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 30
     },
     {
-      "version": 89,
       "hash": "2f050b8",
       "date": "2025-05-09",
       "subject": "fix: Update calendar favicon and optimize GitHub Actions workflow",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 29
     },
     {
-      "version": 88,
       "hash": "a5aa6b3",
       "date": "2025-05-09",
       "subject": "feat(calendar): Add appointment booking system with wrestling-themed UI",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 28
     },
     {
-      "version": 87,
       "hash": "1df2575",
       "date": "2025-05-07",
       "subject": "fix(ci): Add explicit write permissions to GitHub Action workflow",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 27
     },
     {
-      "version": 86,
       "hash": "67d0106",
       "date": "2025-05-07",
       "subject": "fix(changelog): Enhance header styling and update version data",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 26
     },
     {
-      "version": 85,
       "hash": "369db58",
       "date": "2025-05-07",
       "subject": "feat(changelog): Add version tracking and update log page",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 25
     },
     {
-      "version": 84,
       "hash": "eda2e01",
       "date": "2025-05-06",
       "subject": "feat(forms): Complete robust form handling with D1 storage and email notifications",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 24
     },
     {
-      "version": 83,
       "hash": "ce9abdb",
       "date": "2025-04-24",
       "subject": "docs: Add project TODO list for tracking future enhancements",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 23
     },
     {
-      "version": 82,
       "hash": "1cea25f",
       "date": "2025-04-24",
       "subject": "feat(forms): Add D1 database storage and prepare email integration",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 22
     },
     {
-      "version": 81,
       "hash": "dfac9e7",
       "date": "2025-04-24",
       "subject": "feat(forms): Add D1 database storage and MailChannels email integration",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 21
     },
     {
-      "version": 80,
       "hash": "1c2d369",
       "date": "2025-04-24",
       "subject": "feat: Add D1 database integration with migrations",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 20
     },
     {
-      "version": 79,
       "hash": "8760e51",
       "date": "2025-04-24",
       "subject": "Add D1 database storage and MailChannels email integration to form handlers",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 19
     },
     {
-      "version": 78,
       "hash": "eebdb38",
       "date": "2025-04-24",
       "subject": "Add form handling worker and fix D1 database binding in wrangler config",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 18
     },
     {
-      "version": 77,
       "hash": "e39bc88",
       "date": "2025-04-24",
       "subject": "Add form submission handling with D1 database and email notifications",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 17
     },
     {
-      "version": 76,
       "hash": "ff26e1a",
       "date": "2025-04-23",
       "subject": "Add initial styles and form handling for host connection feature",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 16
     },
     {
-      "version": 75,
       "hash": "0500b27",
       "date": "2025-04-23",
       "subject": "Add main CSS styles and footer disclaimer for bug reporting",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 15
     },
     {
-      "version": 74,
       "hash": "74e6ba7",
       "date": "2025-04-23",
       "subject": "Add main.js with form handling, smooth scroll, and stats animation features",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 14
     },
     {
-      "version": 73,
       "hash": "94738e9",
       "date": "2025-04-23",
       "subject": "Consolidate worker configs into single Cloudflare worker deployment",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 13
     },
     {
-      "version": 72,
       "hash": "fe6efdd",
       "date": "2025-04-23",
       "subject": "Add Cloudflare Workers configuration for host and contact form handlers",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 12
     },
     {
-      "version": 71,
       "hash": "2eb926e",
       "date": "2025-04-23",
       "subject": "Add Instagram links and create initial site structure with forms and styling",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 11
     },
     {
-      "version": 70,
       "hash": "2b958de",
       "date": "2025-04-23",
       "subject": "Update Instagram handle and footer quote for brand consistency",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 10
     },
     {
-      "version": 69,
       "hash": "ab2d0ef",
       "date": "2025-04-23",
       "subject": "Update mission tagline and host quote, add initial .gitignore file",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 9
     },
     {
-      "version": 68,
       "hash": "bc74473",
       "date": "2025-04-23",
       "subject": "Add files via upload",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 8
     },
     {
-      "version": 67,
       "hash": "89d0f15",
       "date": "2025-04-23",
       "subject": "Update README with website info and GitHub Pages setup",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 7
     },
     {
-      "version": 66,
       "hash": "f7e27d1",
       "date": "2025-04-23",
       "subject": "Create images directory",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 6
     },
     {
-      "version": 65,
       "hash": "4725f4f",
       "date": "2025-04-23",
       "subject": "Add main JavaScript file",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 5
     },
     {
-      "version": 64,
       "hash": "a5c3ad0",
       "date": "2025-04-23",
       "subject": "Add main CSS stylesheet",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 4
     },
     {
-      "version": 63,
       "hash": "cdbfe34",
       "date": "2025-04-23",
       "subject": "Create initial homepage",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 3
     },
     {
-      "version": 62,
       "hash": "e19c34c",
       "date": "2025-04-23",
       "subject": "Add CNAME for custom domain",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 2
     },
     {
-      "version": 61,
       "hash": "6ad72f4",
       "date": "2025-04-23",
       "subject": "Initial commit",
-      "author": "degenai"
+      "author": "degenai",
+      "version": 1
     }
   ]
 }
