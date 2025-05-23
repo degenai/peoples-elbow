@@ -106,7 +106,6 @@ jobs:
           echo "Regenerating version-data.js to include all commits..."
           node generate-version-data.js
           echo "New version in version-data.js: $(grep -o '"version": "[0-9]*"' js/version-data.js || echo 'Not found')"
-          git add js/version-data.js
           # Show the latest commits in the regenerated file
           echo "Latest commit in regenerated file:"
           grep -A 1 '"commits": \[' js/version-data.js | head -20
