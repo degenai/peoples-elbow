@@ -31,19 +31,18 @@ jobs:
         with:
           node-version: '20'
       
-      - name: Generate version data
+      - name: Generate fresh version data
         run: |
           echo "Generating fresh version data..."
           node generate-version-data.js
           echo "Version generated: $(grep -o '"version": "[0-9]*"' js/version-data.js | grep -o '[0-9]*')"
       
-      - name: Generate changelog data
+      - name: Generate fresh changelog data
         run: |
-          echo "Generating changelog data..."
+          echo "Generating fresh changelog data..."
           node generate-changelog.js
-          echo "Changelog generated"
-          echo "Contents of js/changelog-data.json:"
-          cat js/changelog-data.json | head -20
+          echo "Changelog generated with $(grep -c '"version":' js/changelog-data.json) commits"
+          echo "Latest version: $(grep -m1 '"version":' js/changelog-data.json | grep -o '[0-9]*')"
       
       - name: Setup Pages
         uses: actions/configure-pages@v4
