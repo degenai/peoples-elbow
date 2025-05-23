@@ -265,7 +265,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const isNotSkipCi = !commit.isSkipCiCommit;
         return isMeaningful && isNotSkipCi;
     });
-    meaningfulDisplayCommits.reverse(); // Display newest commits first
+    // Display commits in their natural order (newest first from version-data.js)
+    // meaningfulDisplayCommits.reverse(); // Removed - we want newest first
 
     console.log(`
 --- TIMELINE COMMIT SELECTION ---`);
