@@ -8,6 +8,7 @@
     /* Color palette based on the logo */
     --pe-green: #006937;
     --pe-green-light: #008a47;
+    --pe-green-dark: #004225;
     --pe-gold: #ffcc00;
     --pe-orange: #ff9900;
     --pe-black: #000000;
@@ -554,18 +555,61 @@ textarea {
 }
 
 .map-placeholder {
-    width: 100%;
-    height: 400px;
-    background-color: #eee;
-    border-radius: 8px;
+    background: linear-gradient(135deg, var(--pe-green) 0%, var(--pe-green-dark) 100%);
+    min-height: 400px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: var(--space-lg);
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
 }
 
-.upcoming-events {
+.map-placeholder::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,215,0,0.1) 0%, transparent 70%);
+    animation: rotate 20s linear infinite;
+}
+
+@keyframes rotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.map-coming-soon {
     text-align: center;
+    z-index: 1;
+    position: relative;
+}
+
+.map-coming-soon i {
+    font-size: 4rem;
+    color: var(--pe-gold);
+    margin-bottom: var(--space-md);
+    animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.map-coming-soon p {
+    color: var(--pe-white);
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: var(--space-xs);
+}
+
+.map-coming-soon .small-text {
+    font-size: 1rem;
+    font-weight: normal;
+    opacity: 0.9;
 }
 
 /* Contact Section */
@@ -603,6 +647,98 @@ textarea {
     align-items: center;
     justify-content: center;
     margin-right: var(--space-md);
+}
+
+/* Coming Soon Animations */
+.coming-soon-number {
+    font-size: 3rem;
+    color: var(--pe-gold);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.7; }
+    50% { transform: scale(1.1); opacity: 1; }
+}
+
+.coming-soon {
+    color: var(--pe-green);
+    font-style: italic;
+}
+
+.coming-soon a {
+    color: var(--pe-gold);
+    text-decoration: underline;
+}
+
+/* Tension Meter */
+.mission-graphic {
+    flex: 0 0 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tension-meter {
+    background: var(--pe-white);
+    border: 3px solid var(--pe-green);
+    border-radius: 15px;
+    padding: var(--space-lg);
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.tension-meter h3 {
+    color: var(--pe-green);
+    margin-bottom: var(--space-md);
+}
+
+.meter-container {
+    margin: var(--space-md) 0;
+}
+
+.meter-bar {
+    width: 200px;
+    height: 30px;
+    background: #f0f0f0;
+    border-radius: 15px;
+    overflow: hidden;
+    position: relative;
+}
+
+.meter-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ff4444 0%, #ffaa00 50%, var(--pe-green) 100%);
+    width: 0%;
+    animation: fillMeter 3s ease-out forwards;
+    animation-delay: 1s;
+}
+
+@keyframes fillMeter {
+    0% { width: 0%; }
+    100% { width: 90%; }
+}
+
+.meter-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: var(--space-xs);
+    font-size: 0.875rem;
+}
+
+.meter-labels .high {
+    color: #ff4444;
+}
+
+.meter-labels .defeated {
+    color: var(--pe-green);
+    font-weight: bold;
+}
+
+.meter-text {
+    color: var(--pe-green);
+    font-weight: bold;
+    margin-top: var(--space-md);
 }
 
 /* Footer */
@@ -720,5 +856,18 @@ footer {
     .impact-tracker {
         flex-direction: column;
         gap: var(--space-lg);
+    }
+    
+    .mission-content {
+        flex-direction: column;
+    }
+    
+    .mission-graphic {
+        margin-top: var(--space-lg);
+    }
+    
+    .tension-meter {
+        max-width: 300px;
+        margin: 0 auto;
     }
 }
