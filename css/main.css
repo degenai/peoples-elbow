@@ -301,6 +301,15 @@ nav ul li.version-badge a {
     margin-bottom: var(--space-lg);
 }
 
+.hero-subtitle {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--pe-gold);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    margin-bottom: var(--space-lg);
+    letter-spacing: 1px;
+}
+
 .hero-buttons {
     display: flex;
     justify-content: center;
