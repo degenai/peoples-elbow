@@ -153,6 +153,12 @@ document.addEventListener('DOMContentLoaded', function() {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     const target = entry.target;
+                    // Skip animation if the content is "TBD"
+                    if (target.textContent.trim() === 'TBD') {
+                        observer.unobserve(target);
+                        return;
+                    }
+                    
                     const finalValue = parseInt(target.textContent);
                     let currentValue = 0;
                     
