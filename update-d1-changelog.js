@@ -12,7 +12,7 @@ const { execSync } = require('child_process');
 console.log(' D1 Changelog Incremental Update\n');
 
 // Configuration
-const WRITER_WORKER_URL = process.env.WRITER_WORKER_URL || 'https://peoples-elbow.alex-adamczyk.workers.dev'; // Fallback to main worker
+const WRITER_WORKER_URL = process.env.WRITER_WORKER_URL || 'https://changelog-writer.alex-adamczyk.workers.dev'; // Updated to use dedicated writer worker
 const READER_WORKER_URL = 'https://changelog-reader.alex-adamczyk.workers.dev';
 
 /**

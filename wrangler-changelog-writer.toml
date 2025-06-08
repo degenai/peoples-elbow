@@ -1,0 +1,9 @@
+name = "changelog-writer"
+main = "./workers/changelog-writer-worker.js"
+compatibility_date = "2025-04-24"
+
+# D1 Database binding for Changelog
+[[d1_databases]]
+binding = "CHANGELOG_DB"
+database_name = "peoples-elbow-changelog"
+database_id = "525c3570-af7a-4939-9d3c-d9beafab9cf3"
