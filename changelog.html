@@ -6,8 +6,8 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>The People's Elbow | Development Ring</title>
-    <meta name="description" content="The People's Elbow - Version history and update log showing the continuous development of this mutual aid project.">
+    <title>The People's Elbow | D1 Changelog</title>
+    <meta name="description" content="The People's Elbow - D1 database-backed version history and update log showing the continuous development of this mutual aid project.">
     <link rel="shortcut icon" href="images/logo.png" type="image/png">
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/changelog.css">
@@ -38,7 +38,7 @@
     
     <main>
         <section class="changelog-hero">
-            <h1>DEVELOPMENT RING <i class="fas fa-code-branch"></i></h1>
+            <h1>D1 CHANGELOG <i class="fas fa-database"></i></h1>
             <h2>"OH MY GOD! IS THAT... YES! THE PEOPLE'S ELBOW IS ENTERING THE DEVELOPMENT RING WITH A STEEL CHAIR FULL OF COMMITS!"</h2>
             <div id="current-version">
                 <span class="version-label">CURRENT BUILD:</span> 
@@ -48,7 +48,7 @@
 
         <section class="timeline-container">
             <div class="timeline-intro">
-                <p>Welcome to the Development Ring - the place where we track the build history of The People's Elbow website. Each version represents improvements to what will eventually become our mutual aid project. The timeline below shows what changed, when it changed, and why. Click any update to see the full details.</p>
+                <p>Welcome to the D1 Changelog - where we track the build history of The People's Elbow website using Cloudflare's D1 database. Each version represents improvements to what will eventually become our mutual aid project. The timeline below shows what changed, when it changed, and why. Click any update to see the full details.</p>
             </div>
             
             <div id="commit-timeline" class="timeline">
@@ -85,11 +85,6 @@
     </footer>
 
     <script src="js/main.js"></script>
-    <script>
-        // Add timestamp to prevent caching
-        const timestamp = Date.now();
-        document.write(`<script src="js/version-data.js?v=${timestamp}"><\/script>`);
-        document.write(`<script src="js/changelog.js?v=${timestamp}"><\/script>`);
-    </script>
+    <script src="js/d1-changelog.js"></script>
 </body>
 </html>

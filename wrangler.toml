@@ -8,6 +8,13 @@ binding = "FORMS_DB" # This field was missing before
 database_name = "peoples-elbow-forms"
 database_id = "3587acfa-1da5-4c4f-ac73-33308f01bb4c"
 
+# D1 Database binding for Changelog
+[[d1_databases]]
+binding = "CHANGELOG_DB"
+database_name = "peoples-elbow-changelog"
+database_id = "525c3570-af7a-4939-9d3c-d9beafab9cf3"
+preview_database_id = "CHANGELOG_DB" # For local development, often matches binding
+
 # Email Routing binding
 [[send_email]]
 name = "MAIL"

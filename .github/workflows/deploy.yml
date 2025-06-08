@@ -31,42 +31,50 @@ jobs:
         with:
           node-version: '20'
       
-      - name: Generate fresh version data
+      - name: Update D1 Changelog
         run: |
-          echo "Generating fresh version data..."
-          node generate-version-data.js
-          echo "Version generated: $(grep -o '"version": "[0-9]*"' js/version-data.js | grep -o '[0-9]*')"
+          echo "🔄 Updating D1 changelog with new meaningful commits..."
+          node update-d1-changelog.js
+          echo "✅ D1 changelog update complete"
       
-      - name: Generate fresh changelog data
-        run: |
-          echo "Generating fresh changelog data..."
-          node generate-changelog.js
-          echo "Changelog generated with $(grep -c '"version":' js/changelog-data.json) commits"
-          echo "Latest version: $(grep -m1 '"version":' js/changelog-data.json | grep -o '[0-9]*')"
+#      - name: Generate fresh version data
+#        run: |
+#          echo "Generating fresh version data..."
+#          node generate-version-data.js
+#          echo "Version generated: $(grep -o '"version": "[0-9]*"' js/version-data.js | grep -o '[0-9]*')"
       
-      - name: Verify generated files
-        run: |
-          echo "Checking generated files..."
-          echo "version-data.js:"
-          ls -la js/version-data.js
-          head -5 js/version-data.js
-          echo ""
-          echo "changelog-data.json:"
-          ls -la js/changelog-data.json
-          head -5 js/changelog-data.json
-          echo ""
-          echo "Generated timestamp in changelog:"
-          grep generated js/changelog-data.json | head -1
-          echo ""
-          echo "Git status:"
-          git status --porcelain
+#      - name: Generate fresh changelog data
+#        run: |
+#          echo "Generating fresh changelog data..."
+#          node generate-changelog.js
+#          echo "Changelog generated with $(grep -c '"version":' js/changelog-data.json) commits"
+#          echo "Latest version: $(grep -m1 '"version":' js/changelog-data.json | grep -o '[0-9]*')"
+      
+#      - name: Verify generated files
+#        run: |
+#          echo "Checking generated files..."
+#          echo "version-data.js:"
+#          ls -la js/version-data.js
+#          head -5 js/version-data.js
+#          echo ""
+#          echo "changelog-data.json:"
+#          ls -la js/changelog-data.json
+#          head -5 js/changelog-data.json
+#          echo ""
+#          echo "Generated timestamp in changelog:"
+#          grep generated js/changelog-data.json | head -1
+#          echo ""
+#          echo "Git status:"
+#          git status --porcelain
       
       - name: Temporarily commit generated files
         run: |
           echo "Creating temporary commit with generated files..."
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add js/version-data.js js/changelog-data.json
+          # git add js/version-data.js js/changelog-data.json
+          # If other files need to be added, list them here. Otherwise, this can be removed if the commit is no longer needed.
+          # For now, ensuring no attempt to add archived files.
           git commit -m "chore: update generated files for deployment [skip ci]" || echo "No changes to commit"
           echo "Git log:"
           git log --oneline -3
