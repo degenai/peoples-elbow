@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The People's Elbow | Booking Calendar</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/calendar.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Montserrat:wght@400;700&display=swap">
+    <link rel="shortcut icon" href="images/logo.png" type="image/png">
+</head>
+<body>
+    <header class="main-header">
+        <div class="header-container">
+            <div class="logo">
+                <a href="index.html">
+                    <img src="images/peoples-elbow-logo.png" alt="The People's Elbow Logo">
+                </a>
+            </div>
+            <nav class="main-nav">
+                <button class="menu-toggle" aria-label="Toggle Menu">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </button>
+                <ul class="nav-list">
+                    <li><a href="index.html#mission">Mission</a></li>
+                    <li><a href="index.html#services">Services</a></li>
+                    <li><a href="index.html#host-connection">Host Connection</a></li>
+                    <li><a href="index.html#community-impact">Community Impact</a></li>
+                    <li><a href="index.html#locations">Locations</a></li>
+                    <li><a href="index.html#contact">Contact</a></li>
+                    <li><a href="changelog.html" class="version-badge">v<span id="version-number">...</span></a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="calendar-hero">
+            <div class="container">
+                <h1>The Appointment Arena</h1>
+                <h2>"The People's Elbow checks the calendar... AND THE APPOINTMENTS ARE OPEN!"</h2>
+            </div>
+        </section>
+
+        <section class="calendar-container">
+            <div class="container">
+                <div class="calendar-nav">
+                    <div class="view-options">
+                        <button id="month-view" class="view-btn active">Month</button>
+                        <button id="week-view" class="view-btn">Week</button>
+                        <button id="list-view" class="view-btn">List</button>
+                    </div>
+                </div>
+                
+                <div id="calendar"></div>
+                
+                <div class="calendar-info">
+                    <div class="calendar-legend">
+                        <h3>Event Legend</h3>
+                        <ul>
+                            <li><span class="legend-marker available"></span> Available Sessions</li>
+                            <li><span class="legend-marker booked"></span> Booked Sessions</li>
+                            <li><span class="legend-marker special"></span> Special Events</li>
+                        </ul>
+                    </div>
+                    <div class="booking-info">
+                        <h3>How to Book</h3>
+                        <p><strong>Coming Soon:</strong> Online booking functionality is currently in development!</p>
+                        <p>In the meantime, please use our <a href="index.html#contact">contact form</a> to request a booking or to inquire about available dates.</p>
+                        <p>The People's Elbow operates at various community venues on a 50/50 split model.</p>
+                        <a href="index.html#host-connection" class="btn btn-primary">Host an Event</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="request-form" class="booking-request hide">
+            <div class="container">
+                <h2>Request a Booking</h2>
+                <form id="booking-form">
+                    <div class="form-close">×</div>
+                    <input type="hidden" id="event-id" name="eventId">
+                    <div class="form-group">
+                        <label for="name">Your Name</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number (optional)</label>
+                        <input type="tel" id="phone" name="phone">
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Message (optional)</label>
+                        <textarea id="message" name="message" rows="3"></textarea>
+                    </div>
+                    <div class="form-notice">
+                        <p>In the spirit of mutual aid, all information is stored securely and will only be used for this booking.</p>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Submit Request</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <footer class="main-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <h3>The People's Elbow</h3>
+                    <p>Mutual aid massage powered by community support.</p>
+                </div>
+                <div class="footer-connect">
+                    <h3>Connect</h3>
+                    <a href="mailto:peoples.elbow.massage@gmail.com">peoples.elbow.massage@gmail.com</a>
+                    <a href="https://www.instagram.com/peoples_elbow_massage/" target="_blank">@peoples_elbow_massage</a>
+                </div>
+            </div>
+            <div class="footer-disclaimer">
+                <p>This website is built from scratch with mutual aid principles. Expect bugs! Please report them to <a href="mailto:bugs@peoples-elbow.com">bugs@peoples-elbow.com</a></p>
+                <p>&copy; 2025 The People's Elbow. Built with ♥ for the community.</p>
+                <p>Site version: <a href="changelog.html">v<span class="version-number">...</span></a></p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/version-data.js"></script>
+    <script src="js/main.js"></script>
+    <!-- Load Event Calendar directly from UNPKG CDN -->
+    <script src="https://unpkg.com/@event-calendar/core"></script>
+    <script src="https://unpkg.com/@event-calendar/time-grid"></script>
+    <script src="https://unpkg.com/@event-calendar/list"></script>
+    <script src="https://unpkg.com/@event-calendar/day-grid"></script>
+    <script src="js/calendar-app.js"></script>
+</body>
+</html>
