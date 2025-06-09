@@ -185,20 +185,32 @@ document.addEventListener('DOMContentLoaded', function() {
     // Call animation function
     animateStats();
     
-    // Version number update - ensure header badge works
-    function updateVersionNumber() {
+    // Version number update - fetch from authoritative D1 database
+    async function updateVersionNumber() {
         const headerVersionElement = document.getElementById('header-version-number');
-        if (headerVersionElement && window.PEOPLES_ELBOW_VERSION_DATA) {
-            const version = window.PEOPLES_ELBOW_VERSION_DATA.version;
-            headerVersionElement.textContent = version;
-            console.log('Header version updated to:', version);
-        } else if (headerVersionElement) {
-            // Retry after a short delay if data not loaded yet
-            setTimeout(updateVersionNumber, 500);
+        if (!headerVersionElement) return;
+        
+        try {
+            // Fetch from the same D1 API that the changelog uses
+            const response = await fetch('https://changelog-reader.alex-adamczyk.workers.dev/api/changelog?page=0&limit=1');
+            const data = await response.json();
+            
+            if (data.success && data.pagination && data.pagination.total) {
+                const version = data.pagination.total;
+                headerVersionElement.textContent = version;
+                console.log('Header version updated from D1 database:', `v${version}`);
+            } else {
+                throw new Error('Invalid D1 response format');
+            }
+        } catch (error) {
+            console.warn('Failed to fetch D1 version:', error);
+            // Don't fall back to incorrect local data - show error state instead
+            headerVersionElement.textContent = 'v?';
+            headerVersionElement.style.opacity = '0.6';
+            console.log('Header version showing error state due to D1 API failure');
         }
     }
     
-    // Try to update version immediately and also after a delay
+    // Try to update version immediately
     updateVersionNumber();
-    setTimeout(updateVersionNumber, 1000);
 });

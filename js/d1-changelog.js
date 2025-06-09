@@ -70,6 +70,7 @@ class D1Changelog {
     displayVersionNumber() {
         const versionElement = document.getElementById('version-number');
         const footerVersionElement = document.getElementById('footer-version-number');
+        const headerVersionElement = document.getElementById('header-version-number'); // Add header badge
         
         if (this.totalCount > 0) {
             // Use total count from database (87 meaningful commits) as version
@@ -79,10 +80,18 @@ class D1Changelog {
             if (footerVersionElement) {
                 footerVersionElement.textContent = `v${version}`;
             }
+            // Update header badge with the same authoritative version
+            if (headerVersionElement) {
+                headerVersionElement.textContent = `v${version}`;
+                console.log('Header badge updated to authoritative D1 version:', `v${version}`);
+            }
         } else {
             versionElement.textContent = 'v0';
             if (footerVersionElement) {
                 footerVersionElement.textContent = 'v0';
+            }
+            if (headerVersionElement) {
+                headerVersionElement.textContent = 'v0';
             }
         }
     }
