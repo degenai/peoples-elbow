@@ -8,9 +8,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const menuToggle = document.querySelector('.menu-toggle');
     const navMenu = document.querySelector('nav ul');
     
-    if (menuToggle) {
+    if (menuToggle && navMenu) {
         menuToggle.addEventListener('click', function() {
-            navMenu.style.display = navMenu.style.display === 'flex' ? 'none' : 'flex';
+            navMenu.classList.toggle('mobile-menu-active');
+        });
+        
+        // Reset menu state on window resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 768) {
+                // Desktop view - remove mobile classes and inline styles
+                navMenu.classList.remove('mobile-menu-active');
+                navMenu.style.display = '';
+            }
         });
     }
     

@@ -164,6 +164,24 @@ header {
     gap: var(--space-md);
 }
 
+.logo-link {
+    display: inline-block;
+    text-decoration: none;
+    transition: transform 0.2s ease;
+}
+
+.logo-link:hover {
+    transform: scale(1.02);
+}
+
+.logo-link:active {
+    transform: scale(0.98);
+}
+
+.logo-link .main-logo {
+    display: block;
+}
+
 .main-logo {
     height: 80px;
     max-width: 200px;
@@ -764,6 +782,32 @@ footer {
 }
 
 /* Responsive Styles */
+@media (min-width: 769px) {
+    /* Ensure navigation is visible on desktop */
+    nav ul {
+        display: flex !important;
+        position: static !important;
+        flex-direction: row !important;
+        width: auto !important;
+        background-color: transparent !important;
+        box-shadow: none !important;
+    }
+    
+    nav ul li {
+        margin-left: var(--space-lg);
+    }
+    
+    nav ul li a {
+        display: inline !important;
+        padding: 0 !important;
+        border-bottom: none !important;
+    }
+    
+    .menu-toggle {
+        display: none !important;
+    }
+}
+
 @media (max-width: 992px) {
     .mission-content, .host-content, .contact-content {
         flex-direction: column;
@@ -792,6 +836,10 @@ footer {
         background-color: var(--pe-white);
         flex-direction: column;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    nav ul.mobile-menu-active {
+        display: flex;
     }
     
     nav ul li {
