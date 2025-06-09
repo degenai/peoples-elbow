@@ -171,26 +171,57 @@ header {
 }
 
 .version-badge {
-    background: linear-gradient(135deg, var(--pe-gold) 0%, #ffdd33 100%);
-    color: var(--pe-green);
+    background: linear-gradient(135deg, #ffd700 0%, #ffed4e 25%, #ffd700 50%, #b8860b 100%);
+    color: #2d5a2d;
     padding: var(--space-xs) var(--space-sm);
-    border-radius: 20px;
-    font-weight: bold;
-    font-size: 0.9rem;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-    border: 2px solid var(--pe-green);
-    transition: all 0.3s ease;
+    border-radius: 25px;
+    font-weight: 900;
+    font-size: 0.95rem;
+    box-shadow: 
+        0 3px 8px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+    border: 2px solid #2d5a2d;
+    transition: all 0.4s ease;
     white-space: nowrap;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+    min-width: 50px;
+    text-align: center;
+}
+
+.version-badge::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transform: rotate(45deg);
+    transition: all 0.6s ease;
+    opacity: 0;
 }
 
 .version-badge:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transform: scale(1.08) translateY(-1px);
+    box-shadow: 
+        0 6px 16px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.15);
+    background: linear-gradient(135deg, #ffed4e 0%, #ffd700 25%, #ffed4e 50%, #b8860b 100%);
 }
 
-.version-label {
-    font-weight: 900;
-    margin-right: 2px;
+.version-badge:hover::before {
+    opacity: 1;
+    animation: shimmer 1.5s ease-in-out;
+}
+
+@keyframes shimmer {
+    0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); opacity: 0; }
+    50% { opacity: 1; }
+    100% { transform: translateX(100%) translateY(100%) rotate(45deg); opacity: 0; }
 }
 
 .menu-toggle {

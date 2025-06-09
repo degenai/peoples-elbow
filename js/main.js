@@ -184,4 +184,21 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Call animation function
     animateStats();
+    
+    // Version number update - ensure header badge works
+    function updateVersionNumber() {
+        const headerVersionElement = document.getElementById('header-version-number');
+        if (headerVersionElement && window.PEOPLES_ELBOW_VERSION_DATA) {
+            const version = window.PEOPLES_ELBOW_VERSION_DATA.version;
+            headerVersionElement.textContent = version;
+            console.log('Header version updated to:', version);
+        } else if (headerVersionElement) {
+            // Retry after a short delay if data not loaded yet
+            setTimeout(updateVersionNumber, 500);
+        }
+    }
+    
+    // Try to update version immediately and also after a delay
+    updateVersionNumber();
+    setTimeout(updateVersionNumber, 1000);
 });
