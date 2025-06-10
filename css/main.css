@@ -410,6 +410,17 @@ nav ul li a:hover::after {
 .value-item {
     text-align: center;
     padding: var(--space-md);
+    background: var(--pe-white);
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.value-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    border-color: var(--pe-gold);
 }
 
 .value-item i {
@@ -1270,4 +1281,169 @@ nav ul li a.active {
 @keyframes construction-blink {
     0%, 50% { opacity: 1; }
     51%, 100% { opacity: 0.3; }
+}
+
+/* Dashboard Styling */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--space-lg);
+    margin: var(--space-xl) 0;
+}
+
+.dashboard-card {
+    background: var(--pe-white);
+    border-radius: 15px;
+    padding: var(--space-lg);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+.dashboard-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+    border-color: var(--pe-gold);
+}
+
+.dashboard-card .card-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, var(--pe-green) 0%, var(--pe-green-dark) 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto var(--space-lg) auto;
+    box-shadow: 0 4px 12px rgba(0, 105, 55, 0.3);
+}
+
+.dashboard-card .card-icon i {
+    font-size: 2rem;
+    color: var(--pe-white);
+}
+
+.dashboard-card h3 {
+    text-align: center;
+    color: var(--pe-green-dark);
+    margin-bottom: var(--space-md);
+    font-size: 1.5rem;
+}
+
+.dashboard-card p {
+    text-align: center;
+    color: var(--pe-text-dark);
+    line-height: 1.6;
+    margin-bottom: var(--space-lg);
+}
+
+.coming-soon-badge {
+    background: linear-gradient(135deg, var(--pe-gold) 0%, #e6b800 100%);
+    color: var(--pe-black);
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.wip-timeline {
+    background: var(--pe-light-gray);
+    padding: var(--space-xl);
+    border-radius: 15px;
+    margin-top: var(--space-xl);
+    border-left: 5px solid var(--pe-green);
+}
+
+.wip-timeline h3 {
+    color: var(--pe-green-dark);
+    margin-bottom: var(--space-lg);
+    text-align: center;
+    font-size: 2rem;
+}
+
+.timeline-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: var(--space-lg);
+    position: relative;
+}
+
+.timeline-item:last-child {
+    margin-bottom: 0;
+}
+
+.timeline-dot {
+    width: 20px;
+    height: 20px;
+    background: var(--pe-green);
+    border-radius: 50%;
+    margin-right: var(--space-lg);
+    margin-top: var(--space-xs);
+    flex-shrink: 0;
+    box-shadow: 0 0 0 4px rgba(0, 105, 55, 0.2);
+}
+
+.timeline-item:not(:last-child) .timeline-dot::after {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 9px;
+    width: 2px;
+    height: 60px;
+    background: var(--pe-green);
+    opacity: 0.3;
+}
+
+.timeline-content h4 {
+    color: var(--pe-green-dark);
+    margin-bottom: var(--space-sm);
+    font-size: 1.3rem;
+}
+
+.timeline-content p {
+    color: var(--pe-text-dark);
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* Secret admin icon styling */
+.admin-secret {
+    opacity: 0.1;
+    transition: opacity 0.3s ease;
+    position: relative;
+    display: inline-block;
+    margin-left: var(--space-sm);
+}
+
+.admin-secret:hover {
+    opacity: 0.8;
+}
+
+@media (max-width: 768px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .wip-timeline {
+        padding: var(--space-lg);
+    }
+    
+    .timeline-item {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .timeline-dot {
+        margin: 0 auto var(--space-md) auto;
+    }
+    
+    .timeline-item:not(:last-child) .timeline-dot::after {
+        display: none;
+    }
 }
