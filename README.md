@@ -1,22 +1,26 @@
 # The People's Elbow
 
-Official website for The People's Elbow: Mutual Aid Massage - A superhero-themed massage therapy service bringing care directly to card shops and community spaces.
+🎉 **BUILD 100!** Official website for The People's Elbow: Mutual Aid Massage - A superhero-themed massage therapy service bringing care directly to card shops and community spaces.
 
 ## About The Project
 
-The People's Elbow is a mutual aid massage initiative that:
-- Operates on a 50/50 split model with hosting venues
-- Brings massage therapy to card shops, farmers markets, and community spaces
-- Embodies mutual aid principles without upselling or data collection
-- Creates a superhero persona to make care more approachable
+The People's Elbow is a mutual aid massage initiative that proves **community care infrastructure can be owned, understood, and replicated** by the communities it serves:
+
+- **Transparent Operations**: 50/50 split model with hosting venues, no hidden fees
+- **Community-First**: Brings massage therapy to card shops, farmers markets, and community spaces
+- **Mutual Aid Principles**: No upselling, no data collection, no mission creep
+- **Approachable Care**: Superhero persona makes wellness services less intimidating
+- **Replicable Model**: Entire tech stack runs for ~$10/year on Cloudflare - **steal this site!**
 
 ## Website Features
 
-- Responsive design with mobile-friendly navigation
-- Host connection system for venues to request services
-- Community impact tracker
-- Location finder for service areas
-- Contact forms for inquiries
+- **Component-Based Architecture**: Universal header/footer system (Build 99-100)
+- **Real-Time Version Display**: Live D1 database integration showing current build
+- **Development Transparency**: Complete commit history and changelog accessible to community
+- **Mobile-Responsive Design**: Works seamlessly on all devices
+- **Host Connection System**: Simple forms for venues to request services
+- **Cloudflare Infrastructure**: Forms, database, and hosting for ~$10/year
+- **Zero Vendor Lock-in**: Entirely open-source and self-hostable
 
 ## GitHub Pages Setup
 
@@ -66,9 +70,13 @@ cd peoples-elbow
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-## License
+## License & Replication
 
-This project embodies mutual aid principles. Feel free to adapt and reuse with attribution.
+This project embodies mutual aid principles. **Steal this site!** 
+
+The entire infrastructure (website, forms, database, hosting) runs for approximately **$10/year** on Cloudflare. Feel free to fork, adapt, and deploy for your own community mutual aid project. Every line of code, every commit, and every improvement is documented and freely shareable.
+
+**Mutual aid means building infrastructure that communities can own, understand, and replicate.**
 
 ## Contact
 

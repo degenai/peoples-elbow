@@ -59,6 +59,238 @@
         </div>
     </section>
 
+    <!-- Who is The People's Elbow? -->
+    <section id="who" style="padding: 4rem 0; background: white;">
+        <div class="container">
+            <div style="max-width: 1000px; margin: 0 auto;">
+                <h2 class="section-title">Who is The People's Elbow?</h2>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center;">
+                    <!-- Text Content -->
+                    <div>
+                        <h3 style="color: var(--pe-green); margin-bottom: 1.5rem; font-size: 1.6rem;">
+                            Licensed Massage Therapist. Community Organizer. Tension-Fighting Superhero.
+                        </h3>
+                        <p style="margin-bottom: 1.5rem; line-height: 1.7; color: #333;">
+                            Behind the golden cape is <strong>Alex, Licensed MT #013193</strong> - a massage therapist who believes that community care shouldn't cost communities their autonomy.
+                        </p>
+                        <p style="margin-bottom: 1.5rem; line-height: 1.7; color: #333;">
+                            The People's Elbow persona emerged from a simple realization: wellness services can feel intimidating or clinical. A superhero character makes care more approachable while maintaining professional standards and genuine therapeutic skill.
+                        </p>
+                        <div style="background: linear-gradient(135deg, #f0f8f0 0%, #e8f5e8 100%); padding: 1.5rem; border-radius: 8px; border-left: 4px solid var(--pe-green); box-shadow: 0 2px 8px rgba(0, 105, 55, 0.1);">
+                            <p style="margin: 0; font-style: italic; color: #555; font-size: 1.1rem;">
+                                "Proving that communities can build their own infrastructure for care. One massage, one venue, one $10/year website at a time."
+                            </p>
+                        </div>
+                        <div style="margin-top: 2rem;">
+                            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                                <i class="fas fa-certificate" style="color: var(--pe-green); font-size: 1.2rem;"></i>
+                                <span><strong>Licensed MT #013193</strong> - Professional credentials, superhero heart</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                                <i class="fas fa-handshake" style="color: var(--pe-green); font-size: 1.2rem;"></i>
+                                <span><strong>50/50 Model Pioneer</strong> - No hidden fees, no upselling, no mission creep</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <i class="fas fa-code" style="color: var(--pe-green); font-size: 1.2rem;"></i>
+                                <span><strong>Open Source Advocate</strong> - Building tools communities can own</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Photo -->
+                    <div id="hero-photo-container" style="text-align: center; position: relative; overflow: hidden; padding: 2rem;">
+                        <!-- Rounded background pattern that shows through transparency -->
+                        <div id="photo-bg" style="position: absolute; inset: 1rem; background: 
+                            linear-gradient(135deg, rgba(0, 105, 55, 0.2) 0%, rgba(255, 237, 74, 0.25) 50%, rgba(0, 68, 102, 0.2) 100%),
+                            radial-gradient(circle at 25% 25%, rgba(255, 204, 0, 0.3) 0%, transparent 60%),
+                            radial-gradient(circle at 75% 75%, rgba(0, 105, 55, 0.25) 0%, transparent 60%),
+                            radial-gradient(circle at 50% 50%, rgba(0, 68, 102, 0.15) 0%, transparent 70%);
+                            border-radius: 20px;
+                            z-index: 0;"></div>
+                        
+                        <!-- Particle effect -->
+                        <div id="particles" style="position: absolute; inset: 1rem; border-radius: 20px; overflow: hidden; z-index: 0; pointer-events: none;"></div>
+                        
+                        <!-- Parallax photo container -->
+                        <div id="parallax-photo" style="position: relative; display: inline-block; transition: transform 0.1s ease-out; z-index: 1;">
+                            <img src="images/transparent raw.png" alt="The People's Elbow providing professional massage therapy" 
+                                 style="max-width: 100%; height: auto; 
+                                        filter: drop-shadow(0 8px 32px rgba(0, 105, 55, 0.3)) 
+                                                drop-shadow(0 4px 16px rgba(255, 204, 0, 0.2));
+                                        transition: filter 0.3s ease;
+                                        position: relative;
+                                        z-index: 1;"
+                                 onmouseover="this.style.filter='drop-shadow(0 12px 40px rgba(0, 105, 55, 0.4)) drop-shadow(0 6px 20px rgba(255, 204, 0, 0.3))'"
+                                 onmouseout="this.style.filter='drop-shadow(0 8px 32px rgba(0, 105, 55, 0.3)) drop-shadow(0 4px 16px rgba(255, 204, 0, 0.2))'">
+                        </div>
+                        
+                        <p style="margin-top: 1.5rem; font-style: italic; color: #666; font-size: 0.95rem;">
+                            Professional equipment meets superhero dedication
+                        </p>
+                    </div>
+                    
+                    <!-- Particle effect script -->
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            const particlesContainer = document.getElementById('particles');
+                            if (particlesContainer) {
+                                // Create sexy glowing particles with radial movement
+                                const colors = [
+                                    { bg: 'rgba(0, 105, 55, 0.8)', glow: '0, 105, 55' },   // Green
+                                    { bg: 'rgba(0, 68, 102, 0.8)', glow: '0, 68, 102' },   // Blue  
+                                    { bg: 'rgba(255, 204, 0, 0.9)', glow: '255, 204, 0' }   // Yellow
+                                ];
+                                
+                                for (let i = 0; i < 18; i++) {
+                                    const particle = document.createElement('div');
+                                    const color = colors[Math.floor(Math.random() * colors.length)];
+                                    const size = Math.random() * 8 + 4; // 4-12px
+                                    
+                                    // Random starting position within 50px radius
+                                    const startAngle = Math.random() * Math.PI * 2;
+                                    const startRadius = Math.random() * 50;
+                                    const startX = Math.cos(startAngle) * startRadius;
+                                    const startY = Math.sin(startAngle) * startRadius;
+                                    
+                                    particle.style.cssText = `
+                                        position: absolute;
+                                        width: ${size}px;
+                                        height: ${size}px;
+                                        background: radial-gradient(circle, ${color.bg} 0%, rgba(${color.glow}, 0.3) 70%, transparent 100%);
+                                        border-radius: 50%;
+                                        left: calc(50% + ${startX}px);
+                                        top: calc(50% + ${startY}px);
+                                        transform: translate(-50%, -50%);
+                                        animation: radialFloat${i} ${8 + Math.random() * 6}s infinite ease-out;
+                                        box-shadow: 0 0 ${size * 2}px rgba(${color.glow}, 0.4), 
+                                                   0 0 ${size}px rgba(${color.glow}, 0.6);
+                                        filter: blur(0.5px);
+                                    `;
+                                    particlesContainer.appendChild(particle);
+                                    
+                                    // Create radial outward movement with more lateral motion
+                                    const angle = (Math.PI * 2 / 18) * i + Math.random() * 1.2; // More random spread
+                                    const distance = 200 + Math.random() * 150; // 200-350px outward
+                                    const endX = Math.cos(angle) * distance;
+                                    const endY = Math.sin(angle) * distance;
+                                    
+                                    const style = document.createElement('style');
+                                    style.textContent = `
+                                        @keyframes radialFloat${i} {
+                                            0% { 
+                                                transform: translate(-50%, -50%) scale(0.2); 
+                                                opacity: 0; 
+                                            }
+                                            15% { 
+                                                opacity: 0.8; 
+                                                transform: translate(-50%, -50%) scale(1);
+                                            }
+                                            85% { 
+                                                opacity: 0.6; 
+                                            }
+                                            100% { 
+                                                transform: translate(calc(-50% + ${endX - startX}px), calc(-50% + ${endY - startY}px)) scale(0.3); 
+                                                opacity: 0; 
+                                            }
+                                        }
+                                    `;
+                                    document.head.appendChild(style);
+                                }
+                            }
+                        });
+                    </script>
+                    
+                    <!-- Scroll parallax script -->
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            const photoElement = document.getElementById('parallax-photo');
+                            const containerElement = document.getElementById('hero-photo-container');
+                            
+                            if (photoElement && containerElement) {
+                                function updateParallax() {
+                                    const rect = containerElement.getBoundingClientRect();
+                                    const windowHeight = window.innerHeight;
+                                    
+                                    // Only apply parallax when the element is visible
+                                    if (rect.bottom >= 0 && rect.top <= windowHeight) {
+                                        // Calculate parallax offset (very subtle)
+                                        const scrollPercent = (windowHeight - rect.top) / (windowHeight + rect.height);
+                                        const parallaxOffset = (scrollPercent - 0.5) * 20; // Max 10px movement in either direction
+                                        
+                                        photoElement.style.transform = `translateY(${parallaxOffset}px)`;
+                                    }
+                                }
+                                
+                                // Throttled scroll listener for performance
+                                let ticking = false;
+                                function onScroll() {
+                                    if (!ticking) {
+                                        requestAnimationFrame(() => {
+                                            updateParallax();
+                                            ticking = false;
+                                        });
+                                        ticking = true;
+                                    }
+                                }
+                                
+                                window.addEventListener('scroll', onScroll, { passive: true });
+                                updateParallax(); // Initial call
+                            }
+                        });
+                    </script>
+                </div>
+                
+                <!-- Mobile-responsive adjustment -->
+                <style>
+                    @media (max-width: 768px) {
+                        #who div[style*="grid-template-columns"] {
+                            grid-template-columns: 1fr !important;
+                            gap: 2rem !important;
+                        }
+                        
+                        #who div[style*="grid-template-columns"] > div:last-child {
+                            order: -1;
+                        }
+                    }
+                </style>
+            </div>
+        </div>
+    </section>
+
+    <!-- Version 100 Milestone -->
+    <section class="version-100-milestone" style="background: linear-gradient(135deg, #006937 0%, #008a47 100%); color: white; padding: 3rem 0; text-align: center;">
+        <div class="container">
+            <div style="max-width: 800px; margin: 0 auto;">
+                <h2 style="color: #ffd700; font-size: 2.5rem; margin-bottom: 1rem; font-family: var(--font-heading);">
+                    🎉 BUILD 100: A Milestone in Mutual Aid 🎉
+                </h2>
+                <p style="font-size: 1.2rem; margin-bottom: 1.5rem; line-height: 1.6;">
+                    We've reached build 100 of The People's Elbow website! This milestone represents our commitment to transparency, community-driven development, and the radical idea that <strong>mutual aid infrastructure should be freely copyable</strong>.
+                </p>
+                <div style="background: rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 2rem; margin: 2rem 0;">
+                    <h3 style="color: #ffd700; margin-bottom: 1rem;">Copy This Site for $10/Year</h3>
+                    <p style="margin-bottom: 1rem;">
+                        This entire website - forms, database, hosting, and all - runs on <strong>Cloudflare</strong> for about $10 per year. No hidden costs, no vendor lock-in, no corporate dependencies.
+                    </p>
+                    <p style="margin-bottom: 1rem;">
+                        <strong>Steal this site!</strong> Fork our <a href="https://github.com/degenai/peoples-elbow" style="color: #ffd700; text-decoration: underline;">open-source code</a>, adapt it for your community's mutual aid project, and start serving your neighbors with the same low-cost, high-impact approach.
+                    </p>
+                    <p style="font-style: italic; font-size: 0.95rem;">
+                        Mutual aid means building infrastructure that communities can own, understand, and replicate. Every commit, every build, every improvement is documented and freely shareable.
+                    </p>
+                </div>
+                <div style="margin-top: 2rem;">
+                    <a href="/steal-this-site.html" class="btn btn-secondary" style="background: #ffd700; color: #006937; padding: 1rem 2rem; font-weight: bold; border-radius: 6px; text-decoration: none; display: inline-block; margin-right: 1rem;">
+                        Steal This Site →
+                    </a>
+                    <a href="/changelog.html" class="btn" style="background: rgba(255, 255, 255, 0.2); color: white; padding: 1rem 2rem; border-radius: 6px; text-decoration: none; display: inline-block;">
+                        View All 100 Builds
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <section id="services" class="services">
         <div class="container">
             <h2 class="section-title">Our Services</h2>

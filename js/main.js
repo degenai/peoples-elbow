@@ -207,7 +207,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (data.success && data.pagination && data.pagination.total) {
                 const version = data.pagination.total;
                 headerVersionElement.textContent = version;
-                console.log('Header version updated from D1 database:', `v${version}`);
+                // Header version updated from D1 database
             } else {
                 throw new Error('Invalid D1 response format');
             }
@@ -216,7 +216,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Don't fall back to incorrect local data - show error state instead
             headerVersionElement.textContent = 'v?';
             headerVersionElement.style.opacity = '0.6';
-            console.log('Header version showing error state due to D1 API failure');
+                            // Header version showing error state due to D1 API failure
         }
     }
     

@@ -19,7 +19,7 @@ class D1Changelog {
     }
 
     async init() {
-        console.log('D1 Changelog initializing...');
+        // D1 Changelog initializing
         await this.loadChangelog();
         this.setupEventListeners();
     }
@@ -83,7 +83,7 @@ class D1Changelog {
             // Update header badge with the same authoritative version
             if (headerVersionElement) {
                 headerVersionElement.textContent = `v${version}`;
-                console.log('Header badge updated to authoritative D1 version:', `v${version}`);
+                // Header badge updated to authoritative D1 version
             }
         } else {
             versionElement.textContent = 'v0';

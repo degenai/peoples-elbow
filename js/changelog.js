@@ -8,24 +8,15 @@
  */
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Changelog script running');
-    console.log('BUILD VERSION DIRECT CHECK: ' + (window.PEOPLES_ELBOW_VERSION_DATA ? window.PEOPLES_ELBOW_VERSION_DATA.version : 'NOT LOADED YET'));
-    
     // Elements we'll be updating
     const timelineElement = document.getElementById('commit-timeline');
     const versionNumberElement = document.getElementById('version-number');
     const footerVersionElement = document.getElementById('footer-version-number');
     
-    console.log('Timeline element found:', timelineElement ? 'Yes' : 'No');
-    console.log('Version number element found:', versionNumberElement ? 'Yes' : 'No');
-    console.log('Footer version element found:', footerVersionElement ? 'Yes' : 'No');
-    
     /**
      * Sets the version number on the page
      */
     function setVersionNumber(version) {
-        console.log('Setting version number to:', version);
-        
         // Update specific elements if they exist
         if (versionNumberElement) {
             versionNumberElement.textContent = version;
@@ -45,7 +36,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Also update any other version elements with class version-number
         const allVersionElements = document.querySelectorAll('.version-number, #header-version-number');
-        console.log('Found', allVersionElements.length, 'version elements to update');
         allVersionElements.forEach(element => {
             element.textContent = version;
         });
@@ -121,8 +111,6 @@ document.addEventListener('DOMContentLoaded', function() {
         timelineElement.innerHTML = '';
         const fragment = document.createDocumentFragment();
         
-        console.log(`Displaying ${commits.length} commits in timeline`);
-        
         // Track versions we've already displayed (avoid duplicates)
         const displayedVersions = new Set();
         let displayedCount = 0;
@@ -132,7 +120,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Check for duplicate versions - only show the first occurrence of each version
                 // (but always show version-incrementing commits)
                 if (!commit.isVersionIncrementing && displayedVersions.has(commit.version)) {
-                    console.log('Skipping duplicate version:', commit.version, commit.hash);
                     return;
                 }
                 
@@ -239,59 +226,36 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         timelineElement.appendChild(fragment);
-        console.log('Timeline display complete with', displayedCount, 'entries out of', commits.length, 'total commits');
     }
     
     // Process version data
     if (window.PEOPLES_ELBOW_VERSION_DATA) {
         const versionData = window.PEOPLES_ELBOW_VERSION_DATA;
-        console.log('Version data found:', versionData.version);
-        console.log('Last updated:', versionData.lastUpdated);
-        console.log('Total commits in data:', versionData.commits.length);
 
-    // Set the global version number for the page
-    setVersionNumber(versionData.version);
+        // Set the global version number for the page
+        setVersionNumber(versionData.version);
 
-    // Initial log of all commits from version-data.js
-    console.log('Raw commits from version-data.js:');
-    versionData.commits.forEach((commit, i) => {
-        console.log(`[Raw ${i}] Hash: ${commit.hash}, Version ${commit.version}, SkipIncrement: ${commit.shouldSkipVersionIncrement}, SkipCI: ${commit.isSkipCiCommit}, Subject: ${commit.subject}`);
-    });
+        // Filter for meaningful commits to display on the timeline
+        // We only want to show commits that increment the version and are not marked [skip ci]
+        const meaningfulDisplayCommits = versionData.commits.filter(commit => {
+            const isMeaningful = !commit.shouldSkipVersionIncrement;
+            const isNotSkipCi = !commit.isSkipCiCommit;
+            return isMeaningful && isNotSkipCi;
+        });
 
-    // Filter for meaningful commits to display on the timeline
-    // We only want to show commits that increment the version and are not marked [skip ci]
-    const meaningfulDisplayCommits = versionData.commits.filter(commit => {
-        const isMeaningful = !commit.shouldSkipVersionIncrement;
-        const isNotSkipCi = !commit.isSkipCiCommit;
-        return isMeaningful && isNotSkipCi;
-    });
-    // Display commits in their natural order (newest first from version-data.js)
-    // meaningfulDisplayCommits.reverse(); // Removed - we want newest first
-
-    console.log(`
---- TIMELINE COMMIT SELECTION ---`);
-    console.log(`Total raw commits: ${versionData.commits.length}`);
-    console.log(`Commits selected for timeline display: ${meaningfulDisplayCommits.length}`);
-    meaningfulDisplayCommits.forEach((commit, i) => {
-        console.log(`  [Display ${i}] Hash: ${commit.hash}, Version: ${commit.version}, Subject: ${commit.subject}`);
-    });
-    console.log('--- END TIMELINE COMMIT SELECTION ---\n');
-
-    // Use timeout for better performance and display the selected commits
-    setTimeout(() => {
-        try {
-            if (meaningfulDisplayCommits.length > 0) {
-                displayCommitHistory(meaningfulDisplayCommits);
-                console.log('Timeline displayed successfully with meaningful commits.');
-            } else {
-                console.log('No meaningful commits to display on the timeline.');
-                if (timelineElement) timelineElement.innerHTML = '<p>No significant updates to display at this time.</p>';
+        // Use timeout for better performance and display the selected commits
+        setTimeout(() => {
+            try {
+                if (meaningfulDisplayCommits.length > 0) {
+                    displayCommitHistory(meaningfulDisplayCommits);
+                } else {
+                    if (timelineElement) timelineElement.innerHTML = '<p>No significant updates to display at this time.</p>';
+                }
+            } catch (error) {
+                console.error('Display error:', error);
+                showErrorMessage('Error displaying timeline: ' + error.message);
             }
-        } catch (error) {
-            console.error('Display error:', error);
-            showErrorMessage('Error displaying timeline: ' + error.message);
-        }
-    }, 10);
+        }, 10);
     } else {
         // Handle case where version data is not found
         console.warn('PEOPLES_ELBOW_VERSION_DATA not found. Displaying fallback message.');
