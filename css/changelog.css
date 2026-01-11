@@ -580,7 +580,43 @@
     text-shadow: 2px 2px 0 #CE9C00, 3px 3px 0 rgba(0, 0, 0, 0.5);
 }
 
-/* Innovation Highlight Section */
+/* Changelog Explanation Section (clean, honest copy) */
+.changelog-explanation {
+    background: rgba(0, 0, 0, 0.6);
+    border-radius: 10px;
+    padding: 2rem;
+    margin: 2rem 0;
+    border-left: 4px solid #CE9C00;
+}
+
+.changelog-explanation h3 {
+    font-family: 'Bangers', cursive;
+    font-size: 1.5rem;
+    color: #CE9C00;
+    margin-bottom: 1rem;
+    margin-top: 1.5rem;
+}
+
+.changelog-explanation h3:first-child {
+    margin-top: 0;
+}
+
+.changelog-explanation p {
+    color: #ddd;
+    line-height: 1.7;
+    margin-bottom: 1rem;
+}
+
+.changelog-explanation a {
+    color: #CE9C00;
+    text-decoration: underline;
+}
+
+.changelog-explanation a:hover {
+    color: #fff;
+}
+
+/* Legacy Innovation Highlight Section (deprecated, keeping for reference) */
 .innovation-highlight {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     border-radius: 15px;
