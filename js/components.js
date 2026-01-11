@@ -168,7 +168,7 @@ class ComponentLoader {
         
         try {
             // Fetch from the same D1 API that the changelog uses
-            const response = await fetch('https://changelog-reader.alex-adamczyk.workers.dev/api/changelog?page=0&limit=1');
+            const response = await fetch('https://changelog-reader.alex-adamczyk.workers.dev?limit=1&offset=0');
             const data = await response.json();
             
             if (data.success && data.pagination && data.pagination.total) {

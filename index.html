@@ -257,36 +257,19 @@
         </div>
     </section>
 
-    <!-- Version 100 Milestone -->
-    <section class="version-100-milestone" style="background: linear-gradient(135deg, #006937 0%, #008a47 100%); color: white; padding: 3rem 0; text-align: center;">
+    <!-- Steal This Site Banner -->
+    <section class="steal-banner" style="background: linear-gradient(135deg, #006937 0%, #008a47 100%); color: white; padding: 2.5rem 0; text-align: center;">
         <div class="container">
-            <div style="max-width: 800px; margin: 0 auto;">
-                <h2 style="color: #ffd700; font-size: 2.5rem; margin-bottom: 1rem; font-family: var(--font-heading);">
-                    🎉 BUILD 100: A Milestone in Mutual Aid 🎉
+            <div style="max-width: 700px; margin: 0 auto;">
+                <h2 style="color: #ffd700; font-size: 2rem; margin-bottom: 0.75rem; font-family: var(--font-heading);">
+                    This Site Costs $10/Year. Take It.
                 </h2>
-                <p style="font-size: 1.2rem; margin-bottom: 1.5rem; line-height: 1.6;">
-                    We've reached build 100 of The People's Elbow website! This milestone represents our commitment to transparency, community-driven development, and the radical idea that <strong>mutual aid infrastructure should be freely copyable</strong>.
+                <p style="font-size: 1.1rem; margin-bottom: 1.5rem; line-height: 1.6;">
+                    Running a community project? Don't give Squarespace $200/year. Fork our code, adapt it, and own your infrastructure.
                 </p>
-                <div style="background: rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 2rem; margin: 2rem 0;">
-                    <h3 style="color: #ffd700; margin-bottom: 1rem;">Copy This Site for $10/Year</h3>
-                    <p style="margin-bottom: 1rem;">
-                        This entire website - forms, database, hosting, and all - runs on <strong>Cloudflare</strong> for about $10 per year. No hidden costs, no vendor lock-in, no corporate dependencies.
-                    </p>
-                    <p style="margin-bottom: 1rem;">
-                        <strong>Steal this site!</strong> Fork our <a href="https://github.com/degenai/peoples-elbow" style="color: #ffd700; text-decoration: underline;">open-source code</a>, adapt it for your community's mutual aid project, and start serving your neighbors with the same low-cost, high-impact approach.
-                    </p>
-                    <p style="font-style: italic; font-size: 0.95rem;">
-                        Mutual aid means building infrastructure that communities can own, understand, and replicate. Every commit, every build, every improvement is documented and freely shareable.
-                    </p>
-                </div>
-                <div style="margin-top: 2rem;">
-                    <a href="/steal-this-site.html" class="btn btn-secondary" style="background: #ffd700; color: #006937; padding: 1rem 2rem; font-weight: bold; border-radius: 6px; text-decoration: none; display: inline-block; margin-right: 1rem;">
-                        Steal This Site →
-                    </a>
-                    <a href="/changelog.html" class="btn" style="background: rgba(255, 255, 255, 0.2); color: white; padding: 1rem 2rem; border-radius: 6px; text-decoration: none; display: inline-block;">
-                        View All 100 Builds
-                    </a>
-                </div>
+                <a href="/steal-this-site.html" class="btn btn-secondary" style="background: #ffd700; color: #006937; padding: 1rem 2rem; font-weight: bold; border-radius: 6px; text-decoration: none; display: inline-block;">
+                    Steal This Site →
+                </a>
             </div>
         </div>
     </section>
@@ -500,11 +483,5 @@
     <!-- JavaScript -->
     <script src="js/components.js"></script>
     <script src="js/main.js"></script>
-    <script>
-        // Add timestamp to prevent caching
-        const timestamp = Date.now();
-        document.write(`<script src="js/version-data.js?v=${timestamp}"><\/script>`);
-        document.write(`<script src="js/changelog.js?v=${timestamp}"><\/script>`);
-    </script>
 </body>
 </html>
