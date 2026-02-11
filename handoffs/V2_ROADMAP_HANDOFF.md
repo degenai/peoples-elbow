@@ -214,8 +214,8 @@ Also update the response parsing - the API returns `pagination.total`, which is 
 |------|--------|--------|
 | `changelog-reader-worker.js` | ✅ KEEP | **ACTIVE** - D1 API |
 | `changelog-writer-worker.js` | ✅ KEEP | **ACTIVE** - D1 write API |
-| `contact-form-worker.js` | ✅ KEEP | Contact form handler |
-| `host-form-worker.js` | ✅ KEEP | Host form handler |
+| `contact-form-worker.js` | 🗑️ DELETED | Consolidated into `host-form-worker.js` |
+| `host-form-worker.js` | ✅ KEEP | Main form handler (Host & Contact) |
 | `wrangler-changelog-reader.toml` | ✅ KEEP | Config file |
 | `node_modules/` | ❓ CHECK | May not need to be tracked |
 
