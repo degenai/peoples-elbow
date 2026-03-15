@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restricted Area | The People's Elbow</title>
+    <link rel="shortcut icon" href="images/logo.png" type="image/png">
+
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Open+Sans:wght@400;700&display=swap">
+
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="css/main.css">
+    <style>
+        .login-container {
+            text-align: center;
+            padding: 4rem 2rem;
+            min-height: 70vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+
+        .login-title {
+            font-family: var(--font-heading);
+            font-size: 3.5rem;
+            color: var(--pe-red);
+            text-transform: uppercase;
+            text-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+            margin-bottom: 1rem;
+        }
+
+        .login-message {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto 2rem auto;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .login-image {
+            max-width: 100%;
+            height: auto;
+            margin: 0 0 2rem 0;
+            border: 5px solid var(--pe-gold);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            border-radius: 8px;
+            max-width: 500px; /* Restrict width */
+        }
+
+        .login-form {
+            background: var(--pe-white);
+            padding: 2.5rem;
+            border-radius: 15px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            max-width: 400px;
+            width: 100%;
+            border-top: 5px solid var(--pe-green);
+        }
+
+        .login-form .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .login-form label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: var(--pe-green-dark);
+            font-size: 1.1rem;
+        }
+
+        .login-form input[type="password"] {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            text-align: center;
+            letter-spacing: 2px;
+        }
+
+        .login-form input[type="password"]:focus {
+            outline: none;
+            border-color: var(--pe-green);
+            box-shadow: 0 0 0 3px rgba(0, 105, 55, 0.1);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1.2rem;
+            font-family: var(--font-heading);
+            letter-spacing: 1px;
+            border-radius: 8px;
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        #login-error {
+            color: var(--pe-red);
+            margin-top: 1rem;
+            font-weight: bold;
+            display: none;
+            text-align: center;
+            padding: 0.5rem;
+            background: rgba(139, 0, 0, 0.1);
+            border-radius: 4px;
+        }
+
+        .loading-spinner {
+            display: none;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Universal Header Component -->
+    <div id="header-placeholder"></div>
+
+    <main>
+        <div class="login-container">
+            <h1 class="login-title">Restricted Area</h1>
+
+            <img src="images/404-technicality.jpg" alt="Restricted Area" class="login-image">
+
+            <p class="login-message">
+                <strong>Halt!</strong> You've reached a protected area of The People's Elbow infrastructure.
+                Please enter the secret password to access the administrative dashboard.
+            </p>
+
+            <div class="login-form">
+                <form id="auth-form">
+                    <div class="form-group">
+                        <label for="admin-password"><i class="fas fa-lock"></i> Secret Password</label>
+                        <input type="password" id="admin-password" name="password" required autofocus placeholder="Enter password...">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary login-btn" id="login-submit-btn">
+                        <span>Unlock Dashboard</span>
+                        <i class="fas fa-key"></i>
+                        <i class="fas fa-circle-notch loading-spinner"></i>
+                    </button>
+
+                    <div id="login-error"></div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- Universal Footer Component -->
+    <div id="footer-placeholder"></div>
+
+    <!-- JavaScript -->
+    <script src="js/components.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const authForm = document.getElementById('auth-form');
+            const errorDiv = document.getElementById('login-error');
+            const submitBtn = document.getElementById('login-submit-btn');
+            const btnText = submitBtn.querySelector('span');
+            const keyIcon = submitBtn.querySelector('.fa-key');
+            const spinner = submitBtn.querySelector('.loading-spinner');
+
+            // The URL for our auth worker
+            const AUTH_WORKER_URL = 'https://admin-auth.alex-adamczyk.workers.dev';
+
+            authForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const password = document.getElementById('admin-password').value;
+                if (!password) return;
+
+                // Show loading state
+                errorDiv.style.display = 'none';
+                btnText.textContent = 'Verifying...';
+                keyIcon.style.display = 'none';
+                spinner.style.display = 'inline-block';
+                submitBtn.disabled = true;
+
+                try {
+                    const response = await fetch(AUTH_WORKER_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ action: 'login', password: password })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success && data.token) {
+                        // Store token in session storage (lasts until browser closes)
+                        sessionStorage.setItem('admin_token', data.token);
+
+                        // Show success state briefly before redirect
+                        submitBtn.classList.remove('btn-primary');
+                        submitBtn.classList.add('btn-secondary'); // Turn gold
+                        btnText.textContent = 'Access Granted!';
+                        spinner.style.display = 'none';
+                        submitBtn.innerHTML += ' <i class="fas fa-check"></i>';
+
+                        // Redirect to dashboard
+                        setTimeout(() => {
+                            window.location.href = 'dashboard.html';
+                        }, 500);
+                    } else {
+                        // Invalid password
+                        throw new Error(data.message || 'Invalid password');
+                    }
+                } catch (error) {
+                    // Show error
+                    errorDiv.textContent = error.message === 'Failed to fetch'
+                        ? 'Could not connect to authentication server. Please try again.'
+                        : error.message;
+                    errorDiv.style.display = 'block';
+
+                    // Reset button state
+                    btnText.textContent = 'Unlock Dashboard';
+                    keyIcon.style.display = 'inline-block';
+                    spinner.style.display = 'none';
+                    submitBtn.disabled = false;
+
+                    // Add shake animation to form
+                    const formContainer = document.querySelector('.login-form');
+                    formContainer.style.animation = 'shake 0.5s';
+                    setTimeout(() => formContainer.style.animation = '', 500);
+                }
+            });
+
+            // Add keyframes for shake animation dynamically
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes shake {
+                    0%, 100% { transform: translateX(0); }
+                    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+                    20%, 40%, 60%, 80% { transform: translateX(5px); }
+                }
+            `;
+            document.head.appendChild(style);
+        });
+    </script>
+</body>
+</html>

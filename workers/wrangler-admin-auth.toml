@@ -1,0 +1,8 @@
+name = "admin-auth"
+main = "admin-auth-worker.js"
+compatibility_date = "2025-04-24"
+
+# Set default password for development
+# To set secret for production: wrangler secret put ADMIN_PASSWORD -c workers/wrangler-admin-auth.toml
+[vars]
+# ADMIN_PASSWORD = "secret_goes_here" # Commented out, set via secrets!
