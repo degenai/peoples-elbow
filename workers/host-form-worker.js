@@ -85,6 +85,54 @@ async function handleRequest(request, env) {
   }
 }
 
+
+/**
+ * Generic helper to handle D1 database insertion and email notification
+ * @param {Object} env - Environment containing D1 bindings and MAIL
+ * @param {string} table - D1 database table name
+ * @param {Object} data - Key-value pairs of data to insert
+ * @param {string} subject - Email subject
+ * @param {string} emailContent - Email body
+ * @param {string} successMessage - Message for successful response
+ */
+async function processFormSubmission(env, table, data, subject, emailContent, successMessage) {
+  try {
+    // Get current date/time as ISO string
+    const createdAt = new Date().toISOString();
+
+    // Add createdAt to data
+    const insertData = { ...data, created_at: createdAt };
+    const columns = Object.keys(insertData);
+    const values = Object.values(insertData);
+    const placeholders = columns.map(() => '?').join(', ');
+
+    // 1. Store in D1 database
+    if (env && env.FORMS_DB) {
+      await env.FORMS_DB.prepare(
+        `INSERT INTO ${table} (${columns.join(', ')}) VALUES (${placeholders})`
+      )
+      .bind(...values)
+      .run();
+    } else {
+      console.warn('D1 database not available');
+    }
+
+    // 2. Send email notification
+    await sendEmail(
+      'peoples.elbow.massage@gmail.com',
+      subject,
+      emailContent,
+      env
+    );
+
+    // Return success response
+    return successResponse(successMessage);
+  } catch (error) {
+    console.error(`Error processing ${table} submission:`, error);
+    return errorResponse('There was an error processing your request. Please try again later.');
+  }
+}
+
 /**
  * Handle host connection form submissions
  * @param {FormData} formData
@@ -116,36 +164,20 @@ async function handleHostForm(formData, env) {
     ${message}
   `
   
-  try {
-    // Get current date/time as ISO string
-    const createdAt = new Date().toISOString();
-    
-    // 1. Store in D1 database
-    if (env && env.FORMS_DB) {
-      await env.FORMS_DB.prepare(
-        `INSERT INTO host_submissions (venue_name, contact_name, contact_email, venue_type, message, created_at) 
-         VALUES (?, ?, ?, ?, ?, ?)`
-      )
-      .bind(venueName, contactName, contactEmail, venueType, message, createdAt)
-      .run();
-    } else {
-      console.warn('D1 database not available');
-    }
-    
-    // 2. Send email notification
-    await sendEmail(
-      'peoples.elbow.massage@gmail.com', 
-      `New Host Request: ${venueName}`,
-      emailContent,
-      env
-    );
-    
-    // Return success response
-    return successResponse('Your hosting request has been received! We\'ll be in touch soon.');
-  } catch (error) {
-    console.error('Error processing host form:', error);
-    return errorResponse('There was an error processing your request. Please try again later.');
-  }
+  return processFormSubmission(
+    env,
+    'host_submissions',
+    {
+      venue_name: venueName,
+      contact_name: contactName,
+      contact_email: contactEmail,
+      venue_type: venueType,
+      message: message
+    },
+    `New Host Request: ${venueName}`,
+    emailContent,
+    'Your hosting request has been received! We\'ll be in touch soon.'
+  );
 }
 
 /**
@@ -175,36 +207,18 @@ async function handleContactForm(formData, env) {
     ${message}
   `
   
-  try {
-    // Get current date/time as ISO string
-    const createdAt = new Date().toISOString();
-    
-    // 1. Store in D1 database
-    if (env && env.FORMS_DB) {
-      await env.FORMS_DB.prepare(
-        `INSERT INTO contact_submissions (name, email, message, created_at) 
-         VALUES (?, ?, ?, ?)`
-      )
-      .bind(name, email, message, createdAt)
-      .run();
-    } else {
-      console.warn('D1 database not available');
-    }
-    
-    // 2. Send email notification
-    await sendEmail(
-      'peoples.elbow.massage@gmail.com', 
-      `New Contact Form Message from ${name}`,
-      emailContent,
-      env
-    );
-    
-    // Return success response
-    return successResponse('Your message has been received! We\'ll get back to you soon.');
-  } catch (error) {
-    console.error('Error processing contact form:', error);
-    return errorResponse('There was an error sending your message. Please try again later.');
-  }
+  return processFormSubmission(
+    env,
+    'contact_submissions',
+    {
+      name: name,
+      email: email,
+      message: message
+    },
+    `New Contact Form Message from ${name}`,
+    emailContent,
+    'Your message has been received! We\'ll get back to you soon.'
+  );
 }
 
 /**
