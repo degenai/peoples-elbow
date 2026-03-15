@@ -160,6 +160,62 @@ class ComponentLoader {
     }
 
     /**
+     * Get the current site version, using caching to prevent duplicate requests
+     */
+    async getVersion() {
+        // 1. Check in-memory cache
+        if (this._versionCache !== undefined) {
+            return this._versionCache;
+        }
+
+        // 2. Check if a fetch is already in progress
+        if (this._versionPromise) {
+            return this._versionPromise;
+        }
+
+        // 3. Check sessionStorage
+        try {
+            const storedVersion = sessionStorage.getItem('site_version');
+            if (storedVersion) {
+                const version = parseInt(storedVersion, 10);
+                if (!isNaN(version)) {
+                    this._versionCache = version;
+                    return version;
+                }
+            }
+        } catch (e) {
+            // Ignore sessionStorage errors (e.g., in incognito mode)
+        }
+
+        // 4. Fetch from API
+        this._versionPromise = (async () => {
+            try {
+                const response = await fetch('https://changelog-reader.alex-adamczyk.workers.dev?limit=1&offset=0');
+                const data = await response.json();
+
+                if (data.success && data.pagination && data.pagination.total) {
+                    const version = data.pagination.total;
+                    this._versionCache = version;
+
+                    try {
+                        sessionStorage.setItem('site_version', version);
+                    } catch (e) {
+                        // Ignore sessionStorage errors
+                    }
+
+                    return version;
+                } else {
+                    throw new Error('Invalid D1 response format');
+                }
+            } finally {
+                this._versionPromise = null;
+            }
+        })();
+
+        return this._versionPromise;
+    }
+
+    /**
      * Initialize version number display
      */
     async initializeVersionNumber() {
@@ -167,26 +223,18 @@ class ComponentLoader {
         if (!headerVersionElement) return;
         
         try {
-            // Fetch from the same D1 API that the changelog uses
-            const response = await fetch('https://changelog-reader.alex-adamczyk.workers.dev?limit=1&offset=0');
-            const data = await response.json();
+            const version = await this.getVersion();
+            headerVersionElement.textContent = version;
             
-            if (data.success && data.pagination && data.pagination.total) {
-                const version = data.pagination.total;
-                headerVersionElement.textContent = version;
-                
-                // Special styling for version 100 milestone
-                if (version === 100) {
-                    const versionBadge = headerVersionElement.closest('.version-badge');
-                    if (versionBadge) {
-                        versionBadge.classList.add('milestone-100');
-                    }
+            // Special styling for version 100 milestone
+            if (version === 100) {
+                const versionBadge = headerVersionElement.closest('.version-badge');
+                if (versionBadge) {
+                    versionBadge.classList.add('milestone-100');
                 }
-                
-                // Header version updated from D1 database
-            } else {
-                throw new Error('Invalid D1 response format');
             }
+
+            // Header version updated from D1 database
         } catch (error) {
             console.warn('Failed to fetch D1 version:', error);
             // Don't fall back to incorrect local data - show error state instead
