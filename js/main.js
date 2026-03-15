@@ -194,25 +194,24 @@ document.addEventListener('DOMContentLoaded', function() {
     // Call animation function
     animateStats();
     
-    // Version number update - fetch from authoritative D1 database
+    // Version number update - use centralized component loader
     async function updateVersionNumber() {
         const headerVersionElement = document.getElementById('header-version-number');
         if (!headerVersionElement) return;
         
         try {
-            // Fetch from the same D1 API that the changelog uses
-            const response = await fetch('https://changelog-reader.alex-adamczyk.workers.dev?limit=1&offset=0');
-            const data = await response.json();
-            
-            if (data.success && data.pagination && data.pagination.total) {
-                const version = data.pagination.total;
+            // Wait for componentLoader to be available if it's not already
+            if (window.componentLoader && window.componentLoader.getVersion) {
+                const version = await window.componentLoader.getVersion();
                 headerVersionElement.textContent = version;
-                // Header version updated from D1 database
+                // Header version updated from cached D1 database
             } else {
-                throw new Error('Invalid D1 response format');
+                // Fallback in case main.js runs before components.js
+                // We'll let components.js handle the update when it loads
+                console.log('ComponentLoader not available yet, deferring version update');
             }
         } catch (error) {
-            console.warn('Failed to fetch D1 version:', error);
+            console.warn('Failed to fetch version from cache:', error);
             // Don't fall back to incorrect local data - show error state instead
             headerVersionElement.textContent = 'v?';
             headerVersionElement.style.opacity = '0.6';
