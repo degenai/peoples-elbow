@@ -6,7 +6,45 @@
  */
 
 // Import statements for Workers functionality
-import { EmailMessage } from 'cloudflare:email';
+// Use a placeholder for EmailMessage when running in Node.js environments for testing
+let EmailMessage;
+try {
+  ({ EmailMessage } = await import('cloudflare:email'));
+} catch (e) {
+  // Mock EmailMessage for Node.js testing
+  EmailMessage = class {
+    constructor(from, to, raw) {
+      this.from = from;
+      this.to = to;
+      this.raw = raw;
+    }
+  };
+}
+
+// Whitelist of allowed origins
+const ALLOWED_ORIGINS = [
+  'https://peoples-elbow.com',
+  'https://degenai.github.io'
+];
+
+/**
+ * Get CORS headers based on the request origin
+ * @param {Request} request
+ * @returns {Object} CORS headers
+ */
+function getCorsHeaders(request) {
+  const origin = request.headers.get('Origin');
+  const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+
+  return {
+    'Access-Control-Allow-Origin': allowedOrigin,
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Max-Age': '86400',
+    'Vary': 'Origin',
+    'Content-Type': 'application/json'
+  };
+}
 
 /**
  * Main handler for all incoming requests
@@ -18,7 +56,7 @@ export default {
   async fetch(request, env, ctx) {
     // Handle CORS preflight requests
     if (request.method === 'OPTIONS') {
-      return handleCors();
+      return handleCors(request);
     }
     
     // Check if database is accessible
@@ -44,15 +82,11 @@ export default {
 
 /**
  * Handle CORS preflight requests
+ * @param {Request} request
  */
-function handleCors() {
+function handleCors(request) {
   return new Response(null, {
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
-      'Access-Control-Max-Age': '86400',
-    }
+    headers: getCorsHeaders(request)
   });
 }
 
@@ -64,7 +98,10 @@ function handleCors() {
 async function handleRequest(request, env) {
   // Only allow POST requests
   if (request.method !== 'POST') {
-    return new Response('Method not allowed', { status: 405 })
+    return new Response('Method not allowed', {
+      status: 405,
+      headers: getCorsHeaders(request)
+    })
   }
 
   try {
@@ -75,13 +112,13 @@ async function handleRequest(request, env) {
     const isHostForm = formData.has('venue-name');
     
     if (isHostForm) {
-      return handleHostForm(formData, env);
+      return handleHostForm(formData, env, request);
     } else {
-      return handleContactForm(formData, env);
+      return handleContactForm(formData, env, request);
     }
   } catch (error) {
     console.error('Error processing request:', error);
-    return errorResponse('There was an error processing your request. Please try again later.');
+    return errorResponse('There was an error processing your request. Please try again later.', 500, request);
   }
 }
 
@@ -90,7 +127,7 @@ async function handleRequest(request, env) {
  * @param {FormData} formData
  * @param {Env} env - Environment containing D1 bindings
  */
-async function handleHostForm(formData, env) {
+async function handleHostForm(formData, env, request) {
   // Extract form fields
   const venueName = formData.get('venue-name')
   const contactName = formData.get('contact-name')
@@ -100,7 +137,7 @@ async function handleHostForm(formData, env) {
   
   // Validate required fields
   if (!venueName || !contactName || !contactEmail || !venueType) {
-    return errorResponse('Please fill in all required fields', 400);
+    return errorResponse('Please fill in all required fields', 400, request);
   }
   
   // Format the email content
@@ -141,10 +178,10 @@ async function handleHostForm(formData, env) {
     );
     
     // Return success response
-    return successResponse('Your hosting request has been received! We\'ll be in touch soon.');
+    return successResponse('Your hosting request has been received! We\'ll be in touch soon.', request);
   } catch (error) {
     console.error('Error processing host form:', error);
-    return errorResponse('There was an error processing your request. Please try again later.');
+    return errorResponse('There was an error processing your request. Please try again later.', 500, request);
   }
 }
 
@@ -153,7 +190,7 @@ async function handleHostForm(formData, env) {
  * @param {FormData} formData
  * @param {Env} env - Environment containing D1 bindings
  */
-async function handleContactForm(formData, env) {
+async function handleContactForm(formData, env, request) {
   // Extract form fields
   const name = formData.get('name')
   const email = formData.get('email')
@@ -161,7 +198,7 @@ async function handleContactForm(formData, env) {
   
   // Validate required fields
   if (!name || !email || !message) {
-    return errorResponse('Please fill in all required fields', 400);
+    return errorResponse('Please fill in all required fields', 400, request);
   }
   
   // Format the email content
@@ -200,10 +237,10 @@ async function handleContactForm(formData, env) {
     );
     
     // Return success response
-    return successResponse('Your message has been received! We\'ll get back to you soon.');
+    return successResponse('Your message has been received! We\'ll get back to you soon.', request);
   } catch (error) {
     console.error('Error processing contact form:', error);
-    return errorResponse('There was an error sending your message. Please try again later.');
+    return errorResponse('There was an error sending your message. Please try again later.', 500, request);
   }
 }
 
@@ -268,30 +305,24 @@ async function sendEmail(to, subject, body, env) {
 /**
  * Create a success response
  */
-function successResponse(message) {
+function successResponse(message, request) {
   return new Response(JSON.stringify({
     success: true,
     message: message
   }), {
-    headers: {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*'
-    }
+    headers: getCorsHeaders(request)
   });
 }
 
 /**
  * Create an error response
  */
-function errorResponse(message, status = 500) {
+function errorResponse(message, status = 500, request) {
   return new Response(JSON.stringify({
     success: false,
     message: message
   }), {
-    headers: {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*'
-    },
+    headers: getCorsHeaders(request),
     status: status
   });
 }

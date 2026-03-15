@@ -1,12 +1,31 @@
+// Whitelist of allowed origins
+const ALLOWED_ORIGINS = [
+  'https://peoples-elbow.com',
+  'https://degenai.github.io'
+];
+
+/**
+ * Get CORS headers based on the request origin
+ * @param {Request} request
+ * @returns {Object} CORS headers
+ */
+function getCorsHeaders(request) {
+  const origin = request.headers.get('Origin');
+  const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+
+  return {
+    'Access-Control-Allow-Origin': allowedOrigin,
+    'Access-Control-Allow-Methods': 'GET, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Max-Age': '86400',
+    'Vary': 'Origin',
+    'Content-Type': 'application/json'
+  };
+}
+
 export default {
   async fetch(request, env, ctx) {
-    // Set CORS headers for cross-origin requests
-    const corsHeaders = {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
-      'Content-Type': 'application/json'
-    };
+    const corsHeaders = getCorsHeaders(request);
 
     // Handle preflight OPTIONS request
     if (request.method === 'OPTIONS') {
