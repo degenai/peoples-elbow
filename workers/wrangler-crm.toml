@@ -11,4 +11,4 @@ ADMIN_PASSWORD = "change_me_in_production"
 # Bind the KV namespace for storing the CRM data blob
 [[kv_namespaces]]
 binding = "PEOPLES_ELBOW_CRM"
-id = "YOUR_KV_NAMESPACE_ID_HERE" # User will need to replace this or run wrangler kv:namespace create
+id = "ec9e4efbf0834900936ca5b52dec3810"
