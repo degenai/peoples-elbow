@@ -132,10 +132,11 @@ function handleCors(request) {
 function getCorsHeaders(request) {
   const origin = request?.headers?.get('Origin') || '';
 
-  // Check if the origin is in our allowed list, or if it's localhost (for local dev)
+  // Check if the origin is in our allowed list, localhost (dev), or a Pages PR preview
   const isAllowedOrigin = ALLOWED_ORIGINS.includes(origin) ||
                           origin.startsWith('http://localhost:') ||
-                          origin.startsWith('http://127.0.0.1:');
+                          origin.startsWith('http://127.0.0.1:') ||
+                          origin.endsWith('.peoples-elbow.pages.dev');
 
   return {
     'Access-Control-Allow-Origin': isAllowedOrigin ? origin : ALLOWED_ORIGINS[0],
