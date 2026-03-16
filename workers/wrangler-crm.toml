@@ -1,0 +1,14 @@
+name = "crm-worker"
+main = "crm-worker.js"
+compatibility_date = "2024-03-20"
+workers_dev = true
+
+# The environment variable for the admin password, used to verify the token.
+# DO NOT COMMIT THE ACTUAL PASSWORD HERE. Use `wrangler secret put ADMIN_PASSWORD`
+[vars]
+ADMIN_PASSWORD = "change_me_in_production"
+
+# Bind the KV namespace for storing the CRM data blob
+[[kv_namespaces]]
+binding = "PEOPLES_ELBOW_CRM"
+id = "YOUR_KV_NAMESPACE_ID_HERE" # User will need to replace this or run wrangler kv:namespace create
