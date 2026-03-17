@@ -154,7 +154,7 @@ async function runEntranceAnimations() {
     translateY: [-20, 0],
     duration: 400,
     ease: 'outQuad'
-  });
+  }).finished;
 
   // Tool cards stagger reveal using anime.js v4
   anime(cards, {
@@ -266,12 +266,6 @@ function setupEventListeners() {
   });
 }
 
-function updateProgress(current, total, message) {
-  const percentage = Math.round((current / total) * 100);
-  elements.progressFill.style.width = `${percentage}%`;
-  elements.progressText.textContent = message;
-}
-
 // ============================================
 // DATA LOADING
 // ============================================
@@ -284,20 +278,25 @@ async function refreshCandidates() {
     };
 
     const data = await CrmApi.getLeads();
-    const now = Date.now();
-    const followUpDays = options.followUpDays || 14;
-    const statusFilter = options.statusFilter || 'active';
+    // In case of API failure, data might not have a leads array
+    if (!data || !data.leads) {
+      state.eligibleLeads = [];
+    } else {
+      const now = Date.now();
+      const followUpDays = options.followUpDays || 14;
+      const statusFilter = options.statusFilter || 'active';
 
-    state.eligibleLeads = (data.leads || []).filter(lead => {
-      if (statusFilter === 'active' && lead.status !== 'active') return false;
-      if (!lead.address || !lead.address.trim()) return false;
-      if (followUpDays > 0) {
-        if (!lead.lastVisit) return true;
-        const daysSinceVisit = Math.floor((now - new Date(lead.lastVisit).getTime()) / (1000 * 60 * 60 * 24));
-        return daysSinceVisit >= followUpDays;
-      }
-      return true;
-    });
+      state.eligibleLeads = data.leads.filter(lead => {
+        if (statusFilter === 'active' && lead.status !== 'active') return false;
+        if (!lead.address || !lead.address.trim()) return false;
+        if (followUpDays > 0) {
+          if (!lead.lastVisit) return true;
+          const daysSinceVisit = Math.floor((now - new Date(lead.lastVisit).getTime()) / (1000 * 60 * 60 * 24));
+          return daysSinceVisit >= followUpDays;
+        }
+        return true;
+      });
+    }
 
     // Animate count update with anime.js
     const oldCount = parseInt(elements.eligibleCount.textContent) || 0;
