@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://admin-auth.alex-adamczyk.workers.dev https://crm-worker.alex-adamczyk.workers.dev; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://api.deepseek.com https://cdnjs.cloudflare.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; connect-src 'self' https://admin-auth.alex-adamczyk.workers.dev https://crm-worker.alex-adamczyk.workers.dev https://api.deepseek.com https://nominatim.openstreetmap.org https://cloudflareinsights.com">
+  <title>Utility Belt - Lead-o-Tron 5000</title>
+  <link rel="shortcut icon" href="images/logo.png" type="image/png">
+  <link rel="stylesheet" href="css/crm.css">
+
+  <!-- Auth Check Script - Runs immediately before page renders -->
+  <style id="auth-shield">
+      body { display: none !important; }
+  </style>
+  <script>
+      // Check for token before revealing content
+      const token = sessionStorage.getItem('admin_token');
+      if (!token) {
+          window.location.replace('login.html');
+      } else {
+          // Validate token asynchronously and unhide body on success
+          fetch('https://admin-auth.alex-adamczyk.workers.dev', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ action: 'verify', token: token })
+          })
+          .then(res => res.json())
+          .then(data => {
+              if (!data.success) {
+                  sessionStorage.removeItem('admin_token');
+                  window.location.replace('login.html');
+              } else {
+                  const shield = document.getElementById('auth-shield');
+                  if (shield) shield.remove();
+              }
+          })
+          .catch(() => {
+              console.warn('Could not verify token with server');
+              sessionStorage.removeItem('admin_token');
+              window.location.replace('login.html');
+          });
+      }
+  </script>
+
+  <style>
+    /* Utility Belt Specific Styles */
+    .utility-belt-app {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .utility-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-md) var(--space-lg);
+      background: linear-gradient(135deg, var(--pe-green-dark) 0%, var(--pe-green) 100%);
+      border-bottom: 3px solid var(--pe-gold);
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+
+    .utility-header .header-left {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+
+    .back-btn {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: var(--text-primary);
+      font-size: 18px;
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .back-btn:hover {
+      background: rgba(255,199,44,0.2);
+      border-color: var(--pe-gold);
+    }
+
+    .utility-title {
+      font-family: var(--font-family-display);
+      font-size: 24px;
+      color: var(--pe-gold);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .utility-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: var(--space-xl);
+      background: var(--bg-dark);
+    }
+
+    .tool-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: var(--space-lg);
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .tool-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(40px) scale(0.9);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .tool-card:hover {
+      border-color: var(--pe-gold);
+      box-shadow: 0 8px 32px rgba(255, 199, 44, 0.15);
+    }
+
+    .tool-card-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      padding: var(--space-lg);
+      background: var(--pe-green);
+      border-bottom: 2px solid var(--pe-gold);
+    }
+
+    .tool-icon {
+      font-size: 32px;
+    }
+
+    .tool-card-header h2 {
+      font-size: 18px;
+      color: var(--pe-gold);
+      margin: 0;
+    }
+
+    .tool-card-body {
+      padding: var(--space-lg);
+    }
+
+    /* Route Finder Specific */
+    .route-config {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+
+    .config-row {
+      display: flex;
+      gap: var(--space-md);
+      align-items: flex-end;
+    }
+
+    .config-group {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+
+    .config-group label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .config-group input,
+    .config-group select {
+      padding: var(--space-sm) var(--space-md);
+      background: var(--bg-dark);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      color: var(--text-primary);
+      font-size: 14px;
+    }
+
+    .config-group input:focus,
+    .config-group select:focus {
+      outline: none;
+      border-color: var(--pe-gold);
+    }
+
+    .lead-count-display {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-md);
+      background: var(--bg-dark);
+      border-radius: var(--radius-md);
+      margin-top: var(--space-sm);
+    }
+
+    .lead-count-label {
+      color: var(--text-secondary);
+      font-size: 13px;
+    }
+
+    .lead-count-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--pe-gold);
+    }
+
+    .slider-group {
+      margin-top: var(--space-md);
+    }
+
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: var(--space-xs);
+    }
+
+    .slider-value {
+      font-weight: 700;
+      color: var(--pe-gold);
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--pe-gold);
+      cursor: pointer;
+    }
+
+    .btn-calculate {
+      width: 100%;
+      padding: var(--space-md);
+      margin-top: var(--space-lg);
+      background: var(--pe-gold);
+      color: var(--pe-green-dark);
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-calculate:hover:not(:disabled) {
+      background: var(--pe-gold-light);
+      box-shadow: 0 4px 16px rgba(255, 199, 44, 0.4);
+    }
+
+    .btn-calculate:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    /* Progress Section */
+    .progress-section {
+      margin-top: var(--space-lg);
+      display: none;
+    }
+
+    .progress-section.visible {
+      display: block;
+    }
+
+    .progress-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-sm);
+    }
+
+    .calc-indicator {
+      width: 12px;
+      height: 12px;
+      background: var(--pe-gold);
+      border-radius: 50%;
+    }
+
+    .progress-text {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .progress-bar {
+      height: 6px;
+      background: var(--bg-dark);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--pe-green-lighter), var(--pe-gold));
+      transform-origin: left;
+      transform: scaleX(0);
+    }
+
+    /* Results Section */
+    .results-section {
+      margin-top: var(--space-xl);
+      display: none;
+    }
+
+    .results-section.visible {
+      display: block;
+    }
+
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-md);
+      padding-bottom: var(--space-md);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .results-title {
+      font-size: 16px;
+      color: var(--pe-gold);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .results-stats {
+      display: flex;
+      gap: var(--space-lg);
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--pe-gold);
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .route-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+
+    .route-stop {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      padding: var(--space-md);
+      background: var(--bg-dark);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      opacity: 0;
+      transform: translateX(-30px);
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+
+    .route-stop:hover {
+      border-color: var(--pe-gold);
+      background: var(--bg-card-hover);
+    }
+
+    .route-stop.selected {
+      border-color: var(--pe-gold);
+      background: rgba(255, 199, 44, 0.05);
+    }
+
+    .stop-number {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--pe-green);
+      color: var(--pe-gold);
+      font-weight: 700;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .stop-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .stop-name {
+      font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .stop-address {
+      font-size: 12px;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .stop-meta {
+      display: flex;
+      gap: var(--space-md);
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .distance-badge {
+      padding: 4px 10px;
+      background: var(--pe-green);
+      color: var(--pe-gold);
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      flex-shrink: 0;
+      transform: scale(0);
+    }
+
+    .geocode-warning {
+      color: var(--warning);
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .btn-maps {
+      width: 100%;
+      padding: var(--space-md);
+      margin-top: var(--space-lg);
+      background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
+      color: white;
+      border: none;
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-sm);
+      transition: all 0.2s;
+    }
+
+    .btn-maps:hover {
+      box-shadow: 0 4px 16px rgba(66, 133, 244, 0.4);
+    }
+
+    /* Empty State */
+    .empty-results {
+      text-align: center;
+      padding: var(--space-xl);
+      color: var(--text-muted);
+    }
+
+    .empty-results-icon {
+      font-size: 48px;
+      margin-bottom: var(--space-md);
+      opacity: 0.5;
+    }
+
+    /* Skeleton loading */
+    .skeleton {
+      background: linear-gradient(90deg, var(--bg-dark) 25%, var(--bg-card) 50%, var(--bg-dark) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite linear;
+    }
+
+    @keyframes shimmer {
+      from { background-position: 200% 0; }
+      to { background-position: -200% 0; }
+    }
+
+    /* Route Actions */
+    .route-actions {
+      display: flex;
+      gap: var(--space-md);
+      margin-top: var(--space-lg);
+    }
+
+    .route-actions button {
+      flex: 1;
+    }
+
+    .btn-export {
+      padding: var(--space-md);
+      background: linear-gradient(135deg, var(--pe-green) 0%, var(--pe-green-dark) 100%);
+      color: var(--pe-gold);
+      border: 2px solid var(--pe-gold);
+      border-radius: var(--radius-md);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-sm);
+      transition: all 0.2s;
+    }
+
+    .btn-export:hover {
+      background: var(--pe-gold);
+      color: var(--pe-green-dark);
+    }
+
+    /* Notes Export Card */
+    .tool-description {
+      color: var(--text-secondary);
+      font-size: 14px;
+      line-height: 1.5;
+      margin-bottom: var(--space-lg);
+    }
+
+    .export-options {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+      padding: var(--space-md);
+      background: var(--bg-dark);
+      border-radius: var(--radius-md);
+      margin-bottom: var(--space-lg);
+    }
+
+    .export-options label {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      font-size: 14px;
+      color: var(--text-primary);
+      cursor: pointer;
+    }
+
+    .export-options input[type="checkbox"] {
+      accent-color: var(--pe-gold);
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+    }
+
+    .export-status {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-md);
+      background: rgba(255, 199, 44, 0.1);
+      border: 1px solid rgba(255, 199, 44, 0.3);
+      border-radius: var(--radius-md);
+      margin-bottom: var(--space-md);
+    }
+
+    .export-status.ready {
+      background: rgba(46, 204, 113, 0.1);
+      border-color: rgba(46, 204, 113, 0.3);
+    }
+
+    .export-status.ready .status-icon {
+      color: #2ecc71;
+    }
+
+    .status-icon {
+      font-size: 16px;
+    }
+
+    .status-text {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+  </style>
+</head>
+<body>
+  <div class="utility-belt-app">
+    <!-- Header -->
+    <header class="utility-header">
+      <div class="header-left">
+        <button id="backBtn" class="back-btn" title="Back to Lead-o-Tron">←</button>
+        <h1 class="utility-title">🛠️ Utility Belt</h1>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="utility-content">
+      <div class="tool-cards">
+        <!-- Route Finder Card -->
+        <div class="tool-card" id="routeFinderCard">
+          <div class="tool-card-header">
+            <span class="tool-icon">🗺️</span>
+            <h2>Optimal Route Finder</h2>
+          </div>
+          <div class="tool-card-body">
+            <div class="route-config">
+              <!-- Starting Location -->
+              <div class="config-group">
+                <label for="startAddress">Starting Location</label>
+                <input type="text" id="startAddress" placeholder="Enter your starting address...">
+              </div>
+
+              <!-- Follow-up Filter -->
+              <div class="config-row">
+                <div class="config-group">
+                  <label for="followUpDays">Due for Follow-up</label>
+                  <select id="followUpDays">
+                    <option value="7">1+ week ago</option>
+                    <option value="14" selected>2+ weeks ago</option>
+                    <option value="21">3+ weeks ago</option>
+                    <option value="30">1+ month ago</option>
+                    <option value="0">All leads</option>
+                  </select>
+                </div>
+                <div class="config-group">
+                  <label for="statusFilter">Status</label>
+                  <select id="statusFilter">
+                    <option value="active" selected>Active only</option>
+                    <option value="all">All statuses</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Eligible Leads Count -->
+              <div class="lead-count-display">
+                <span class="lead-count-label">Eligible Leads</span>
+                <span class="lead-count-value" id="eligibleCount">0</span>
+              </div>
+
+              <!-- How many to visit slider -->
+              <div class="slider-group">
+                <div class="slider-header">
+                  <label for="maxStops">How many to visit?</label>
+                  <span class="slider-value" id="maxStopsValue">5</span>
+                </div>
+                <input type="range" id="maxStops" min="1" max="15" value="5">
+              </div>
+
+              <!-- Calculate Button -->
+              <button id="calculateBtn" class="btn-calculate">
+                🧮 Calculate Optimal Route
+              </button>
+
+              <!-- Progress Section -->
+              <div class="progress-section" id="progressSection">
+                <div class="progress-header">
+                  <div class="calc-indicator"></div>
+                  <span class="progress-text" id="progressText">Calculating route...</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill" id="progressFill"></div>
+                </div>
+              </div>
+
+              <!-- Results Section -->
+              <div class="results-section" id="resultsSection">
+                <div class="results-header">
+                  <h3 class="results-title">📍 Your Route</h3>
+                  <div class="results-stats">
+                    <div class="stat">
+                      <div class="stat-value" id="totalDistance">0</div>
+                      <div class="stat-label">Miles Total</div>
+                    </div>
+                    <div class="stat">
+                      <div class="stat-value" id="stopCount">0</div>
+                      <div class="stat-label">Stops</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="route-list" id="routeList">
+                  <!-- Route stops will be rendered here -->
+                </div>
+
+                <div class="route-actions">
+                  <button id="openMapsBtn" class="btn-maps">
+                    🗺️ Open in Google Maps
+                  </button>
+                  <button id="exportNotesBtn" class="btn-export">
+                    📝 Export Route Notes
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Route Notes Export Card -->
+        <div class="tool-card" id="notesExportCard">
+          <div class="tool-card-header">
+            <span class="tool-icon">📝</span>
+            <h2>Route Notes Export</h2>
+          </div>
+          <div class="tool-card-body">
+            <p class="tool-description">
+              Export visit notes for your route to view on your phone in the field.
+              Creates a mobile-friendly HTML file.
+            </p>
+
+            <div class="export-options">
+              <div class="config-group">
+                <label>
+                  <input type="checkbox" id="includeContacts" checked>
+                  Include contact info
+                </label>
+              </div>
+              <div class="config-group">
+                <label>
+                  <input type="checkbox" id="includeVisitHistory" checked>
+                  Include visit history
+                </label>
+              </div>
+              <div class="config-group">
+                <label>
+                  <input type="checkbox" id="includeScores" checked>
+                  Include scores
+                </label>
+              </div>
+            </div>
+
+            <div class="export-status" id="exportStatus">
+              <span class="status-icon">ℹ️</span>
+              <span class="status-text">Calculate a route first to export notes</span>
+            </div>
+
+            <button id="exportRouteNotesBtn" class="btn-calculate" disabled>
+              📱 Export for Mobile
+            </button>
+          </div>
+        </div>
+
+        <!-- Future Tool Cards (placeholders) -->
+        <div class="tool-card" id="futureCard1">
+          <div class="tool-card-header">
+            <span class="tool-icon">📊</span>
+            <h2>Analytics Dashboard</h2>
+          </div>
+          <div class="tool-card-body">
+            <div class="empty-results">
+              <div class="empty-results-icon">🚧</div>
+              <p>Coming soon! Track your outreach metrics and conversion rates.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="tool-card" id="futureCard2">
+          <div class="tool-card-header">
+            <span class="tool-icon">📧</span>
+            <h2>Follow-up Reminders</h2>
+          </div>
+          <div class="tool-card-body">
+            <div class="empty-results">
+              <div class="empty-results-icon">🚧</div>
+              <p>Coming soon! Set automated reminders for lead follow-ups.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- anime.js v4 UMD build - exposes global anime object -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+  <script type="module" src="js/crm/utility.js"></script>
+</body>
+</html>

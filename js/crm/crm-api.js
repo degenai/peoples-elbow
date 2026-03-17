@@ -174,8 +174,7 @@ export const CrmApi = {
   },
 
   openUtilityBelt() {
-    // Navigate to map.html or open it in a new tab
-    window.open('map.html', '_blank');
+    window.open('utility.html', '_blank');
   },
 
   addActivityLog(message) {
