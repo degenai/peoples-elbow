@@ -173,6 +173,11 @@ export const CrmApi = {
     });
   },
 
+  openUtilityBelt() {
+    // Navigate to map.html or open it in a new tab
+    window.open('map.html', '_blank');
+  },
+
   addActivityLog(message) {
      const logEntry = {
         timestamp: new Date().toISOString(),
