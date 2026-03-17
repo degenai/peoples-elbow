@@ -7,7 +7,7 @@ if (typeof anime === 'undefined') {
   console.error('anime.js not loaded! Check cdn import');
   // Create no-op fallback that won't break the app
   window.anime = Object.assign(
-    (targets, props) => ({
+    (config) => ({
       pause: () => {},
       play: () => {},
       finished: Promise.resolve()
@@ -53,7 +53,7 @@ function animateCounter(element, targetValue, options = {}) {
 
   const counter = { value: startValue };
 
-  return anime(counter, {
+  return anime({ targets: counter,
     value: targetValue,
     duration: duration,
     ease: 'outExpo',
@@ -74,7 +74,7 @@ function animateCounter(element, targetValue, options = {}) {
 function createPulseAnimation(element, options = {}) {
   const duration = options.duration || 800;
 
-  return anime(element, {
+  return anime({ targets: element,
     scale: [1, 1.2],
     opacity: [1, 0.7],
     duration: duration / 2,
@@ -149,7 +149,7 @@ async function runEntranceAnimations() {
   const cards = document.querySelectorAll('.tool-card');
 
   // Header slide in using anime.js v4
-  await anime(header, {
+  await anime({ targets: header,
     opacity: [0, 1],
     translateY: [-20, 0],
     duration: 400,
@@ -157,7 +157,7 @@ async function runEntranceAnimations() {
   }).finished;
 
   // Tool cards stagger reveal using anime.js v4
-  anime(cards, {
+  anime({ targets: cards,
     opacity: [0, 1],
     translateY: [40, 0],
     scale: [0.9, 1],
@@ -197,14 +197,14 @@ function setupEventListeners() {
 
   // Back button hover animation using anime.js v4
   elements.backBtn.addEventListener('mouseenter', () => {
-    anime(elements.backBtn, {
+    anime({ targets: elements.backBtn,
       scale: 1.1,
       duration: 200,
       ease: 'outQuad'
     });
   });
   elements.backBtn.addEventListener('mouseleave', () => {
-    anime(elements.backBtn, {
+    anime({ targets: elements.backBtn,
       scale: 1,
       duration: 200,
       ease: 'outQuad'
@@ -221,7 +221,7 @@ function setupEventListeners() {
     elements.maxStopsValue.textContent = value;
 
     // Animate the value change with anime.js v4
-    anime(elements.maxStopsValue, {
+    anime({ targets: elements.maxStopsValue,
       scale: [1.3, 1],
       duration: 200,
       ease: 'outBack'
@@ -234,7 +234,7 @@ function setupEventListeners() {
   // Calculate button hover with anime.js v4
   elements.calculateBtn.addEventListener('mouseenter', () => {
     if (!state.isCalculating) {
-      anime(elements.calculateBtn, {
+      anime({ targets: elements.calculateBtn,
         scale: 1.02,
         duration: 150,
         ease: 'outQuad'
@@ -242,7 +242,7 @@ function setupEventListeners() {
     }
   });
   elements.calculateBtn.addEventListener('mouseleave', () => {
-    anime(elements.calculateBtn, {
+    anime({ targets: elements.calculateBtn,
       scale: 1,
       duration: 150,
       ease: 'outQuad'
@@ -346,7 +346,7 @@ async function calculateRoute() {
   // Update button state with anime.js v4
   elements.calculateBtn.disabled = true;
   elements.calculateBtn.textContent = '🔄 Calculating...';
-  anime(elements.calculateBtn, {
+  anime({ targets: elements.calculateBtn,
     opacity: 0.7,
     duration: 200,
     ease: 'outQuad'
@@ -430,7 +430,7 @@ async function calculateRoute() {
     state.isCalculating = false;
     elements.calculateBtn.disabled = false;
     elements.calculateBtn.textContent = '🧮 Calculate Optimal Route';
-    anime(elements.calculateBtn, {
+    anime({ targets: elements.calculateBtn,
       opacity: 1,
       duration: 200,
       ease: 'outQuad'
@@ -443,7 +443,7 @@ function updateProgress(current, total, message) {
 
   const progress = total > 0 ? current / total : 0;
   // Animate progress bar with anime.js v4
-  anime(elements.progressFill, {
+  anime({ targets: elements.progressFill,
     scaleX: progress,
     duration: 300,
     ease: 'outQuad'
@@ -484,7 +484,7 @@ async function displayResults() {
 
   // Animate route stops staggered reveal using anime.js v4
   const stops = elements.routeList.querySelectorAll('.route-stop');
-  anime(stops, {
+  anime({ targets: stops,
     opacity: [0, 1],
     translateX: [-30, 0],
     duration: 400,
@@ -494,7 +494,7 @@ async function displayResults() {
 
   // Animate distance badges with bounce using anime.js v4
   const badges = elements.routeList.querySelectorAll('.distance-badge');
-  anime(badges, {
+  anime({ targets: badges,
     scale: [0, 1],
     duration: 400,
     delay: anime.stagger(60, { start: 300 }),
@@ -503,7 +503,7 @@ async function displayResults() {
 
   // Animate maps button glow effect using anime.js v4
   setTimeout(() => {
-    anime(elements.openMapsBtn, {
+    anime({ targets: elements.openMapsBtn,
       boxShadow: [
         '0 4px 16px rgba(66, 133, 244, 0.3)',
         '0 4px 24px rgba(66, 133, 244, 0.6)',
@@ -548,7 +548,7 @@ function createRouteStopElement(lead, index) {
     div.classList.add('selected');
 
     // Animate selection with anime.js v4
-    anime(div, {
+    anime({ targets: div,
       boxShadow: ['0 0 0 rgba(255,199,44,0)', '0 0 20px rgba(255,199,44,0.4)'],
       duration: 300,
       ease: 'outQuad'
