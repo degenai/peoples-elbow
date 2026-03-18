@@ -220,7 +220,6 @@ export const CrmApi = {
       }
     }
     return {
-      deepseekApiKey: '',
       defaultLocation: 'Woodstock, GA',
       defaultZipcode: '30188'
     };
