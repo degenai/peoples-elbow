@@ -21,6 +21,16 @@ export const CrmApi = {
   },
 
   async getLeads() {
+    // Try to load from localStorage first as a fallback/buffer
+    const cached = localStorage.getItem('leadOTron_crmData');
+    if (cached) {
+      try {
+        this.localState = JSON.parse(cached);
+      } catch (e) {
+        console.warn('Failed to parse cached CRM data');
+      }
+    }
+
     try {
       const response = await fetch(CRM_API_URL, {
         method: 'GET',
@@ -33,14 +43,19 @@ export const CrmApi = {
 
       const data = await response.json();
       this.localState = data;
+      // Buffer to localStorage
+      localStorage.setItem('leadOTron_crmData', JSON.stringify(this.localState));
       return this.localState;
     } catch (error) {
-      console.error('Error fetching leads:', error);
+      console.error('Error fetching leads (using cached state):', error);
       return this.localState;
     }
   },
 
   async saveState() {
+    // Buffer to localStorage immediately
+    localStorage.setItem('leadOTron_crmData', JSON.stringify(this.localState));
+
     try {
       const response = await fetch(CRM_API_URL, {
         method: 'PUT',
@@ -53,8 +68,8 @@ export const CrmApi = {
       }
       return true;
     } catch (error) {
-      console.error('Error saving leads:', error);
-      return false;
+      console.error('Error saving leads to KV:', error);
+      return false; // Still saved locally
     }
   },
 
@@ -171,6 +186,10 @@ export const CrmApi = {
       };
       input.click();
     });
+  },
+
+  openUtilityBelt() {
+    window.open('utility.html', '_blank');
   },
 
   addActivityLog(message) {

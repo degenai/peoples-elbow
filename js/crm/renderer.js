@@ -16,14 +16,15 @@ import { CrmApi } from './crm-api.js';
 if (typeof anime === 'undefined') {
   console.error('anime.js not loaded! Check cdn import');
   // Create no-op fallback that won't break the app
-  window.anime = {
-    animate: (targets, props) => ({
+  window.anime = Object.assign(
+    (config) => ({
       pause: () => {},
       play: () => {},
       finished: Promise.resolve()
     }),
-    stagger: (val, opts) => 0,
-    set: (targets, props) => {
+    {
+      stagger: (val, opts) => 0,
+      set: (targets, props) => {
       // Actually set the final values so elements are visible
       const els = typeof targets === 'string' ? document.querySelectorAll(targets) :
                   targets instanceof NodeList ? targets :
@@ -37,7 +38,7 @@ if (typeof anime === 'undefined') {
       });
     },
     timeline: () => ({ add: () => ({}) })
-  };
+  });
 }
 
 /**
@@ -48,7 +49,7 @@ function animateCounter(element, targetValue, options = {}) {
   const duration = options.duration || 800;
   const counter = { value: startValue };
 
-  return anime.animate(counter, {
+  return anime({ targets: counter,
     value: targetValue,
     duration,
     ease: 'outExpo',
@@ -62,7 +63,7 @@ function animateCounter(element, targetValue, options = {}) {
  * Shake animation for warnings/errors
  */
 function shakeElement(element) {
-  return anime.animate(element, {
+  return anime({ targets: element,
     translateX: [-5, 5, -5, 5, -3, 3, 0],
     duration: 400,
     ease: 'easeInOutSine'
@@ -78,7 +79,7 @@ function animateModalOpen(modalElement) {
 
   // Backdrop fade in
   anime.set(modalElement, { opacity: 0 });
-  anime.animate(modalElement, {
+  anime({ targets: modalElement,
     opacity: [0, 1],
     duration: 200,
     ease: 'outQuad'
@@ -87,7 +88,7 @@ function animateModalOpen(modalElement) {
   // Content scale up with spring
   if (content) {
     anime.set(content, { opacity: 0, scale: 0.9, translateY: -20 });
-    anime.animate(content, {
+    anime({ targets: content,
       opacity: [0, 1],
       scale: [0.9, 1],
       translateY: [-20, 0],
@@ -105,7 +106,7 @@ async function animateModalClose(modalElement) {
 
   // Animate content out first
   if (content) {
-    anime.animate(content, {
+    anime({ targets: content,
       opacity: [1, 0],
       scale: [1, 0.95],
       duration: 200,
@@ -114,7 +115,7 @@ async function animateModalClose(modalElement) {
   }
 
   // Backdrop fade out
-  await anime.animate(modalElement, {
+  await anime({ targets: modalElement,
     opacity: [1, 0],
     duration: 200,
     ease: 'inQuad'
@@ -135,14 +136,14 @@ function runPageLoadAnimation() {
   document.body.classList.remove('page-loading');
 
   try {
-    if (typeof anime === 'undefined' || !anime.animate) {
+    if (typeof anime === 'undefined' || !anime) {
       return;
     }
 
     // Only animate the stat cards - simple and reliable
     const statCards = document.querySelectorAll('.stat-card');
     if (statCards.length > 0) {
-      anime.animate(statCards, {
+      anime({ targets: statCards,
         scale: [0.9, 1],
         opacity: [0.5, 1],
         duration: 400,
@@ -755,7 +756,7 @@ function selectLead(leadId) {
     // Animate detail panel opening
     if (wasHidden) {
       anime.set(elements.detailPanel, { opacity: 0, translateX: 20 });
-      anime.animate(elements.detailPanel, {
+      anime({ targets: elements.detailPanel,
         opacity: [0, 1],
         translateX: [20, 0],
         duration: 350,
@@ -769,7 +770,7 @@ function selectLead(leadId) {
     // Animate the selected card with a subtle pulse
     const selectedCard = document.querySelector(`.lead-card[data-id="${leadId}"]`);
     if (selectedCard) {
-      anime.animate(selectedCard, {
+      anime({ targets: selectedCard,
         scale: [1, 1.02, 1],
         duration: 300,
         ease: 'outQuad'
@@ -798,7 +799,7 @@ function animateDetailContent() {
   scoreSliders.forEach((slider, index) => {
     const width = slider.style.width;
     slider.style.width = '0';
-    anime.animate(slider, {
+    anime({ targets: slider,
       width: [0, width],
       duration: 400,
       delay: index * 100,
@@ -810,7 +811,7 @@ function animateDetailContent() {
   const visitItems = elements.detailPanel.querySelectorAll('.visit-item');
   if (visitItems.length > 0) {
     anime.set(visitItems, { opacity: 0, translateY: 10 });
-    anime.animate(visitItems, {
+    anime({ targets: visitItems,
       opacity: [0, 1],
       translateY: [10, 0],
       duration: 300,
@@ -823,7 +824,7 @@ function animateDetailContent() {
   const contactCards = elements.detailPanel.querySelectorAll('.contact-card, .other-contact-card');
   if (contactCards.length > 0) {
     anime.set(contactCards, { opacity: 0, scale: 0.95 });
-    anime.animate(contactCards, {
+    anime({ targets: contactCards,
       opacity: [0, 1],
       scale: [0.95, 1],
       duration: 300,
@@ -837,7 +838,7 @@ async function closeDetailPanel() {
   selectedLeadId = null;
 
   // Animate out before hiding
-  await anime.animate(elements.detailPanel, {
+  await anime({ targets: elements.detailPanel,
     opacity: [1, 0],
     translateX: [0, 20],
     duration: 250,
@@ -1117,7 +1118,7 @@ async function handleLeadSubmit(e) {
       const newCard = document.querySelector(`.lead-card[data-id="${newLead.id}"]`);
       if (newCard) {
         anime.set(newCard, { opacity: 0, translateY: -30, scale: 0.95 });
-        anime.animate(newCard, {
+        anime({ targets: newCard,
           opacity: [0, 1],
           translateY: [-30, 0],
           scale: [0.95, 1],
@@ -1152,7 +1153,7 @@ async function handleDeleteLead() {
 
     if (cardToDelete) {
       // Animate out with fade + collapse
-      await anime.animate(cardToDelete, {
+      await anime({ targets: cardToDelete,
         opacity: [1, 0],
         translateX: [0, -30],
         scale: [1, 0.95],
@@ -1510,7 +1511,7 @@ function updateStats() {
 function pulseStatCard(statElement) {
   const card = statElement.closest('.stat-card');
   if (card) {
-    anime.animate(card, {
+    anime({ targets: card,
       scale: [1, 1.05, 1],
       duration: 300,
       ease: 'outQuad'
@@ -1570,14 +1571,14 @@ function updateScoreDisplay(event) {
       case 'scoreVibes': valueElement = elements.vibesValue; break;
     }
     if (valueElement) {
-      anime.animate(valueElement, {
+      anime({ targets: valueElement,
         scale: [1, 1.4, 1],
         duration: 250,
         ease: 'outBack'
       });
     }
     // Also animate total
-    anime.animate(elements.totalScoreValue, {
+    anime({ targets: elements.totalScoreValue,
       scale: [1, 1.2, 1],
       duration: 300,
       ease: 'outQuad'
