@@ -577,8 +577,8 @@ function renderDetailPanel(lead) {
     </div>
 
     <div class="detail-section">
-      <h3>Visit History (${lead.visits.length})</h3>
-      ${lead.visits.length === 0 ?
+      <h3>Visit History (${(lead.visits || []).length})</h3>
+      ${!(lead.visits || []).length ?
         '<p style="color: var(--text-muted); font-style: italic;">No visits logged yet</p>' :
         lead.visits.slice().reverse().map((visit, reverseIndex) => {
           // Calculate original index (visits are reversed for display - newest first)
@@ -1181,7 +1181,7 @@ function openVisitModal(leadId, visitIndex = null) {
   if (isEditMode) {
     // Edit mode - pre-fill with existing visit data
     const lead = leads.find(l => l.id === leadId);
-    if (lead && lead.visits[visitIndex]) {
+    if (lead && lead.visits && lead.visits[visitIndex]) {
       const visit = lead.visits[visitIndex];
       elements.visitDate.value = new Date(visit.date).toISOString().slice(0, 16);
       elements.visitNotes.value = visit.notes || '';
@@ -1258,7 +1258,7 @@ async function handleVisitSubmit(e) {
 // Delete Visit Confirmation
 function openDeleteVisitConfirmation(leadId, visitIndex) {
   const lead = leads.find(l => l.id === leadId);
-  if (!lead || !lead.visits[visitIndex]) return;
+  if (!lead || !lead.visits || !lead.visits[visitIndex]) return;
 
   const visit = lead.visits[visitIndex];
 

@@ -99,6 +99,7 @@ export const CrmApi = {
   async addVisit(leadId, visitData) {
     const lead = this.localState.leads.find(l => l.id === leadId);
     if (lead) {
+      lead.visits = lead.visits || [];
       lead.visits.push(visitData);
       lead.lastVisit = visitData.date;
       await this.saveState();
@@ -109,21 +110,27 @@ export const CrmApi = {
 
   async updateVisit(leadId, visitIndex, visitData) {
     const lead = this.localState.leads.find(l => l.id === leadId);
-    if (lead && lead.visits[visitIndex]) {
-      lead.visits[visitIndex] = visitData;
-      await this.saveState();
-      return lead;
+    if (lead) {
+      lead.visits = lead.visits || [];
+      if (lead.visits[visitIndex]) {
+        lead.visits[visitIndex] = visitData;
+        await this.saveState();
+        return lead;
+      }
     }
     return null;
   },
 
   async deleteVisit(leadId, visitIndex) {
     const lead = this.localState.leads.find(l => l.id === leadId);
-    if (lead && lead.visits[visitIndex]) {
-      lead.visits.splice(visitIndex, 1);
-      // Update lastVisit if needed, but for simplicity keep existing logic
-      await this.saveState();
-      return lead;
+    if (lead) {
+      lead.visits = lead.visits || [];
+      if (lead.visits[visitIndex]) {
+        lead.visits.splice(visitIndex, 1);
+        // Update lastVisit if needed, but for simplicity keep existing logic
+        await this.saveState();
+        return lead;
+      }
     }
     return null;
   },
