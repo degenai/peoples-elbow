@@ -1090,7 +1090,6 @@ async function handleLeadSubmit(e) {
   } else {
     // Create new lead
     const newLead = await CrmApi.createLead(leadData);
-    leads.push(newLead);
 
     // Add quick visit if checked
     if (elements.addQuickVisit.checked) {
@@ -1098,9 +1097,10 @@ async function handleLeadSubmit(e) {
         notes: elements.quickVisitNotes.value.trim(),
         reception: elements.quickVisitReception.value
       });
-      // Reload to get updated lead with visit
-      await loadData();
     }
+
+    // Always reload to sync the UI array pointer with the CrmApi state
+    await loadData();
 
     logActivity(`Added new lead: ${newLead.name}`);
 
