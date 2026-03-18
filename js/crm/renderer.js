@@ -1328,7 +1328,12 @@ async function handleSearchGoogle() {
     const config = await CrmApi.getConfig();
     const location = [config.defaultLocation, config.defaultZipcode].filter(Boolean).join(' ');
     const query = encodeURIComponent(`${businessName} ${location}`.trim());
-    window.open(`https://www.google.com/search?q=${query}`, '_blank');
+    const width = 800;
+    const height = 800;
+    const left = (window.screen.width / 2) - (width / 2);
+    const top = (window.screen.height / 2) - (height / 2);
+    const features = `width=${width},height=${height},top=${top},left=${left},scrollbars=yes,resizable=yes`;
+    window.open(`https://www.google.com/search?q=${query}`, '_blank', features);
   } catch (error) {
     console.error('Error opening search:', error);
   }
