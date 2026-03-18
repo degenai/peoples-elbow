@@ -88,7 +88,8 @@ export const CrmApi = {
       ...data,
       id: generateId(),
       created: generateDateStr(),
-      lastVisit: null
+      lastVisit: null,
+      visits: data.visits || []
     };
     this.localState.leads.push(newLead);
     await this.saveState();
