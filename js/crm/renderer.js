@@ -1072,6 +1072,7 @@ async function handleLeadSubmit(e) {
       traffic: parseInt(elements.scoreTraffic.value),
       vibes: parseInt(elements.scoreVibes.value)
     },
+    totalScore: parseInt(elements.scoreSpace.value) + parseInt(elements.scoreTraffic.value) + parseInt(elements.scoreVibes.value),
     aiEnhanced: !elements.addressAiTag.classList.contains('hidden')
   };
 
