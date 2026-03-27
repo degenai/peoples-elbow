@@ -53,18 +53,37 @@ export const CrmApi = {
   },
 
   async saveState() {
+    const dataString = JSON.stringify(this.localState);
+
+    // Cloudflare KV limits value size to 25MiB (26,214,400 bytes).
+    // Calculate approximate byte size (assuming UTF-8 characters).
+    const byteSize = new Blob([dataString]).size;
+    const mbSize = (byteSize / (1024 * 1024)).toFixed(2);
+
+    if (byteSize > 25 * 1024 * 1024) {
+      alert(`⚠️ ERROR: CRM data is too large to save to the cloud (${mbSize} MB). Cloudflare KV has a 25MB limit. Please export your data to back it up, and then clear out old leads or activity logs to free up space.`);
+    } else if (byteSize > 20 * 1024 * 1024) {
+      console.warn(`⚠️ WARNING: CRM data is approaching the 25MB Cloudflare KV limit (${mbSize} MB used).`);
+      // Alert the user only occasionally so it's not super annoying, or just rely on a persistent UI banner if one existed.
+      // We'll throw one alert to make sure they know.
+      if (!sessionStorage.getItem('kv_size_warning_shown')) {
+        alert(`⚠️ WARNING: CRM data is approaching the 25MB cloud storage limit (${mbSize} MB used). Consider backing up and clearing old data soon.`);
+        sessionStorage.setItem('kv_size_warning_shown', 'true');
+      }
+    }
+
     // Buffer to localStorage immediately
-    localStorage.setItem('leadOTron_crmData', JSON.stringify(this.localState));
+    localStorage.setItem('leadOTron_crmData', dataString);
 
     try {
       const response = await fetch(CRM_API_URL, {
         method: 'PUT',
         headers: await this.getHeaders(),
-        body: JSON.stringify(this.localState)
+        body: dataString
       });
 
       if (!response.ok) {
-        throw new Error('Failed to save CRM data');
+        throw new Error(`Failed to save CRM data (Status: ${response.status})`);
       }
       return true;
     } catch (error) {
