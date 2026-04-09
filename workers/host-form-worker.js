@@ -21,23 +21,6 @@ export default {
       return handleCors();
     }
     
-    // Check if database is accessible
-    if (env && env.FORMS_DB) {
-      console.log('Database binding found:', env.FORMS_DB);
-      
-      // Try to query tables
-      try {
-        const tables = await env.FORMS_DB.prepare(
-          "SELECT name FROM sqlite_master WHERE type='table';"
-        ).all();
-        console.log('Available tables:', tables);
-      } catch (error) {
-        console.error('Error checking tables:', error);
-      }
-    } else {
-      console.error('No database binding found');
-    }
-    
     return handleRequest(request, env);
   }
 }
