@@ -81,12 +81,12 @@ console.log(`Commits kept: ${filtered.keptCommits}`);
 console.log(`Total commits displayed: ${filteredCommits.length}`);
 console.log('--- END OF FILTERING REPORT ---\n');
 
-// Fix any formatting issues in commit messages
+// Correct any formatting issues in commit messages
 const correctedCommits = filteredCommits.map(commit => {
     // Make a copy of the commit to avoid modifying the original
     const fixedCommit = {...commit};
     
-    // Fix Development Ring formatting issue with trailing backslash
+    // Corrects Development Ring formatting issue with trailing backslash
     if (fixedCommit.subject && fixedCommit.subject.includes('rename to " Development Ring')) {
         console.log('Found commit with formatting issue:', fixedCommit.subject);
         fixedCommit.subject = fixedCommit.subject.replace('rename to " Development Ring', 'rename to "Development Ring"');
