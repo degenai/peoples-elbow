@@ -32,3 +32,4 @@ build/
 out/
 .next/
 devring_overhaul.md
+node_modules

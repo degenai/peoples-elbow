@@ -11,6 +11,41 @@ class ComponentLoader {
     }
 
     /**
+     * Basic HTML sanitizer to prevent DOM-based XSS
+     */
+    sanitizeHTML(html) {
+        if (!html) return '';
+
+        // Parse the HTML string into a DOM Document
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+
+        // 1. Remove all script tags
+        const scripts = doc.querySelectorAll('script');
+        scripts.forEach(script => script.remove());
+
+        // 2. Remove all event handler attributes and javascript: URIs
+        const elements = doc.querySelectorAll('*');
+        elements.forEach(el => {
+            Array.from(el.attributes).forEach(attr => {
+                const attrName = attr.name.toLowerCase();
+                // Remove on* event handlers (e.g., onclick, onload)
+                if (attrName.startsWith('on')) {
+                    el.removeAttribute(attrName);
+                }
+                // Remove javascript: URIs in href or src attributes
+                if ((attrName === 'href' || attrName === 'src') &&
+                    attr.value.trim().toLowerCase().startsWith('javascript:')) {
+                    el.removeAttribute(attrName);
+                }
+            });
+        });
+
+        // Return the sanitized inner HTML of the body
+        return doc.body.innerHTML;
+    }
+
+    /**
      * Get current page identifier for navigation highlighting
      */
     getCurrentPageIdentifier() {
@@ -67,7 +102,7 @@ class ComponentLoader {
             return false;
         }
 
-        targetElement.innerHTML = headerHtml;
+        targetElement.innerHTML = this.sanitizeHTML(headerHtml);
         this.highlightCurrentPage();
         return true;
     }
@@ -85,7 +120,7 @@ class ComponentLoader {
             return false;
         }
 
-        targetElement.innerHTML = footerHtml;
+        targetElement.innerHTML = this.sanitizeHTML(footerHtml);
         return true;
     }
 
