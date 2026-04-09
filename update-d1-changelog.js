@@ -7,7 +7,7 @@
  * Used in GitHub Actions to keep the changelog current without full repopulation.
  */
 
-const { execSync } = require('child_process');
+const { execFileSync } = require('child_process');
 
 console.log(' D1 Changelog Incremental Update\n');
 
@@ -78,17 +78,25 @@ async function getLatestD1Commit() {
 function getNewCommits(sinceHash) {
     console.log(' Getting new commits from git...');
     
-    let gitCommand;
+    // Validate the hash to prevent command injection
+    if (sinceHash && !/^[0-9a-fA-F]{7,40}$/.test(sinceHash)) {
+        console.error(' Invalid commit hash format received from D1');
+        return [];
+    }
+
+    const gitArgs = [
+        'log',
+        '--pretty=format:%H<|DELIM|>%B<|DELIM|>%ai<|DELIM|>%an<|DELIM|>%ae<|COMMIT_END|>',
+        '--reverse'
+    ];
+
     if (sinceHash) {
         // Get commits newer than the latest D1 commit
-        gitCommand = `git log --pretty=format:"%H<|DELIM|>%B<|DELIM|>%ai<|DELIM|>%an<|DELIM|>%ae<|COMMIT_END|>" ${sinceHash}..HEAD --reverse`;
-    } else {
-        // Get all commits (fallback)
-        gitCommand = `git log --pretty=format:"%H<|DELIM|>%B<|DELIM|>%ai<|DELIM|>%an<|DELIM|>%ae<|COMMIT_END|>" --reverse`;
+        gitArgs.splice(2, 0, `${sinceHash}..HEAD`);
     }
     
     try {
-        const gitOutput = execSync(gitCommand, { 
+        const gitOutput = execFileSync('git', gitArgs, {
             encoding: 'utf8',
             cwd: __dirname 
         });
