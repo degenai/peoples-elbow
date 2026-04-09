@@ -1078,8 +1078,15 @@ function escapeHtml(text) {
 
 init().catch(err => {
   console.error('Utility Belt initialization failed:', err);
-  document.body.innerHTML = `<div style="color: red; padding: 20px;">
-    <h2>Error loading Utility Belt</h2>
-    <pre>${err.message}\n${err.stack}</pre>
-  </div>`;
+  document.body.innerHTML = '';
+  const container = document.createElement('div');
+  container.style.color = 'red';
+  container.style.padding = '20px';
+  const h2 = document.createElement('h2');
+  h2.textContent = 'Error loading Utility Belt';
+  const pre = document.createElement('pre');
+  pre.textContent = err.message + '\n' + err.stack;
+  container.appendChild(h2);
+  container.appendChild(pre);
+  document.body.appendChild(container);
 });
