@@ -83,6 +83,31 @@ export const CrmApi = {
     return null;
   },
 
+  // ⚡ Bolt: Batch update multiple leads to avoid N+1 KV writes
+  async updateLeads(updates) {
+    if (!updates || updates.length === 0) return [];
+
+    // Create an O(1) lookup map for lead indices to optimize performance
+    const leadIndices = new Map();
+    this.localState.leads.forEach((lead, index) => {
+      leadIndices.set(lead.id, index);
+    });
+
+    const updatedLeads = [];
+    for (const update of updates) {
+      const index = leadIndices.get(update.id);
+      if (index !== undefined) {
+        this.localState.leads[index] = { ...this.localState.leads[index], ...update.data };
+        updatedLeads.push(this.localState.leads[index]);
+      }
+    }
+
+    if (updatedLeads.length > 0) {
+      await this.saveState();
+    }
+    return updatedLeads;
+  },
+
   async createLead(data) {
     const newLead = {
       ...data,

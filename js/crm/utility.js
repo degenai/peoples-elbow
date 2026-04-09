@@ -390,6 +390,8 @@ async function calculateRoute() {
 
     if (leadsNeedingGeocode.length > 0) {
       let geocoded = 0;
+      const batchUpdates = []; // ⚡ Bolt: Collect updates to avoid N+1 KV writes
+
       for (const lead of leadsNeedingGeocode) {
         geocoded++;
         updateProgress(geocoded, leadsNeedingGeocode.length, `Geocoding ${lead.name}... (${geocoded}/${leadsNeedingGeocode.length})`);
@@ -397,9 +399,13 @@ async function calculateRoute() {
         const coords = await geocodeAddress(lead.address);
         if (coords) {
           lead.coords = coords;
-          // Update via CrmApi
-          await CrmApi.updateLead(lead.id, { coords });
+          batchUpdates.push({ id: lead.id, data: { coords } });
         }
+      }
+
+      // ⚡ Bolt: Execute a single batched update request
+      if (batchUpdates.length > 0) {
+        await CrmApi.updateLeads(batchUpdates);
       }
     }
 
