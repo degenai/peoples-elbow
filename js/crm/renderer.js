@@ -288,8 +288,7 @@ async function init() {
   renderLeadList(); // Page load animation handles this
   renderActivityLog();
   updateStats();
-  updateNeighborhoodFilter();
-  updateNeighborhoodSelect();
+  updateNeighborhoodControls();
 
   // Show data path
   const dataPath = await CrmApi.getDataPath();
@@ -723,18 +722,43 @@ function clearFilters() {
   renderLeadList();
 }
 
+// Helper to get unique, sorted neighborhoods in a single O(N) pass
+function getUniqueNeighborhoods() {
+  const uniqueNeighborhoods = new Set();
+  for (let i = 0; i < leads.length; i++) {
+    const n = leads[i].neighborhood;
+    if (n) uniqueNeighborhoods.add(n);
+  }
+  return [...uniqueNeighborhoods].sort();
+}
+
 function updateNeighborhoodFilter() {
-  const neighborhoods = [...new Set(leads.map(l => l.neighborhood).filter(Boolean))].sort();
+  const neighborhoods = getUniqueNeighborhoods();
+
+  // Store current value to restore after update
+  const currentValue = elements.filterNeighborhood.value;
 
   elements.filterNeighborhood.innerHTML = '<option value="all">All Areas</option>' +
     neighborhoods.map(n => `<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`).join('');
+
+  // Restore previous value if it still exists
+  if (currentValue && currentValue !== 'all' && neighborhoods.includes(currentValue)) {
+    elements.filterNeighborhood.value = currentValue;
+  } else {
+    elements.filterNeighborhood.value = 'all';
+  }
 }
 
 function updateNeighborhoodSelect() {
-  const neighborhoods = [...new Set(leads.map(l => l.neighborhood).filter(Boolean))].sort();
+  const neighborhoods = getUniqueNeighborhoods();
   elements.leadNeighborhoodOptions.innerHTML = neighborhoods
     .map(n => `<option value="${escapeHtml(n)}"></option>`)
     .join('');
+}
+
+function updateNeighborhoodControls() {
+  updateNeighborhoodFilter();
+  updateNeighborhoodSelect();
 }
 
 // ============================================
@@ -1129,16 +1153,14 @@ async function handleLeadSubmit(e) {
     });
 
     updateStats();
-    updateNeighborhoodFilter();
-    updateNeighborhoodSelect();
+    updateNeighborhoodControls();
     return;
   }
 
   closeLeadModal();
   renderLeadList(); // Just an edit, no list change
   updateStats();
-  updateNeighborhoodFilter();
-  updateNeighborhoodSelect();
+  updateNeighborhoodControls();
 }
 
 async function handleDeleteLead() {
@@ -1169,7 +1191,7 @@ async function handleDeleteLead() {
     closeDetailPanel();
     renderLeadList(); // Card already animated out
     updateStats();
-    updateNeighborhoodFilter();
+    updateNeighborhoodControls();
   }
 }
 
@@ -1456,8 +1478,7 @@ async function handleImport() {
     await loadData();
     renderLeadList();
     updateStats();
-    updateNeighborhoodFilter();
-    updateNeighborhoodSelect();
+    updateNeighborhoodControls();
     renderActivityLog();
     logActivity(`Imported ${result.count} leads from backup`);
   } else if (result.error) {
