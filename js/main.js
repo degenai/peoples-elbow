@@ -317,7 +317,6 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 // Fallback in case main.js runs before components.js
                 // We'll let components.js handle the update when it loads
-                console.log('ComponentLoader not available yet, deferring version update');
             }
         } catch (error) {
             console.warn('Failed to fetch version from cache:', error);
