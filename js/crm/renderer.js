@@ -633,13 +633,17 @@ function getFilteredLeads() {
   const reception = elements.filterReception.value;
   const search = elements.searchInput.value.toLowerCase().trim();
 
+  // Cache the current time for the duration of the filter operation
+  const now = Date.now();
+
   return leads.filter(lead => {
     // Status filter
     if (status !== 'all' && lead.status !== status) return false;
 
     // Time filter
     if (time !== 'all') {
-      const daysSince = getDaysSinceVisit(lead.lastVisit);
+      // Pass the cached 'now' value to avoid repeated Date.now() calls
+      const daysSince = getDaysSinceVisit(lead.lastVisit, now);
       switch (time) {
         case 'week': if (daysSince > 7) return false; break;
         case 'due-1': if (daysSince < 7) return false; break;
@@ -664,16 +668,20 @@ function getFilteredLeads() {
 
     // Search filter
     if (search) {
-      const contactFields = (lead.contacts || [])
-        .flatMap(c => [c.name, c.phone, c.email])
-        .filter(Boolean);
-      const searchFields = [
-        lead.name,
-        lead.address,
-        lead.neighborhood,
-        ...contactFields
-      ].join(' ').toLowerCase();
-      if (!searchFields.includes(search)) return false;
+      // Fast path string matching without allocating temporary arrays
+      if (lead.name && lead.name.toLowerCase().includes(search)) return true;
+      if (lead.address && lead.address.toLowerCase().includes(search)) return true;
+      if (lead.neighborhood && lead.neighborhood.toLowerCase().includes(search)) return true;
+
+      if (lead.contacts) {
+        for (let i = 0; i < lead.contacts.length; i++) {
+          const c = lead.contacts[i];
+          if (c.name && c.name.toLowerCase().includes(search)) return true;
+          if (c.phone && String(c.phone).toLowerCase().includes(search)) return true;
+          if (c.email && c.email.toLowerCase().includes(search)) return true;
+        }
+      }
+      return false; // Not found in any field
     }
 
     return true;
@@ -1494,14 +1502,22 @@ async function handleImport() {
 let prevStats = { total: 0, active: 0, converted: 0, due: 0 };
 
 function updateStats() {
+  let active = 0;
+  let converted = 0;
+  let due = 0;
+
+  const now = Date.now();
+  for (let i = 0; i < leads.length; i++) {
+    const l = leads[i];
+    if (l.status === 'active') {
+      active++;
+      if (getDaysSinceVisit(l.lastVisit, now) >= 7) due++;
+    } else if (l.status === 'converted') {
+      converted++;
+    }
+  }
+
   const total = leads.length;
-  const active = leads.filter(l => l.status === 'active').length;
-  const converted = leads.filter(l => l.status === 'converted').length;
-  const due = leads.filter(l => {
-    if (l.status !== 'active') return false;
-    const days = getDaysSinceVisit(l.lastVisit);
-    return days >= 7;
-  }).length;
 
   // Animate counters if values changed
   if (total !== prevStats.total) {
@@ -1626,12 +1642,12 @@ function getTimeBadge(lastVisit) {
   return { color: 'black', label: '2+ months ago' };
 }
 
-function getDaysSinceVisit(lastVisit) {
+function getDaysSinceVisit(lastVisit, now = Date.now()) {
   if (!lastVisit) return Infinity;
-  const now = new Date();
-  const visit = new Date(lastVisit);
-  const diffTime = now - visit;
-  return Math.floor(diffTime / (1000 * 60 * 60 * 24));
+  // Use getTime() which is faster than subtracting Date objects directly
+  const visitTime = new Date(lastVisit).getTime();
+  const diffTime = now - visitTime;
+  return Math.floor(diffTime / 86400000); // 86400000 = 1000 * 60 * 60 * 24
 }
 
 function getLastReception(lead) {
