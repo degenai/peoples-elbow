@@ -108,10 +108,14 @@ class D1Changelog {
             return;
         }
 
+        const fragment = document.createDocumentFragment();
+
         this.allData.forEach((entry, index) => {
             const timelineItem = this.createTimelineItem(entry, index);
-            timeline.appendChild(timelineItem);
+            fragment.appendChild(timelineItem);
         });
+
+        timeline.appendChild(fragment);
 
         // Add load more button if there are more entries
         if (this.hasMore) {
