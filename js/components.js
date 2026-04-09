@@ -67,7 +67,13 @@ class ComponentLoader {
             return false;
         }
 
-        targetElement.innerHTML = headerHtml;
+        // Sanitize the HTML before inserting it to prevent DOM-based XSS
+        if (window.DOMPurify) {
+            targetElement.innerHTML = window.DOMPurify.sanitize(headerHtml);
+        } else {
+            console.error('DOMPurify not found, aborting HTML injection for security');
+            return false;
+        }
         this.highlightCurrentPage();
         return true;
     }
@@ -85,7 +91,13 @@ class ComponentLoader {
             return false;
         }
 
-        targetElement.innerHTML = footerHtml;
+        // Sanitize the HTML before inserting it to prevent DOM-based XSS
+        if (window.DOMPurify) {
+            targetElement.innerHTML = window.DOMPurify.sanitize(footerHtml);
+        } else {
+            console.error('DOMPurify not found, aborting HTML injection for security');
+            return false;
+        }
         return true;
     }
 
@@ -117,9 +129,29 @@ class ComponentLoader {
     }
 
     /**
+     * Ensure DOMPurify is loaded for safe HTML injection
+     */
+    async ensureSanitizer() {
+        if (window.DOMPurify) return true;
+
+        return new Promise((resolve) => {
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.8/purify.min.js';
+            script.onload = () => resolve(true);
+            script.onerror = () => {
+                console.error('Failed to load DOMPurify');
+                resolve(false);
+            };
+            document.head.appendChild(script);
+        });
+    }
+
+    /**
      * Load all components
      */
     async loadAllComponents() {
+        await this.ensureSanitizer();
+
         const promises = [
             this.loadHeader(),
             this.loadFooter()
