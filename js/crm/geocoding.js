@@ -174,7 +174,6 @@ async function geocodeAddress(address) {
   await waitForRateLimit();
   let result = await geocodeQuery(cleanAddress);
   if (result) {
-    console.log(`Geocoded (exact): ${cleanAddress}`);
     return { lat: result.lat, lon: result.lon };
   }
 
@@ -184,7 +183,6 @@ async function geocodeAddress(address) {
     await waitForRateLimit();
     result = await geocodeQuery(withoutZip);
     if (result) {
-      console.log(`Geocoded (without zip): ${withoutZip}`);
       return { lat: result.lat, lon: result.lon, approximate: true };
     }
   }
@@ -195,7 +193,6 @@ async function geocodeAddress(address) {
     await waitForRateLimit();
     result = await geocodeQuery(cityStateZip);
     if (result) {
-      console.log(`Geocoded (city/state): ${cityStateZip}`);
       return { lat: result.lat, lon: result.lon, approximate: true };
     }
   }
@@ -205,7 +202,6 @@ async function geocodeAddress(address) {
     await waitForRateLimit();
     result = await geocodeQuery(`${city}, ${state}`);
     if (result) {
-      console.log(`Geocoded (city only): ${city}, ${state}`);
       return { lat: result.lat, lon: result.lon, approximate: true };
     }
   }
