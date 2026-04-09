@@ -88,14 +88,15 @@ async function handleRequest(request, env) {
 
 /**
  * Generic helper to handle D1 database insertion and email notification
- * @param {Object} env - Environment containing D1 bindings and MAIL
- * @param {string} table - D1 database table name
- * @param {Object} data - Key-value pairs of data to insert
- * @param {string} subject - Email subject
- * @param {string} emailContent - Email body
- * @param {string} successMessage - Message for successful response
+ * @param {Object} options - Configuration options
+ * @param {Object} options.env - Environment containing D1 bindings and MAIL
+ * @param {string} options.table - D1 database table name
+ * @param {Object} options.data - Key-value pairs of data to insert
+ * @param {string} options.subject - Email subject
+ * @param {string} options.emailContent - Email body
+ * @param {string} options.successMessage - Message for successful response
  */
-async function processFormSubmission(env, table, data, subject, emailContent, successMessage) {
+async function processFormSubmission({ env, table, data, subject, emailContent, successMessage }) {
   try {
     // Get current date/time as ISO string
     const createdAt = new Date().toISOString();
@@ -164,20 +165,20 @@ async function handleHostForm(formData, env) {
     ${message}
   `
   
-  return processFormSubmission(
+  return processFormSubmission({
     env,
-    'host_submissions',
-    {
+    table: 'host_submissions',
+    data: {
       venue_name: venueName,
       contact_name: contactName,
       contact_email: contactEmail,
       venue_type: venueType,
       message: message
     },
-    `New Host Request: ${venueName}`,
+    subject: `New Host Request: ${venueName}`,
     emailContent,
-    'Your hosting request has been received! We\'ll be in touch soon.'
-  );
+    successMessage: 'Your hosting request has been received! We\'ll be in touch soon.'
+  });
 }
 
 /**
@@ -207,18 +208,18 @@ async function handleContactForm(formData, env) {
     ${message}
   `
   
-  return processFormSubmission(
+  return processFormSubmission({
     env,
-    'contact_submissions',
-    {
+    table: 'contact_submissions',
+    data: {
       name: name,
       email: email,
       message: message
     },
-    `New Contact Form Message from ${name}`,
+    subject: `New Contact Form Message from ${name}`,
     emailContent,
-    'Your message has been received! We\'ll get back to you soon.'
-  );
+    successMessage: 'Your message has been received! We\'ll get back to you soon.'
+  });
 }
 
 /**
