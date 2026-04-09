@@ -6,7 +6,8 @@
 if (typeof anime === 'undefined') {
   console.error('anime.js not loaded! Check cdn import');
   // Create no-op fallback that won't break the app
-  window.anime = Object.assign(
+  if (typeof window !== 'undefined') {
+    window.anime = Object.assign(
     (config) => ({
       pause: () => {},
       play: () => {},
@@ -30,6 +31,7 @@ if (typeof anime === 'undefined') {
       timeline: () => ({ add: () => ({}) })
     }
   );
+  }
 }
 
 import { CrmApi } from './crm-api.js';
@@ -1078,8 +1080,18 @@ function escapeHtml(text) {
 
 init().catch(err => {
   console.error('Utility Belt initialization failed:', err);
-  document.body.innerHTML = `<div style="color: red; padding: 20px;">
-    <h2>Error loading Utility Belt</h2>
-    <pre>${err.message}\n${err.stack}</pre>
-  </div>`;
+  const errorContainer = document.createElement('div');
+  errorContainer.style.color = 'red';
+  errorContainer.style.padding = '20px';
+
+  const heading = document.createElement('h2');
+  heading.textContent = 'Error loading Utility Belt';
+  errorContainer.appendChild(heading);
+
+  const pre = document.createElement('pre');
+  pre.textContent = err.message + '\n' + err.stack;
+  errorContainer.appendChild(pre);
+
+  document.body.innerHTML = '';
+  document.body.appendChild(errorContainer);
 });
