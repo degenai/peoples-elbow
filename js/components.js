@@ -99,20 +99,12 @@ class ComponentLoader {
         });
 
         // Add active class to current page
-        const currentNavItem = document.querySelector(`nav a[data-nav="${this.currentPage}"]`);
-        if (currentNavItem) {
-            currentNavItem.classList.add('active');
-        }
+        document.querySelector(`nav a[data-nav="${this.currentPage}"]`)?.classList.add('active');
 
         // Special handling for home page sections
-        if (this.currentPage === 'home') {
-            const hash = window.location.hash;
-            if (hash) {
-                const sectionNav = document.querySelector(`nav a[href="index.html${hash}"]`);
-                if (sectionNav) {
-                    sectionNav.classList.add('active');
-                }
-            }
+        const hash = window.location.hash;
+        if (this.currentPage === 'home' && hash) {
+            document.querySelector(`nav a[href="index.html${hash}"]`)?.classList.add('active');
         }
     }
 
