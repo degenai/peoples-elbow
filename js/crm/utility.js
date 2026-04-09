@@ -326,6 +326,58 @@ async function refreshCandidates() {
 // ROUTE CALCULATION
 // ============================================
 
+function setCalculateButtonState(isCalculating) {
+  elements.calculateBtn.disabled = isCalculating;
+  elements.calculateBtn.textContent = isCalculating ? '🔄 Calculating...' : '🧮 Calculate Optimal Route';
+  anime({ targets: elements.calculateBtn,
+    opacity: isCalculating ? 0.7 : 1,
+    duration: 200,
+    ease: 'outQuad'
+  });
+}
+
+function toggleProgressUI(show) {
+  const indicator = document.querySelector('.calc-indicator');
+
+  if (show) {
+    elements.progressSection.classList.add('visible');
+    elements.resultsSection.classList.remove('visible');
+    state.pulseAnimation = createPulseAnimation(indicator);
+  } else {
+    if (state.pulseAnimation) {
+      state.pulseAnimation.pause();
+      anime.set(indicator, { scale: 1, opacity: 1 });
+    }
+    elements.progressSection.classList.remove('visible');
+  }
+}
+
+async function geocodeMissingLeads(leads) {
+  const leadsNeedingGeocode = leads.filter(lead =>
+    !lead.coords || !lead.coords.lat || !lead.coords.lon
+  );
+
+  if (leadsNeedingGeocode.length > 0) {
+    let geocoded = 0;
+    const batchUpdates = [];
+
+    for (const lead of leadsNeedingGeocode) {
+      geocoded++;
+      updateProgress(geocoded, leadsNeedingGeocode.length, `Geocoding ${lead.name}... (${geocoded}/${leadsNeedingGeocode.length})`);
+
+      const coords = await geocodeAddress(lead.address);
+      if (coords) {
+        lead.coords = coords;
+        batchUpdates.push({ id: lead.id, data: { coords } });
+      }
+    }
+
+    if (batchUpdates.length > 0) {
+      await CrmApi.updateLeads(batchUpdates);
+    }
+  }
+}
+
 async function calculateRoute() {
   if (state.isCalculating) return;
 
@@ -342,23 +394,8 @@ async function calculateRoute() {
   }
 
   state.isCalculating = true;
-
-  // Update button state with anime.js v4
-  elements.calculateBtn.disabled = true;
-  elements.calculateBtn.textContent = '🔄 Calculating...';
-  anime({ targets: elements.calculateBtn,
-    opacity: 0.7,
-    duration: 200,
-    ease: 'outQuad'
-  });
-
-  // Show progress section
-  elements.progressSection.classList.add('visible');
-  elements.resultsSection.classList.remove('visible');
-
-  // Start pulsing indicator with anime.js
-  const indicator = document.querySelector('.calc-indicator');
-  state.pulseAnimation = createPulseAnimation(indicator);
+  setCalculateButtonState(true);
+  toggleProgressUI(true);
 
   try {
     // Geocode start address first
@@ -384,39 +421,11 @@ async function calculateRoute() {
     const maxStops = options.maxStops;
 
     // Geocode any leads without coords
-    const leadsNeedingGeocode = state.eligibleLeads.filter(lead =>
-      !lead.coords || !lead.coords.lat || !lead.coords.lon
-    );
-
-    if (leadsNeedingGeocode.length > 0) {
-      let geocoded = 0;
-      const batchUpdates = [];
-
-      for (const lead of leadsNeedingGeocode) {
-        geocoded++;
-        updateProgress(geocoded, leadsNeedingGeocode.length, `Geocoding ${lead.name}... (${geocoded}/${leadsNeedingGeocode.length})`);
-
-        const coords = await geocodeAddress(lead.address);
-        if (coords) {
-          lead.coords = coords;
-          batchUpdates.push({ id: lead.id, data: { coords } });
-        }
-      }
-
-      if (batchUpdates.length > 0) {
-        await CrmApi.updateLeads(batchUpdates);
-      }
-    }
+    await geocodeMissingLeads(state.eligibleLeads);
 
     state.routeResults = solveRoute(startCoords, state.eligibleLeads, maxStops);
 
-    // Hide progress - pause anime.js animation
-    if (state.pulseAnimation) {
-      state.pulseAnimation.pause();
-      // Reset the indicator scale/opacity
-      anime.set(indicator, { scale: 1, opacity: 1 });
-    }
-    elements.progressSection.classList.remove('visible');
+    toggleProgressUI(false);
 
     // Show results with animations
     await displayResults();
@@ -424,22 +433,11 @@ async function calculateRoute() {
   } catch (error) {
     console.error('Route calculation failed:', error);
     alert('Route calculation failed: ' + error.message);
-
-    if (state.pulseAnimation) {
-      state.pulseAnimation.pause();
-      anime.set(indicator, { scale: 1, opacity: 1 });
-    }
-    elements.progressSection.classList.remove('visible');
+    toggleProgressUI(false);
 
   } finally {
     state.isCalculating = false;
-    elements.calculateBtn.disabled = false;
-    elements.calculateBtn.textContent = '🧮 Calculate Optimal Route';
-    anime({ targets: elements.calculateBtn,
-      opacity: 1,
-      duration: 200,
-      ease: 'outQuad'
-    });
+    setCalculateButtonState(false);
   }
 }
 
