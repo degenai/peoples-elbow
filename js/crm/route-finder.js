@@ -154,18 +154,41 @@ function twoOptImprove(route, distMatrix, maxIterations = 100) {
     // Start from 1 to keep the starting point fixed
     for (let i = 1; i < bestRoute.length - 1; i++) {
       for (let j = i + 1; j < bestRoute.length; j++) {
-        // Create new route by reversing segment between i and j
-        const newRoute = [
-          ...bestRoute.slice(0, i),
-          ...bestRoute.slice(i, j + 1).reverse(),
-          ...bestRoute.slice(j + 1)
-        ];
+        // The edge before the reversed segment: nodeA -> nodeB
+        const nodeA = bestRoute[i - 1];
+        const nodeB = bestRoute[i];
 
-        const newDistance = routeDistance(newRoute, distMatrix);
+        // The edge after the reversed segment: nodeC -> nodeD
+        const nodeC = bestRoute[j];
+        // If j is the last element, there is no nodeD in a non-circular path
+        const hasNext = j + 1 < bestRoute.length;
+        const nodeD = hasNext ? bestRoute[j + 1] : -1;
 
-        if (newDistance < bestDistance) {
-          bestRoute = newRoute;
-          bestDistance = newDistance;
+        // Current edges distance
+        const dAB = distMatrix[nodeA][nodeB];
+        const dCD = hasNext ? distMatrix[nodeC][nodeD] : 0;
+
+        // New edges distance if reversed
+        // The segment is reversed, so it starts at nodeC and ends at nodeB
+        // The new edges are nodeA -> nodeC and nodeB -> nodeD
+        const dAC = distMatrix[nodeA][nodeC];
+        const dBD = hasNext ? distMatrix[nodeB][nodeD] : 0;
+
+        // If distance decreases, apply the reverse
+        // Use an epsilon to account for floating point inaccuracies
+        if (dAC + dBD < dAB + dCD - 1e-9) {
+          // Reverse in place
+          let left = i;
+          let right = j;
+          while (left < right) {
+            const temp = bestRoute[left];
+            bestRoute[left] = bestRoute[right];
+            bestRoute[right] = temp;
+            left++;
+            right--;
+          }
+
+          bestDistance = bestDistance + (dAC + dBD - dAB - dCD);
           improved = true;
         }
       }
