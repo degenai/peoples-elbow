@@ -390,7 +390,7 @@ async function calculateRoute() {
 
     if (leadsNeedingGeocode.length > 0) {
       let geocoded = 0;
-      const batchUpdates = []; // ⚡ Bolt: Collect updates to avoid N+1 KV writes
+      const batchUpdates = [];
 
       for (const lead of leadsNeedingGeocode) {
         geocoded++;
@@ -403,7 +403,6 @@ async function calculateRoute() {
         }
       }
 
-      // ⚡ Bolt: Execute a single batched update request
       if (batchUpdates.length > 0) {
         await CrmApi.updateLeads(batchUpdates);
       }
