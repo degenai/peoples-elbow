@@ -67,6 +67,19 @@ async function geocodeQuery(query) {
   }
 }
 
+// US state abbreviations (exclude common street suffixes like Dr, St, Ave)
+const STATE_ABBREVIATIONS = [
+  'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA',
+  'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD',
+  'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ',
+  'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC',
+  'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY', 'DC'
+];
+
+// Pre-compiled regex to find state abbreviation - must be preceded by comma or space (not hyphen like GA-92)
+// and followed by zip code, end of string, or comma. Word boundaries prevent partial matches.
+const STATE_REGEX = new RegExp(`(?:,\\s*|\\s)\\b(${STATE_ABBREVIATIONS.join('|')})\\b(?=\\s+\\d{5}|\\s*$|,)`, 'gi');
+
 /**
  * Extract city, state, and zip from an address string.
  *
@@ -74,29 +87,21 @@ async function geocodeQuery(query) {
  * @returns {Object} Parsed components
  */
 function parseAddressComponents(address) {
-  // US state abbreviations (exclude common street suffixes like Dr, St, Ave)
-  const stateAbbreviations = [
-    'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA',
-    'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD',
-    'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ',
-    'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC',
-    'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY', 'DC'
-  ];
-
-  // Find state abbreviation - must be preceded by comma or space (not hyphen like GA-92)
-  // and followed by zip code, end of string, or comma
   let state = null;
   let stateMatch = null;
-  for (const abbr of stateAbbreviations) {
-    // State must be preceded by comma+space or just space (not hyphen like "GA-92")
-    // and followed by space+zip, comma, or end of string
-    const stateRegex = new RegExp(`(?:,\\s*|\\s)${abbr}(?=\\s+\\d{5}|\\s*$|,)`, 'i');
-    const match = address.match(stateRegex);
-    if (match) {
-      state = abbr;
-      stateMatch = match;
-      break;
-    }
+
+  // Find all state abbreviation matches
+  const matches = [...address.matchAll(STATE_REGEX)];
+
+  if (matches.length > 0) {
+    // Take the last match to handle edge cases like "404 Birch Ct, Denver, CO 80201"
+    // where "Ct" might match "CT", but "CO" is the actual state at the end.
+    const lastMatch = matches[matches.length - 1];
+    state = lastMatch[1].toUpperCase();
+
+    // Reconstruct match object similar to String.prototype.match()
+    stateMatch = [lastMatch[0], lastMatch[1]];
+    stateMatch.index = lastMatch.index;
   }
 
   // Extract zip code - must appear after the state (if found) or at end of address
