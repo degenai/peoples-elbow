@@ -9,7 +9,6 @@
 
 const { execFileSync } = require('child_process');
 
-console.log(' D1 Changelog Incremental Update\n');
 
 // Configuration
 const WRITER_WORKER_URL = process.env.WRITER_WORKER_URL || 'https://changelog-writer.alex-adamczyk.workers.dev'; // Updated to use dedicated writer worker
