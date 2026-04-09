@@ -51,7 +51,7 @@
       </div>
       <div class="header-right">
         <button id="utilityBeltBtn" class="btn btn-utility" title="Utility Belt - Route Finder & Tools">🛠️ Utility Belt</button>
-        <button id="settingsBtn" class="btn btn-icon" title="Settings">⚙️</button>
+        <button id="settingsBtn" class="btn btn-icon" title="Settings" aria-label="Settings">⚙️</button>
         <button id="exportBtn" class="btn btn-secondary">Export JSON</button>
         <button id="importBtn" class="btn btn-secondary">Import JSON</button>
         <button id="addLeadBtn" class="btn btn-primary">+ New Lead</button>
@@ -148,7 +148,7 @@
               <option value="neighborhood">Sort: Neighborhood</option>
               <option value="created">Sort: Date Added</option>
             </select>
-            <button id="sortOrderBtn" class="btn btn-icon" title="Toggle sort order">↓</button>
+            <button id="sortOrderBtn" class="btn btn-icon" title="Toggle sort order" aria-label="Toggle sort order">↓</button>
           </div>
           <div class="list-count">
             <span id="leadCount">0 leads</span>
@@ -163,7 +163,7 @@
       <!-- Lead Detail Panel -->
       <aside id="detailPanel" class="detail-panel hidden">
         <div class="detail-header">
-          <button id="closeDetailBtn" class="btn btn-icon">✕</button>
+          <button id="closeDetailBtn" class="btn btn-icon" aria-label="Close lead details">✕</button>
           <h2 id="detailTitle">Lead Details</h2>
           <div class="detail-actions">
             <button id="editLeadBtn" class="btn btn-secondary">Edit</button>
@@ -181,7 +181,7 @@
     <footer class="console-panel">
       <div class="console-header">
         <span>📋 Activity Log</span>
-        <button id="toggleConsoleBtn" class="btn btn-icon btn-sm">▼</button>
+        <button id="toggleConsoleBtn" class="btn btn-icon btn-sm" aria-label="Toggle activity log">▼</button>
       </div>
       <div id="consoleContent" class="console-content">
         <!-- Log entries will appear here -->
@@ -193,7 +193,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h2 id="modalTitle">Add New Lead</h2>
-          <button id="closeModalBtn" class="btn btn-icon">✕</button>
+          <button id="closeModalBtn" class="btn btn-icon" aria-label="Close modal">✕</button>
         </div>
         <form id="leadForm" class="modal-body">
           <div class="form-row">
@@ -302,7 +302,7 @@
       <div class="modal-content modal-sm">
         <div class="modal-header">
           <h2 id="visitModalTitle">Log Visit</h2>
-          <button id="closeVisitModalBtn" class="btn btn-icon">✕</button>
+          <button id="closeVisitModalBtn" class="btn btn-icon" aria-label="Close visit modal">✕</button>
         </div>
         <form id="visitForm" class="modal-body">
           <div class="form-group">
@@ -336,7 +336,7 @@
       <div class="modal-content modal-sm modal-danger">
         <div class="modal-header">
           <h2>⚠️ Delete Visit?</h2>
-          <button id="closeDeleteVisitBtn" class="btn btn-icon">✕</button>
+          <button id="closeDeleteVisitBtn" class="btn btn-icon" aria-label="Close delete visit confirmation">✕</button>
         </div>
         <div class="modal-body">
           <p class="delete-warning">This action cannot be undone.</p>
@@ -359,7 +359,7 @@
       <div class="modal-content modal-sm">
         <div class="modal-header">
           <h2>⚙️ Settings</h2>
-          <button id="closeSettingsModalBtn" class="btn btn-icon">✕</button>
+          <button id="closeSettingsModalBtn" class="btn btn-icon" aria-label="Close settings modal">✕</button>
         </div>
         <div class="modal-body">
           <div class="form-group">
