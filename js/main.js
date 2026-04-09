@@ -153,6 +153,113 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
+
+    // Initialize particle effect
+    function initParticles() {
+        const particlesContainer = document.getElementById('particles');
+        if (!particlesContainer) return;
+
+        // Create sexy glowing particles with radial movement
+        const colors = [
+            { bg: 'rgba(0, 105, 55, 0.8)', glow: '0, 105, 55' },   // Green
+            { bg: 'rgba(0, 68, 102, 0.8)', glow: '0, 68, 102' },   // Blue
+            { bg: 'rgba(255, 204, 0, 0.9)', glow: '255, 204, 0' }   // Yellow
+        ];
+
+        for (let i = 0; i < 18; i++) {
+            const particle = document.createElement('div');
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            const size = Math.random() * 8 + 4; // 4-12px
+
+            // Random starting position within 50px radius
+            const startAngle = Math.random() * Math.PI * 2;
+            const startRadius = Math.random() * 50;
+            const startX = Math.cos(startAngle) * startRadius;
+            const startY = Math.sin(startAngle) * startRadius;
+
+            particle.style.cssText = `
+                position: absolute;
+                width: ${size}px;
+                height: ${size}px;
+                background: radial-gradient(circle, ${color.bg} 0%, rgba(${color.glow}, 0.3) 70%, transparent 100%);
+                border-radius: 50%;
+                left: calc(50% + ${startX}px);
+                top: calc(50% + ${startY}px);
+                transform: translate(-50%, -50%);
+                animation: radialFloat${i} ${8 + Math.random() * 6}s infinite ease-out;
+                box-shadow: 0 0 ${size * 2}px rgba(${color.glow}, 0.4),
+                           0 0 ${size}px rgba(${color.glow}, 0.6);
+                filter: blur(0.5px);
+            `;
+            particlesContainer.appendChild(particle);
+
+            // Create radial outward movement with more lateral motion
+            const angle = (Math.PI * 2 / 18) * i + Math.random() * 1.2; // More random spread
+            const distance = 200 + Math.random() * 150; // 200-350px outward
+            const endX = Math.cos(angle) * distance;
+            const endY = Math.sin(angle) * distance;
+
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes radialFloat${i} {
+                    0% {
+                        transform: translate(-50%, -50%) scale(0.2);
+                        opacity: 0;
+                    }
+                    15% {
+                        opacity: 0.8;
+                        transform: translate(-50%, -50%) scale(1);
+                    }
+                    85% {
+                        opacity: 0.6;
+                    }
+                    100% {
+                        transform: translate(calc(-50% + ${endX - startX}px), calc(-50% + ${endY - startY}px)) scale(0.3);
+                        opacity: 0;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+    }
+
+    // Initialize parallax effect
+    function initParallax() {
+        const photoElement = document.getElementById('parallax-photo');
+        const containerElement = document.getElementById('hero-photo-container');
+
+        if (!photoElement || !containerElement) return;
+
+        function updateParallax() {
+            const rect = containerElement.getBoundingClientRect();
+            const windowHeight = window.innerHeight;
+
+            // Only apply parallax when the element is visible
+            if (rect.bottom >= 0 && rect.top <= windowHeight) {
+                // Calculate parallax offset (very subtle)
+                const scrollPercent = (windowHeight - rect.top) / (windowHeight + rect.height);
+                const parallaxOffset = (scrollPercent - 0.5) * 20; // Max 10px movement in either direction
+
+                photoElement.style.transform = `translateY(${parallaxOffset}px)`;
+            }
+        }
+
+        // Throttled scroll listener for performance
+        let ticking = false;
+        function onScroll() {
+            if (!ticking) {
+                requestAnimationFrame(() => {
+                    updateParallax();
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        }
+
+        window.addEventListener('scroll', onScroll, { passive: true });
+        updateParallax(); // Initial call
+    }
+
     // Simple animation for stats in the impact section
     function animateStats() {
         const stats = document.querySelectorAll('.stat-number');
@@ -193,6 +300,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Call animation function
     animateStats();
+    initParticles();
+    initParallax();
     
     // Version number update - use centralized component loader
     async function updateVersionNumber() {
