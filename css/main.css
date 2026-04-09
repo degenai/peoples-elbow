@@ -276,6 +276,18 @@ header {
     display: none;
     font-size: 1.5rem;
     cursor: pointer;
+    background: none;
+    border: none;
+    padding: 0;
+    color: inherit;
+    font: inherit;
+    outline: none;
+}
+
+.menu-toggle:focus-visible {
+    outline: 2px solid var(--primary-color, currentColor);
+    border-radius: 4px;
+    outline-offset: 4px;
 }
 
 nav ul {
@@ -1015,6 +1027,13 @@ footer {
 
 .social-icon:hover {
     color: var(--pe-gold);
+}
+
+.social-icon:focus-visible,
+.admin-secret:focus-visible {
+    outline: 2px solid var(--pe-gold);
+    border-radius: 4px;
+    outline-offset: 4px;
 }
 
 .site-disclaimer {

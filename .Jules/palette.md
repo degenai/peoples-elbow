@@ -1,0 +1,3 @@
+## 2025-04-09 - Native Button vs Div for Mobile Menu Toggle
+**Learning:** When adding accessibility to legacy custom components (like a mobile menu toggle), it's highly preferred to refactor `div` elements into semantic `<button>` elements rather than adding `role="button"` and `tabindex="0"`. Native `<button>` elements inherently handle keyboard interactions (Space and Enter keys) and focus states, reducing custom JavaScript and styling overhead.
+**Action:** Prioritize transforming interactive `div`s into `<button>`s with necessary CSS resets (`background: none; border: none; padding: 0; color: inherit; font: inherit;`) over piling ARIA attributes onto non-semantic elements.
