@@ -498,7 +498,11 @@ function renderLeadList() {
       </div>
     `;
   } else {
-    elements.leadList.innerHTML = sorted.map(lead => renderLeadCard(lead)).join('');
+    let html = '';
+    for (let i = 0; i < sorted.length; i++) {
+      html += renderLeadCard(sorted[i]);
+    }
+    elements.leadList.innerHTML = html;
   }
 
   elements.leadCount.textContent = `${sorted.length} lead${sorted.length !== 1 ? 's' : ''}`;
@@ -636,56 +640,61 @@ function getFilteredLeads() {
   // Cache the current time for the duration of the filter operation
   const now = Date.now();
 
-  return leads.filter(lead => {
+  const filtered = [];
+  for (let i = 0; i < leads.length; i++) {
+    const lead = leads[i];
     // Status filter
-    if (status !== 'all' && lead.status !== status) return false;
+    if (status !== 'all' && lead.status !== status) continue;
 
     // Time filter
     if (time !== 'all') {
       // Pass the cached 'now' value to avoid repeated Date.now() calls
       const daysSince = getDaysSinceVisit(lead.lastVisit, now);
+      let skip = false;
       switch (time) {
-        case 'week': if (daysSince > 7) return false; break;
-        case 'due-1': if (daysSince < 7) return false; break;
-        case 'due-2': if (daysSince < 14) return false; break;
-        case 'due-3': if (daysSince < 21) return false; break;
-        case 'due-month': if (daysSince < 30) return false; break;
-        case 'never': if (lead.lastVisit) return false; break;
+        case 'week': if (daysSince > 7) skip = true; break;
+        case 'due-1': if (daysSince < 7) skip = true; break;
+        case 'due-2': if (daysSince < 14) skip = true; break;
+        case 'due-3': if (daysSince < 21) skip = true; break;
+        case 'due-month': if (daysSince < 30) skip = true; break;
+        case 'never': if (lead.lastVisit) skip = true; break;
       }
+      if (skip) continue;
     }
 
     // Neighborhood filter
-    if (neighborhood !== 'all' && lead.neighborhood !== neighborhood) return false;
+    if (neighborhood !== 'all' && lead.neighborhood !== neighborhood) continue;
 
     // Score filter
-    if (lead.totalScore < minScore) return false;
+    if (lead.totalScore < minScore) continue;
 
     // Reception filter
     if (reception !== 'all') {
       const lastReception = getLastReception(lead);
-      if (lastReception !== reception) return false;
+      if (lastReception !== reception) continue;
     }
 
     // Search filter
     if (search) {
       // Fast path string matching without allocating temporary arrays
-      if (lead.name && lead.name.toLowerCase().includes(search)) return true;
-      if (lead.address && lead.address.toLowerCase().includes(search)) return true;
-      if (lead.neighborhood && lead.neighborhood.toLowerCase().includes(search)) return true;
-
-      if (lead.contacts) {
-        for (let i = 0; i < lead.contacts.length; i++) {
-          const c = lead.contacts[i];
-          if (c.name && c.name.toLowerCase().includes(search)) return true;
-          if (c.phone && String(c.phone).toLowerCase().includes(search)) return true;
-          if (c.email && c.email.toLowerCase().includes(search)) return true;
+      let found = false;
+      if (lead.name && lead.name.toLowerCase().includes(search)) found = true;
+      else if (lead.address && lead.address.toLowerCase().includes(search)) found = true;
+      else if (lead.neighborhood && lead.neighborhood.toLowerCase().includes(search)) found = true;
+      else if (lead.contacts) {
+        for (let j = 0; j < lead.contacts.length; j++) {
+          const c = lead.contacts[j];
+          if (c.name && c.name.toLowerCase().includes(search)) { found = true; break; }
+          if (c.phone && String(c.phone).toLowerCase().includes(search)) { found = true; break; }
+          if (c.email && c.email.toLowerCase().includes(search)) { found = true; break; }
         }
       }
-      return false; // Not found in any field
+      if (!found) continue; // Not found in any field
     }
 
-    return true;
-  });
+    filtered.push(lead);
+  }
+  return filtered;
 }
 
 function getSortedLeads(leadsToSort) {
