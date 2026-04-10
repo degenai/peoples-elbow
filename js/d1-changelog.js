@@ -158,7 +158,7 @@ class D1Changelog {
                            : isDegenai ? 'timeline-content timeline-content--degenai'
                            : 'timeline-content';
         const markerClass = isBot ? 'timeline-marker timeline-marker--bot' : 'timeline-marker';
-        const degenaiTag = isDegenai ? '<span class="degenai-badge">degenai</span>' : '';
+        const authorClass = isDegenai ? 'commit-author commit-author--degenai' : 'commit-author';
 
         item.innerHTML = `
             <div class="${markerClass}"></div>
@@ -166,8 +166,7 @@ class D1Changelog {
                 <div class="timeline-header">
                     <span class="commit-hash">${shortHash}</span>
                     <span class="commit-date">${formattedDate}</span>
-                    <span class="commit-author">${this.escapeHtml(entry.author_name)}</span>
-                    ${degenaiTag}
+                    <span class="${authorClass}">${this.escapeHtml(entry.author_name)}</span>
                 </div>
                 <div class="timeline-body">
                     <h3 class="commit-message">${this.escapeHtml(commitTitle)}</h3>
