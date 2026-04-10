@@ -127,6 +127,12 @@ p {
     transition: all 0.3s ease;
 }
 
+.btn:focus-visible {
+    outline: 2px solid var(--pe-gold);
+    border-radius: 4px;
+    outline-offset: 4px;
+}
+
 .btn-primary {
     background-color: var(--pe-green);
 }

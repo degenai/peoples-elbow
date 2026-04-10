@@ -1,3 +1,3 @@
-## $(date +%Y-%m-%d) - Adding ARIA labels to icon-only buttons
-**Learning:** Found a widespread pattern in this app's components where icon-only buttons lacked ARIA labels (only having `title`). This is bad for screen reader accessibility. Added `aria-label` to these buttons.
-**Action:** Always ensure that icon-only buttons have an `aria-label` attribute in addition to a `title` attribute for screen readers.
+## 2026-04-10 - Adding :focus-visible to interactive elements
+**Learning:** Implementing `:focus-visible` styles using existing brand colors (like `var(--pe-gold)`) provides a huge accessibility win for keyboard navigation while maintaining visual design for mouse users, a practice often overlooked in custom UI.
+**Action:** Always verify keyboard focus states and add `:focus-visible` to interactive elements like buttons and links to ensure keyboard navigation is clear and accessible.
