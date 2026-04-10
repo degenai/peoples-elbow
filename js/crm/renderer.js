@@ -694,21 +694,40 @@ function getSortedLeads(leadsToSort) {
 
   return [...leadsToSort].sort((a, b) => {
     switch (sortField) {
-      case 'name':
-        return multiplier * a.name.localeCompare(b.name);
+      case 'name': {
+        // Use lowercase for case-insensitive string comparison without localeCompare overhead
+        const nameA = a.name ? a.name.toLowerCase() : '';
+        const nameB = b.name ? b.name.toLowerCase() : '';
+        if (nameA < nameB) return -1 * multiplier;
+        if (nameA > nameB) return 1 * multiplier;
+        return 0;
+      }
       case 'totalScore':
         return multiplier * (a.totalScore - b.totalScore);
-      case 'neighborhood':
-        return multiplier * (a.neighborhood || '').localeCompare(b.neighborhood || '');
-      case 'created':
-        return multiplier * (new Date(a.created) - new Date(b.created));
+      case 'neighborhood': {
+        const nA = a.neighborhood ? a.neighborhood.toLowerCase() : '';
+        const nB = b.neighborhood ? b.neighborhood.toLowerCase() : '';
+        if (nA < nB) return -1 * multiplier;
+        if (nA > nB) return 1 * multiplier;
+        return 0;
+      }
+      case 'created': {
+        // ISO date strings sort perfectly lexicographically, avoiding Date parsing overhead
+        if (a.created < b.created) return -1 * multiplier;
+        if (a.created > b.created) return 1 * multiplier;
+        return 0;
+      }
       case 'lastVisit':
       default:
         // Null values go to the end
         if (!a.lastVisit && !b.lastVisit) return 0;
         if (!a.lastVisit) return 1;
         if (!b.lastVisit) return -1;
-        return multiplier * (new Date(a.lastVisit) - new Date(b.lastVisit));
+
+        // ISO date strings sort perfectly lexicographically, avoiding Date parsing overhead
+        if (a.lastVisit < b.lastVisit) return -1 * multiplier;
+        if (a.lastVisit > b.lastVisit) return 1 * multiplier;
+        return 0;
     }
   });
 }
