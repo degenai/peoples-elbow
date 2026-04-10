@@ -4,6 +4,7 @@ const STORAGE_KEY = 'leadOTron_demoData';
 
 // Seed data — realistic outreach leads for a chair massage operation.
 // This is the starting state for new demo sessions; it resets on clear.
+// Scores: space(1-5) + traffic(1-5) + vibes(1-5) = totalScore (3-15 max)
 function getSeedData() {
   const now = Date.now();
   const daysAgo = d => new Date(now - d * 86400000).toISOString();
@@ -12,33 +13,43 @@ function getSeedData() {
       {
         id: 'demo-001',
         name: 'Hustle House Gym',
-        address: '123 Main St, Woodstock, GA 30188',
+        address: '9580 Main St, Woodstock, GA 30188',
         neighborhood: 'Woodstock',
         status: 'active',
-        totalScore: 85,
-        notes: 'Wednesday residency. Hosts are enthusiastic — great community fit.',
-        contacts: [{ name: 'Matt R.', phone: '555-0101', email: '', isPrimary: true }],
+        totalScore: 14,
+        notes: 'Wednesday evening residency, going on 7 weeks. Family gym — owners are genuinely invested in the community angle, not just the novelty. Consistent clients week over week, some regulars emerging. Sarah has started coming on Wednesdays. Seth (trainer) was a client and became a word-of-mouth source. Pre-existing family relationship with Erica makes this the anchor venue — not replicable elsewhere but sets the template.',
+        contacts: [
+          { name: 'Matt Ribley', phone: '', email: '', isPrimary: true },
+          { name: 'Erica Ribley', phone: '', email: '', isPrimary: false }
+        ],
         visits: [
-          { date: daysAgo(3), notes: 'Good turnout. 6 clients in 2 hours.', reception: 'warm' },
-          { date: daysAgo(10), notes: 'First visit. Introduced the concept, left flyer.', reception: 'warm' }
+          { date: daysAgo(3),  notes: '7th Wednesday. Steady flow, 5 clients. A regular asked specifically when I\'d be back next week — that\'s the sign.', reception: 'warm' },
+          { date: daysAgo(10), notes: '6th Wednesday. Seth brought two coworkers over. Good energy in the room.', reception: 'warm' },
+          { date: daysAgo(17), notes: '5th Wednesday. Slow start, picked up after 7pm. 4 clients total.', reception: 'warm' },
+          { date: daysAgo(24), notes: '4th Wednesday. Started feeling like a regular thing. Matt mentioned it to new members during orientation.', reception: 'warm' },
+          { date: daysAgo(31), notes: '3rd Wednesday. First repeat client from week 1. That\'s validation.', reception: 'warm' },
+          { date: daysAgo(38), notes: '2nd Wednesday. Better than the first — word had spread a little.', reception: 'warm' },
+          { date: daysAgo(45), notes: 'First visit. Pitched Erica on the concept. She said yes immediately. Setup worked, 3 clients.', reception: 'warm' }
         ],
         lastVisit: daysAgo(3),
-        created: daysAgo(30)
+        created: daysAgo(50)
       },
       {
         id: 'demo-002',
         name: 'House Wolf Records',
-        address: '456 Canton St, Roswell, GA 30075',
-        neighborhood: 'Roswell',
+        address: '784 Marietta St NW, Atlanta, GA 30318',
+        neighborhood: 'Atlanta',
         status: 'converted',
-        totalScore: 92,
-        notes: 'Record Store Day booking confirmed. Fundraiser for local dog rescue.',
-        contacts: [{ name: 'Laura W.', phone: '555-0202', email: 'laura@example.com', isPrimary: true }],
-        visits: [
-          { date: daysAgo(1), notes: 'Cold pitch success on first try. Booked on the spot.', reception: 'warm' }
+        totalScore: 13,
+        notes: 'Record Store Day booking — April 18. First fully independent cold-visit booking after roughly 60 doors. Fundraiser for Southern Cross German Shepherd Rescue (501c3, ~6.7K FB members, run by Laura Allen Wolf). Chair setup outside serving the line. Money is not the primary metric here — this is the proof of concept, the resume piece, the first photo op that shows the thing actually works in the wild.',
+        contacts: [
+          { name: 'Laura Allen Wolf', phone: '', email: '', isPrimary: true }
         ],
-        lastVisit: daysAgo(1),
-        created: daysAgo(20)
+        visits: [
+          { date: daysAgo(8), notes: 'Cold pitch. Walked in, introduced the concept, explained the 50/50 split model. Laura said yes on the spot. Booked April 18. This is the one.', reception: 'warm' }
+        ],
+        lastVisit: daysAgo(8),
+        created: daysAgo(8)
       },
       {
         id: 'demo-003',
@@ -46,8 +57,8 @@ function getSeedData() {
         address: '1851 Roswell Rd, Marietta, GA 30062',
         neighborhood: 'Marietta',
         status: 'active',
-        totalScore: 70,
-        notes: 'Friday Night Magic crowd. 18-year community institution. Strong potential, haven\'t pitched yet.',
+        totalScore: 13,
+        notes: 'Primary next cold-pitch target. Friday Night Magic drafts, beer and food, 18-year community institution. Childhood synchronicity — visited this place as a kid with my dad. The crowd is exactly right: regulars, nerds, people who sit hunched over cards for 4 hours straight. They need this. Haven\'t pitched yet — want to go on a Friday to scope the layout first.',
         contacts: [],
         visits: [],
         lastVisit: null,
@@ -55,19 +66,31 @@ function getSeedData() {
       },
       {
         id: 'demo-004',
-        name: 'Stout Brothers Taproom',
-        address: '789 Commerce Dr, Woodstock, GA 30188',
+        name: 'Trefoil Gardens',
+        address: 'Kingsridge West, Woodstock, GA 30188',
         neighborhood: 'Woodstock',
         status: 'active',
-        totalScore: 50,
-        notes: 'Two cold visits, no decision-maker available. Client Jill has owner contact — waiting on intro.',
-        contacts: [],
-        visits: [
-          { date: daysAgo(21), notes: 'Second visit. Left card with bartender.', reception: 'neutral' },
-          { date: daysAgo(35), notes: 'First cold visit. Left flyer.', reception: 'neutral' }
+        totalScore: 11,
+        notes: 'Woodstock CSA run by Rob Miller — community garden plots on converted residential lots, shareholders get free weekly produce, surplus goes to farmers market. Pre-existing relationship: Rob staged vegetables in the Dogwood Growlers walk-in cooler before market days, I kept the deal and got a CSA share in return. He\'s the foremost praxis-doer in the area. Farmers market setup could work — physical labor crowd, good politics, perfect values alignment. Traffic is the limiting factor (market days only, seasonal).',
+        contacts: [
+          { name: 'Rob Miller', phone: '', email: '', isPrimary: true }
         ],
-        lastVisit: daysAgo(21),
-        created: daysAgo(40)
+        visits: [],
+        lastVisit: null,
+        created: daysAgo(7)
+      },
+      {
+        id: 'demo-005',
+        name: 'Dixie Speedway',
+        address: '900 Dixie Speedway, Woodstock, GA 30188',
+        neighborhood: 'Woodstock',
+        status: 'active',
+        totalScore: 13,
+        notes: 'Dirt track racing venue. This is a joke that is also not a joke. Racing crowds are enormous, the demographics skew working class, and the human body takes a beating at a speedway — drivers, pit crews, fans standing on concrete bleachers for 4 hours. Chairs fold up, setup is flexible, the concourse has space. The bit writes itself. "Fighting the Forces of Tension at 90mph." Haven\'t pitched yet. Need a plan for how to approach this one without getting laughed out of the parking lot — or maybe lean into that.',
+        contacts: [],
+        visits: [],
+        lastVisit: null,
+        created: daysAgo(2)
       }
     ],
     activityLog: [
