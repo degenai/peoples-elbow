@@ -1639,6 +1639,23 @@ nav ul li a.active {
     margin-top: 0.25rem;
 }
 
+.countdown-residency {
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 0.5rem;
+}
+
+.countdown-residency a {
+    color: var(--pe-green);
+    font-weight: 600;
+    text-decoration: none;
+    border-bottom: 1px solid currentColor;
+}
+
+.countdown-residency a:hover {
+    color: var(--pe-gold, #CE9C00);
+}
+
 .countdown-live {
     font-family: 'Bangers', cursive;
     font-size: 1.5rem;
