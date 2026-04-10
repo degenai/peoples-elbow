@@ -57,7 +57,6 @@ class ComponentLoader {
             'index.html': 'home',
             '': 'home',
             'calendar.html': 'calendar',
-            'map.html': 'map',
             'chat.html': 'chat',
             'changelog.html': 'changelog',
             'steal-this-site.html': 'steal-this-site',
