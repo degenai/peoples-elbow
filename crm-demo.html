@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://api.deepseek.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; connect-src 'self' https://api.deepseek.com https://nominatim.openstreetmap.org">
+  <title>Lead-o-Tron 5000 — Demo</title>
+  <link rel="shortcut icon" href="images/logo.png" type="image/png">
+  <link rel="stylesheet" href="css/crm.css">
+  <style>
+    .demo-banner {
+      background: var(--pe-green-dark, #1a3a2a);
+      border-bottom: 2px solid var(--pe-gold, #d4a017);
+      color: #fff;
+      padding: 8px 16px;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .demo-banner strong { color: var(--pe-gold, #d4a017); }
+    .demo-banner a { color: var(--pe-gold, #d4a017); }
+    .demo-reset-btn {
+      margin-left: auto;
+      font-size: 0.75rem;
+      padding: 3px 10px;
+      background: transparent;
+      border: 1px solid var(--pe-gold, #d4a017);
+      color: var(--pe-gold, #d4a017);
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .demo-reset-btn:hover { background: var(--pe-gold, #d4a017); color: #000; }
+  </style>
+
+  <!-- Import map: transparently swaps the KV-backed API for the local one.
+       renderer.js and utility.js are untouched — they import './crm-api.js'
+       and the browser resolves it here instead. -->
+  <script type="importmap">
+  {
+    "imports": {
+      "/js/crm/crm-api.js": "/js/crm/crm-api-local.js"
+    }
+  }
+  </script>
+</head>
+<body class="page-loading">
+  <div class="demo-banner">
+    <strong>DEMO MODE</strong>
+    <span>All data stays in your browser. Nothing is sent to any server. <a href="steal-this-site.html">Steal this for your org →</a></span>
+    <button class="demo-reset-btn" onclick="if(confirm('Reset demo data to defaults?')){localStorage.removeItem('leadOTron_demoData');location.reload();}">Reset Demo</button>
+  </div>
+
+  <div id="app">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-left">
+        <h1 class="app-title">LEAD-O-TRON 5000</h1>
+        <span class="app-subtitle">The People's Elbow Outreach Tracker</span>
+      </div>
+      <div class="header-right">
+        <button id="utilityBeltBtn" class="btn btn-utility" title="Utility Belt - Route Finder & Tools">🛠️ Utility Belt</button>
+        <button id="settingsBtn" class="btn btn-icon" title="Settings" aria-label="Settings">⚙️</button>
+        <button id="exportBtn" class="btn btn-secondary">Export JSON</button>
+        <button id="importBtn" class="btn btn-secondary">Import JSON</button>
+        <button id="addLeadBtn" class="btn btn-primary">+ New Lead</button>
+        <a href="steal-this-site.html" class="btn btn-secondary">← Steal This Site</a>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Sidebar Filters -->
+      <aside class="sidebar">
+        <div class="filter-section">
+          <h3>🔍 Filters</h3>
+
+          <div class="filter-group">
+            <label>Status</label>
+            <select id="filterStatus">
+              <option value="all">All Status</option>
+              <option value="active" selected>Active</option>
+              <option value="converted">Converted</option>
+              <option value="archived">Archived</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label>Time Since Visit</label>
+            <select id="filterTime">
+              <option value="all">All Time</option>
+              <option value="week">This Week</option>
+              <option value="due-1">Due (1+ weeks)</option>
+              <option value="due-2">Due (2+ weeks)</option>
+              <option value="due-3">Due (3+ weeks)</option>
+              <option value="due-month">Due (1+ month)</option>
+              <option value="never">Never Visited</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label>Neighborhood</label>
+            <select id="filterNeighborhood">
+              <option value="all">All Areas</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label>Min Score</label>
+            <input type="range" id="filterMinScore" min="3" max="15" value="3">
+            <span id="filterMinScoreValue">3+</span>
+          </div>
+
+          <div class="filter-group">
+            <label>Last Reception</label>
+            <select id="filterReception">
+              <option value="all">All</option>
+              <option value="warm">🔥 Warm</option>
+              <option value="lukewarm">🌤️ Lukewarm</option>
+              <option value="cold">❄️ Cold</option>
+            </select>
+          </div>
+
+          <button id="clearFiltersBtn" class="btn btn-secondary btn-block">Clear Filters</button>
+        </div>
+
+        <div class="stats-section">
+          <h3>📊 Stats</h3>
+          <div class="stat-item">
+            <span class="stat-label">Total Leads</span>
+            <span id="statTotal" class="stat-value">0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Active</span>
+            <span id="statActive" class="stat-value">0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Converted</span>
+            <span id="statConverted" class="stat-value">0</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-label">Due This Week</span>
+            <span id="statDue" class="stat-value">0</span>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Lead List -->
+      <section class="lead-list-section">
+        <div class="list-header">
+          <div class="list-controls">
+            <input type="text" id="searchInput" placeholder="Search leads..." class="search-input">
+            <select id="sortBy" class="sort-select">
+              <option value="lastVisit">Sort: Last Visit</option>
+              <option value="name">Sort: Name</option>
+              <option value="totalScore">Sort: Score</option>
+              <option value="neighborhood">Sort: Neighborhood</option>
+              <option value="created">Sort: Date Added</option>
+            </select>
+            <button id="sortOrderBtn" class="btn btn-icon" title="Toggle sort order" aria-label="Toggle sort order">↓</button>
+          </div>
+          <div class="list-count">
+            <span id="leadCount">0 leads</span>
+          </div>
+        </div>
+
+        <div id="leadList" class="lead-list">
+          <!-- Leads will be rendered here -->
+        </div>
+      </section>
+
+      <!-- Lead Detail Panel -->
+      <aside id="detailPanel" class="detail-panel hidden">
+        <div class="detail-header">
+          <button id="closeDetailBtn" class="btn btn-icon" aria-label="Close lead details">✕</button>
+          <h2 id="detailTitle">Lead Details</h2>
+          <div class="detail-actions">
+            <button id="editLeadBtn" class="btn btn-secondary">Edit</button>
+            <button id="deleteLeadBtn" class="btn btn-danger">Delete</button>
+          </div>
+        </div>
+
+        <div id="detailContent" class="detail-content">
+          <!-- Detail content will be rendered here -->
+        </div>
+      </aside>
+    </main>
+
+    <!-- Console/Activity Log -->
+    <footer class="console-panel">
+      <div class="console-header">
+        <span>📋 Activity Log</span>
+        <button id="toggleConsoleBtn" class="btn btn-icon btn-sm" aria-label="Toggle activity log">▼</button>
+      </div>
+      <div id="consoleContent" class="console-content">
+        <!-- Log entries will appear here -->
+      </div>
+    </footer>
+
+    <!-- Add/Edit Lead Modal -->
+    <div id="leadModal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="modalTitle">Add New Lead</h2>
+          <button id="closeModalBtn" class="btn btn-icon" aria-label="Close modal">✕</button>
+        </div>
+        <form id="leadForm" class="modal-body">
+          <div class="form-row">
+            <div class="form-group flex-grow">
+              <label for="leadName">Business Name *</label>
+              <input type="text" id="leadName" required placeholder="Enter business name">
+            </div>
+            <button type="button" id="aiLookupBtn" class="btn btn-ai" title="Look up with DeepSeek AI">
+              🤖 AI Lookup
+            </button>
+          </div>
+
+          <div id="aiStatus" class="ai-status hidden"></div>
+
+          <div class="form-row">
+            <div class="form-group flex-grow">
+              <label for="leadAddress">Address <span class="ai-tag hidden" id="addressAiTag">AI</span></label>
+              <input type="text" id="leadAddress" placeholder="Full address">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="leadNeighborhood">Neighborhood <span class="ai-tag hidden" id="neighborhoodAiTag">AI</span></label>
+              <input type="text" id="leadNeighborhood" placeholder="Area/district" list="leadNeighborhoodOptions">
+              <datalist id="leadNeighborhoodOptions"></datalist>
+            </div>
+            <div class="form-group">
+              <label for="leadStatus">Status</label>
+              <select id="leadStatus">
+                <option value="active">Active</option>
+                <option value="converted">Converted</option>
+                <option value="archived">Archived</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-section contacts-section">
+            <div class="contacts-header">
+              <h3>Contacts</h3>
+              <button type="button" id="addContactBtn" class="btn btn-secondary btn-sm">+ Add Contact</button>
+            </div>
+            <div id="contactsList" class="contacts-list">
+              <!-- Contacts will be rendered dynamically -->
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h3>Scores</h3>
+            <div class="scores-grid">
+              <div class="score-group">
+                <label>🪑 Space <span id="spaceValue">3</span>/5</label>
+                <input type="range" id="scoreSpace" min="1" max="5" value="3">
+                <small>Room for chair massage setup</small>
+              </div>
+              <div class="score-group">
+                <label>👥 Traffic <span id="trafficValue">3</span>/5</label>
+                <input type="range" id="scoreTraffic" min="1" max="5" value="3">
+                <small>Customer foot traffic</small>
+              </div>
+              <div class="score-group">
+                <label>✨ Vibes <span id="vibesValue">3</span>/5</label>
+                <input type="range" id="scoreVibes" min="1" max="5" value="3">
+                <small>Cultural fit / mutual aid alignment</small>
+              </div>
+            </div>
+            <div class="total-score">
+              Total Score: <span id="totalScoreValue">9</span>/15
+            </div>
+          </div>
+
+          <div id="quickVisitSection" class="form-section">
+            <h3>Quick Add Visit</h3>
+            <div class="form-group">
+              <label>
+                <input type="checkbox" id="addQuickVisit"> Log a visit now
+              </label>
+            </div>
+            <div id="quickVisitFields" class="hidden">
+              <div class="form-group">
+                <label for="quickVisitNotes">Notes</label>
+                <textarea id="quickVisitNotes" rows="2" placeholder="Notes from this visit..."></textarea>
+              </div>
+              <div class="form-group">
+                <label for="quickVisitReception">Reception</label>
+                <select id="quickVisitReception">
+                  <option value="lukewarm">🌤️ Lukewarm</option>
+                  <option value="warm">🔥 Warm</option>
+                  <option value="cold">❄️ Cold</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <input type="hidden" id="leadId">
+        </form>
+        <div class="modal-footer">
+          <button type="button" id="cancelModalBtn" class="btn btn-secondary">Cancel</button>
+          <button type="submit" form="leadForm" class="btn btn-primary">Save Lead</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add/Edit Visit Modal -->
+    <div id="visitModal" class="modal hidden">
+      <div class="modal-content modal-sm">
+        <div class="modal-header">
+          <h2 id="visitModalTitle">Log Visit</h2>
+          <button id="closeVisitModalBtn" class="btn btn-icon" aria-label="Close visit modal">✕</button>
+        </div>
+        <form id="visitForm" class="modal-body">
+          <div class="form-group">
+            <label for="visitDate">Date</label>
+            <input type="datetime-local" id="visitDate">
+          </div>
+          <div class="form-group">
+            <label for="visitNotes">Notes</label>
+            <textarea id="visitNotes" rows="4" placeholder="Notes from this visit..."></textarea>
+          </div>
+          <div class="form-group">
+            <label for="visitReception">Reception</label>
+            <select id="visitReception">
+              <option value="lukewarm">🌤️ Lukewarm</option>
+              <option value="warm">🔥 Warm</option>
+              <option value="cold">❄️ Cold</option>
+            </select>
+          </div>
+          <input type="hidden" id="visitLeadId">
+          <input type="hidden" id="visitIndex" value="">
+        </form>
+        <div class="modal-footer">
+          <button type="button" id="cancelVisitModalBtn" class="btn btn-secondary">Cancel</button>
+          <button type="submit" form="visitForm" id="visitSubmitBtn" class="btn btn-primary">Log Visit</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delete Visit Confirmation Modal -->
+    <div id="deleteVisitModal" class="modal hidden">
+      <div class="modal-content modal-sm modal-danger">
+        <div class="modal-header">
+          <h2>⚠️ Delete Visit?</h2>
+          <button id="closeDeleteVisitBtn" class="btn btn-icon" aria-label="Close delete visit confirmation">✕</button>
+        </div>
+        <div class="modal-body">
+          <p class="delete-warning">This action cannot be undone.</p>
+          <div class="delete-preview">
+            <div class="delete-preview-date" id="deleteVisitDate"></div>
+            <div class="delete-preview-notes" id="deleteVisitNotes"></div>
+          </div>
+          <input type="hidden" id="deleteVisitLeadId">
+          <input type="hidden" id="deleteVisitIndex">
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="cancelDeleteVisitBtn" class="btn btn-secondary">Cancel</button>
+          <button type="button" id="confirmDeleteVisitBtn" class="btn btn-danger">Delete Visit</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal hidden">
+      <div class="modal-content modal-sm">
+        <div class="modal-header">
+          <h2>⚙️ Settings</h2>
+          <button id="closeSettingsModalBtn" class="btn btn-icon" aria-label="Close settings modal">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="deepseekApiKey">DeepSeek API Key</label>
+            <input type="password" id="deepseekApiKey" placeholder="Enter your API key">
+            <small>Used for AI-powered business lookup. <a href="https://platform.deepseek.com" target="_blank" rel="noopener noreferrer">Get API key</a></small>
+          </div>
+          <div class="form-group">
+            <label for="defaultLocation">Default Location (City, State)</label>
+            <input type="text" id="defaultLocation" placeholder="e.g., Woodstock, GA">
+            <small>City and state for AI business lookups</small>
+          </div>
+          <div class="form-group">
+            <label for="defaultZipcode">Default Zipcode</label>
+            <input type="text" id="defaultZipcode" placeholder="e.g., 30188" maxlength="10">
+            <small>Optional - adds extra precision to lookups</small>
+          </div>
+          <div class="form-group">
+            <label>Data Location</label>
+            <p id="dataPathDisplay" class="data-path">Local Storage (Demo Mode)</p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="saveSettingsBtn" class="btn btn-primary">Save Settings</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+  <script type="module" src="js/crm/renderer.js"></script>
+</body>
+</html>
