@@ -8,41 +8,57 @@ class ComponentLoader {
     constructor() {
         this.loadedComponents = new Map();
         this.currentPage = this.getCurrentPageIdentifier();
+        this._versionCache = undefined;
+        this._versionPromise = null;
+        this._domPurifyPromise = null;
     }
 
     /**
-     * Basic HTML sanitizer to prevent DOM-based XSS
+     * Dynamically loads DOMPurify from CDN.
+     * Implements fail-closed security - if it fails to load,
+     * throws an error rather than allowing insecure component injection.
+     */
+    async loadDOMPurify() {
+        if (window.DOMPurify) return window.DOMPurify;
+        if (this._domPurifyPromise) return this._domPurifyPromise;
+
+        this._domPurifyPromise = new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.8/purify.min.js';
+            script.integrity = 'sha512-ik8L3z98XpjkBop4A2kH8yH+Z1TiaXqQ0uGkF9kU1P/y/E1mC8sY8N194E/Hw9s28KzYJ6r5uWfL8H0sZ7K+Jw==';
+            script.crossOrigin = 'anonymous';
+
+            script.onload = () => {
+                if (window.DOMPurify) {
+                    resolve(window.DOMPurify);
+                } else {
+                    reject(new Error('DOMPurify loaded but not found on window'));
+                }
+            };
+
+            script.onerror = () => {
+                reject(new Error('Failed to load DOMPurify from CDN'));
+            };
+
+            document.head.appendChild(script);
+        });
+
+        return this._domPurifyPromise;
+    }
+
+    /**
+     * Uses DOMPurify to sanitize HTML and prevent DOM-based XSS.
+     * Fails closed if DOMPurify is not loaded.
      */
     sanitizeHTML(html) {
         if (!html) return '';
 
-        // Parse the HTML string into a DOM Document
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
+        if (!window.DOMPurify) {
+            console.error('CRITICAL: DOMPurify not loaded. Aborting HTML sanitization to prevent XSS.');
+            return ''; // Fail-closed: return empty string to prevent injection
+        }
 
-        // 1. Remove all script tags
-        const scripts = doc.querySelectorAll('script');
-        scripts.forEach(script => script.remove());
-
-        // 2. Remove all event handler attributes and javascript: URIs
-        const elements = doc.querySelectorAll('*');
-        elements.forEach(el => {
-            Array.from(el.attributes).forEach(attr => {
-                const attrName = attr.name.toLowerCase();
-                // Remove on* event handlers (e.g., onclick, onload)
-                if (attrName.startsWith('on')) {
-                    el.removeAttribute(attrName);
-                }
-                // Remove javascript: URIs in href or src attributes
-                if ((attrName === 'href' || attrName === 'src') &&
-                    attr.value.trim().toLowerCase().startsWith('javascript:')) {
-                    el.removeAttribute(attrName);
-                }
-            });
-        });
-
-        // Return the sanitized inner HTML of the body
-        return doc.body.innerHTML;
+        return window.DOMPurify.sanitize(html);
     }
 
     /**
@@ -147,6 +163,14 @@ class ComponentLoader {
      * Load all components
      */
     async loadAllComponents() {
+        try {
+            // Load security dependency first. Fail closed if it fails.
+            await this.loadDOMPurify();
+        } catch (error) {
+            console.error('Security critical failure: Cannot load DOMPurify. Aborting component loading.', error);
+            return false;
+        }
+
         const promises = [
             this.loadHeader(),
             this.loadFooter()
