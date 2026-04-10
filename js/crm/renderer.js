@@ -590,8 +590,8 @@ function renderDetailPanel(lead) {
             <div class="visit-header">
               <span class="visit-date">${formatDate(visit.date)}</span>
               <div class="visit-actions">
-                <button class="btn-icon-sm" data-action="edit-visit" data-lead-id="${lead.id}" data-visit-index="${originalIndex}" title="Edit visit">✏️</button>
-                <button class="btn-icon-sm btn-danger-subtle" data-action="delete-visit" data-lead-id="${lead.id}" data-visit-index="${originalIndex}" title="Delete visit">🗑️</button>
+                <button class="btn-icon-sm" data-action="edit-visit" data-lead-id="${lead.id}" data-visit-index="${originalIndex}" title="Edit visit" aria-label="Edit visit">✏️</button>
+                <button class="btn-icon-sm btn-danger-subtle" data-action="delete-visit" data-lead-id="${lead.id}" data-visit-index="${originalIndex}" title="Delete visit" aria-label="Delete visit">🗑️</button>
                 <span class="visit-reception">${getReceptionEmoji(visit.reception)} ${visit.reception}</span>
               </div>
             </div>
@@ -934,7 +934,7 @@ function renderFormContacts() {
             <input type="radio" name="primaryContact" ${contact.isPrimary ? 'checked' : ''} data-action="set-primary-contact" data-index="${index}">
             <span class="primary-label">${contact.isPrimary ? '★ Primary' : 'Set Primary'}</span>
           </label>
-          <button type="button" class="btn btn-icon btn-sm remove-contact-btn" data-action="remove-contact" data-index="${index}" title="Remove contact">✕</button>
+          <button type="button" class="btn btn-icon btn-sm remove-contact-btn" data-action="remove-contact" data-index="${index}" title="Remove contact" aria-label="Remove contact">✕</button>
         </div>
         <div class="contact-card-fields">
           <div class="form-row">
