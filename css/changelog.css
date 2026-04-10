@@ -612,6 +612,12 @@
     text-decoration: underline;
 }
 
+a:focus-visible {
+    outline: 2px solid #CE9C00;
+    border-radius: 4px;
+    outline-offset: 4px;
+}
+
 .changelog-explanation a:hover {
     color: #fff;
 }
