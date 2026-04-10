@@ -125,8 +125,11 @@ class D1Changelog {
     }
 
     createTimelineItem(entry, index) {
+        const isBot = (entry.author_name || '').toLowerCase().includes('[bot]') ||
+                      (entry.author_email || '').toLowerCase().includes('[bot]');
+
         const item = document.createElement('div');
-        item.className = 'timeline-item';
+        item.className = isBot ? 'timeline-item timeline-item--bot' : 'timeline-item';
         item.dataset.index = index;
 
         const date = new Date(entry.commit_date);
@@ -135,21 +138,35 @@ class D1Changelog {
             month: 'short',
             day: 'numeric'
         });
-        
+
         const shortHash = entry.commit_hash.substring(0, 7);
-        
+
+        if (isBot) {
+            // Minimized bot commit — collapsed by default, no full message block
+            item.innerHTML = `
+                <div class="timeline-marker timeline-marker--bot"></div>
+                <div class="timeline-content timeline-content--bot">
+                    <span class="commit-hash">${shortHash}</span>
+                    <span class="commit-date">${formattedDate}</span>
+                    <span class="commit-author commit-author--bot">${this.escapeHtml(entry.author_name)}</span>
+                    <span class="commit-message--bot">${this.escapeHtml(entry.commit_message.split('\n')[0])}</span>
+                </div>
+            `;
+            return item;
+        }
+
         // Extract commit title (first line) and full message
         const commitLines = entry.commit_message.split('\n');
         const commitTitle = commitLines[0] || entry.commit_message;
         const fullMessage = entry.commit_message;
-        
+
         // Format the full message for display (preserve formatting, highlight sections)
         let formattedFullMessage = this.escapeHtml(fullMessage);
         // Highlight WHAT/WHY/TECHNICAL sections
         formattedFullMessage = formattedFullMessage.replace(/\b(WHAT:|WHY:|TECHNICAL:)\b/g, '<strong>$1</strong>');
         // Convert newlines to line breaks
         formattedFullMessage = formattedFullMessage.replace(/\n/g, '<br>');
-        
+
         item.innerHTML = `
             <div class="timeline-marker"></div>
             <div class="timeline-content">

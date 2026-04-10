@@ -85,7 +85,7 @@ function getNewCommits(sinceHash) {
 
     const gitArgs = [
         'log',
-        '--pretty=format:%H<|DELIM|>%B<|DELIM|>%ai<|DELIM|>%an<|DELIM|>%ae<|COMMIT_END|>',
+        '--pretty=format:%H<|DELIM|>%B<|DELIM|>%ci<|DELIM|>%an<|DELIM|>%ae<|COMMIT_END|>',
         '--reverse'
     ];
 
