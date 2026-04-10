@@ -80,18 +80,19 @@ class D1Changelog {
             if (footerVersionElement) {
                 footerVersionElement.textContent = `v${version}`;
             }
-            // Update header badge with the same authoritative version
+            // Update header badge — no "v" prefix, the HTML span already has it
             if (headerVersionElement) {
-                headerVersionElement.textContent = `v${version}`;
-                // Header badge updated to authoritative D1 version
+                headerVersionElement.textContent = version;
             }
+            // Sync sessionStorage so components.js cache stays current
+            try { sessionStorage.setItem('site_version', version); } catch (e) {}
         } else {
             versionElement.textContent = 'v0';
             if (footerVersionElement) {
                 footerVersionElement.textContent = 'v0';
             }
             if (headerVersionElement) {
-                headerVersionElement.textContent = 'v0';
+                headerVersionElement.textContent = '0';
             }
         }
     }
