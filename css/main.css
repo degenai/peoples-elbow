@@ -1544,4 +1544,84 @@ nav ul li a.active {
     z-index: 1;
 }
 
+/* Event Countdown */
+.event-countdown {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.countdown-event-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    text-align: center;
+}
+
+.countdown-event-name {
+    font-family: 'Bangers', cursive;
+    font-size: 2rem;
+    color: var(--pe-green);
+    letter-spacing: 1px;
+}
+
+.countdown-event-detail {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.countdown-event-cause {
+    font-size: 0.875rem;
+    color: #666;
+}
+
+.countdown-timer {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.countdown-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 64px;
+}
+
+.countdown-number {
+    font-family: 'Bangers', cursive;
+    font-size: 3rem;
+    color: var(--pe-green);
+    line-height: 1;
+}
+
+.countdown-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #888;
+    margin-top: 0.25rem;
+}
+
+.countdown-live {
+    font-family: 'Bangers', cursive;
+    font-size: 1.5rem;
+    color: var(--pe-gold, #CE9C00);
+    text-align: center;
+}
+
+@media (max-width: 480px) {
+    .countdown-timer {
+        gap: 1rem;
+    }
+    .countdown-number {
+        font-size: 2.25rem;
+    }
+    .countdown-unit {
+        min-width: 48px;
+    }
+}
+
 /* Who section responsive styles are handled by inline styles in HTML */

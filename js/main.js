@@ -329,4 +329,32 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Try to update version immediately
     updateVersionNumber();
+
+    // House Wolf Records countdown — Record Store Day, April 18 2026, 8 AM EDT
+    const countdownTarget = new Date('2026-04-18T12:00:00Z');
+    const countdownTimer = document.getElementById('countdown-timer');
+
+    function updateCountdown() {
+        const diff = countdownTarget - new Date();
+
+        if (diff <= 0) {
+            countdownTimer.innerHTML = '<p class="countdown-live">It\'s happening — go get a massage.</p>';
+            return;
+        }
+
+        const days    = Math.floor(diff / 864e5);
+        const hours   = Math.floor((diff % 864e5) / 36e5);
+        const minutes = Math.floor((diff % 36e5) / 6e4);
+        const seconds = Math.floor((diff % 6e4) / 1e3);
+
+        document.getElementById('countdown-days').textContent    = String(days).padStart(2, '0');
+        document.getElementById('countdown-hours').textContent   = String(hours).padStart(2, '0');
+        document.getElementById('countdown-minutes').textContent = String(minutes).padStart(2, '0');
+        document.getElementById('countdown-seconds').textContent = String(seconds).padStart(2, '0');
+    }
+
+    if (countdownTimer) {
+        updateCountdown();
+        setInterval(updateCountdown, 1000);
+    }
 });
