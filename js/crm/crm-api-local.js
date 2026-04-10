@@ -1,4 +1,5 @@
 import { generateId, generateDateStr } from './utils.js';
+import { normalizeLeadsData } from './data-normalizer.js';
 
 const STORAGE_KEY = 'leadOTron_demoData';
 
@@ -16,20 +17,21 @@ function getSeedData() {
         address: '9580 Main St, Woodstock, GA 30188',
         neighborhood: 'Woodstock',
         status: 'active',
+        scores: { space: 5, traffic: 4, vibes: 5 },
         totalScore: 14,
-        notes: 'Wednesday evening residency, going on 7 weeks. Family gym — owners are genuinely invested in the community angle, not just the novelty. Consistent clients week over week, some regulars emerging. Sarah has started coming on Wednesdays. Seth (trainer) was a client and became a word-of-mouth source. Pre-existing family relationship with Erica makes this the anchor venue — not replicable elsewhere but sets the template.',
+        notes: 'Wednesday evening residency, going on 7 weeks. Family gym — owners are genuinely invested in the community angle, not just the novelty. Consistent clients week over week, some regulars emerging. S. (trainer) was an early client who just liked it and kept coming back. Pre-existing relationship with the owners makes this the anchor venue — not replicable elsewhere but sets the template.',
         contacts: [
-          { name: 'Matt Ribley', phone: '', email: '', isPrimary: true },
-          { name: 'Erica Ribley', phone: '', email: '', isPrimary: false }
+          { name: 'Matt R.', phone: '', email: '', isPrimary: true },
+          { name: 'Erica R.', phone: '', email: '', isPrimary: false }
         ],
         visits: [
-          { date: daysAgo(3),  notes: '7th Wednesday. Steady flow, 5 clients. A regular asked specifically when I\'d be back next week — that\'s the sign.', reception: 'warm' },
-          { date: daysAgo(10), notes: '6th Wednesday. Seth brought two coworkers over. Good energy in the room.', reception: 'warm' },
-          { date: daysAgo(17), notes: '5th Wednesday. Slow start, picked up after 7pm. 4 clients total.', reception: 'warm' },
-          { date: daysAgo(24), notes: '4th Wednesday. Started feeling like a regular thing. Matt mentioned it to new members during orientation.', reception: 'warm' },
-          { date: daysAgo(31), notes: '3rd Wednesday. First repeat client from week 1. That\'s validation.', reception: 'warm' },
-          { date: daysAgo(38), notes: '2nd Wednesday. Better than the first — word had spread a little.', reception: 'warm' },
-          { date: daysAgo(45), notes: 'First visit. Pitched Erica on the concept. She said yes immediately. Setup worked, 3 clients.', reception: 'warm' }
+          { date: daysAgo(3),  notes: '', reception: 'warm' },
+          { date: daysAgo(10), notes: '', reception: 'warm' },
+          { date: daysAgo(17), notes: '', reception: 'warm' },
+          { date: daysAgo(24), notes: '', reception: 'warm' },
+          { date: daysAgo(31), notes: '', reception: 'warm' },
+          { date: daysAgo(38), notes: '', reception: 'warm' },
+          { date: daysAgo(45), notes: '', reception: 'warm' }
         ],
         lastVisit: daysAgo(3),
         created: daysAgo(50)
@@ -40,15 +42,17 @@ function getSeedData() {
         address: '784 Marietta St NW, Atlanta, GA 30318',
         neighborhood: 'Atlanta',
         status: 'converted',
+        scores: { space: 4, traffic: 4, vibes: 5 },
         totalScore: 13,
-        notes: 'Record Store Day booking — April 18. First fully independent cold-visit booking after roughly 60 doors. Fundraiser for Southern Cross German Shepherd Rescue (501c3, ~6.7K FB members, run by Laura Allen Wolf). Chair setup outside serving the line. Money is not the primary metric here — this is the proof of concept, the resume piece, the first photo op that shows the thing actually works in the wild.',
+        notes: 'Record Store Day booking — April 18. First fully independent cold-visit booking after roughly 60 doors. Fundraiser for a local animal rescue (501c3). Chair setup outside serving the line. Money is not the primary metric here — this is the proof of concept, the resume piece, the first photo op that shows the thing actually works in the wild.',
         contacts: [
-          { name: 'Laura Allen Wolf', phone: '', email: '', isPrimary: true }
+          { name: 'Laura W.', phone: '', email: '', isPrimary: true }
         ],
         visits: [
-          { date: daysAgo(8), notes: 'Cold pitch. Walked in, introduced the concept, explained the 50/50 split model. Laura said yes on the spot. Booked April 18. This is the one.', reception: 'warm' }
+          { date: daysAgo(8), notes: 'Cold pitch. Walked in, introduced the concept, explained the 50/50 split model. Owner said yes on the spot. Booked April 18. This is the one.', reception: 'warm' },
+          { date: daysAgo(2), notes: 'Stopped in to confirm. Event goes 8am–6pm, chair setup outside serving the line. Good to go.', reception: 'warm' }
         ],
-        lastVisit: daysAgo(8),
+        lastVisit: daysAgo(2),
         created: daysAgo(8)
       },
       {
@@ -57,8 +61,9 @@ function getSeedData() {
         address: '1851 Roswell Rd, Marietta, GA 30062',
         neighborhood: 'Marietta',
         status: 'active',
+        scores: { space: 4, traffic: 4, vibes: 5 },
         totalScore: 13,
-        notes: 'Primary next cold-pitch target. Friday Night Magic drafts, beer and food, 18-year community institution. Childhood synchronicity — visited this place as a kid with my dad. The crowd is exactly right: regulars, nerds, people who sit hunched over cards for 4 hours straight. They need this. Haven\'t pitched yet — want to go on a Friday to scope the layout first.',
+        notes: 'Primary next cold-pitch target. Friday Night Magic drafts, beer and food, 18-year community institution. The crowd is exactly right: regulars, nerds, people who sit hunched over cards for 4 hours straight. They need this. Haven\'t pitched yet — want to go on a Friday to scope the layout first.',
         contacts: [],
         visits: [],
         lastVisit: null,
@@ -70,10 +75,11 @@ function getSeedData() {
         address: 'Kingsridge West, Woodstock, GA 30188',
         neighborhood: 'Woodstock',
         status: 'active',
+        scores: { space: 2, traffic: 4, vibes: 5 },
         totalScore: 11,
-        notes: 'Woodstock CSA run by Rob Miller — community garden plots on converted residential lots, shareholders get free weekly produce, surplus goes to farmers market. Pre-existing relationship: Rob staged vegetables in the Dogwood Growlers walk-in cooler before market days, I kept the deal and got a CSA share in return. He\'s the foremost praxis-doer in the area. Farmers market setup could work — physical labor crowd, good politics, perfect values alignment. Traffic is the limiting factor (market days only, seasonal).',
+        notes: 'Woodstock CSA — community garden plots on converted residential lots, shareholders get free weekly produce, surplus goes to the farmers market. Pre-existing relationship with the organizer. Values alignment is about as good as it gets. Real barrier: vendor space at the Woodstock Farmers Market is a premium bought well in advance — can\'t just show up. Need to either get on the waitlist or find another angle in (market day volunteer, shareholder event, etc.).',
         contacts: [
-          { name: 'Rob Miller', phone: '', email: '', isPrimary: true }
+          { name: 'Rob M.', phone: '', email: '', isPrimary: true }
         ],
         visits: [],
         lastVisit: null,
@@ -85,6 +91,7 @@ function getSeedData() {
         address: '900 Dixie Speedway, Woodstock, GA 30188',
         neighborhood: 'Woodstock',
         status: 'active',
+        scores: { space: 5, traffic: 5, vibes: 3 },
         totalScore: 13,
         notes: 'Dirt track racing venue. This is a joke that is also not a joke. Racing crowds are enormous, the demographics skew working class, and the human body takes a beating at a speedway — drivers, pit crews, fans standing on concrete bleachers for 4 hours. Chairs fold up, setup is flexible, the concourse has space. The bit writes itself. "Fighting the Forces of Tension at 90mph." Haven\'t pitched yet. Need a plan for how to approach this one without getting laughed out of the parking lot — or maybe lean into that.',
         contacts: [],
@@ -121,7 +128,10 @@ export const CrmApi = {
   async getHeaders() { return { 'Content-Type': 'application/json' }; },
 
   async getLeads() {
-    this.localState = load();
+    const raw = load();
+    const { data, needsSave } = normalizeLeadsData(raw);
+    this.localState = data;
+    if (needsSave) save(this.localState);
     return this.localState;
   },
 
