@@ -13,36 +13,48 @@ class ComponentLoader {
     /**
      * Basic HTML sanitizer to prevent DOM-based XSS
      */
-    sanitizeHTML(html) {
-        if (!html) return '';
+    /**
+     * Load DOMPurify dynamically via CDN
+     */
+    async loadDOMPurify() {
+        if (window.DOMPurify) return true;
+        if (this._domPurifyPromise) return this._domPurifyPromise;
 
-        // Parse the HTML string into a DOM Document
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
+        this._domPurifyPromise = new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.9/purify.min.js';
+            script.integrity = 'sha512-9+rO+O46i53J8S9xRzJ83oxA4S0Lzy2/nN2k3EwB1kPq1a1BfN1kM7pGqA2B1N/5xO4L5Y5/P4m3rE0e0O7zEw==';
+            script.crossOrigin = 'anonymous';
 
-        // 1. Remove all script tags
-        const scripts = doc.querySelectorAll('script');
-        scripts.forEach(script => script.remove());
-
-        // 2. Remove all event handler attributes and javascript: URIs
-        const elements = doc.querySelectorAll('*');
-        elements.forEach(el => {
-            Array.from(el.attributes).forEach(attr => {
-                const attrName = attr.name.toLowerCase();
-                // Remove on* event handlers (e.g., onclick, onload)
-                if (attrName.startsWith('on')) {
-                    el.removeAttribute(attrName);
+            script.onload = () => {
+                if (window.DOMPurify) {
+                    resolve(true);
+                } else {
+                    this._domPurifyPromise = null;
+                    reject(new Error('DOMPurify script loaded but DOMPurify object not found'));
                 }
-                // Remove javascript: URIs in href or src attributes
-                if ((attrName === 'href' || attrName === 'src') &&
-                    attr.value.trim().toLowerCase().startsWith('javascript:')) {
-                    el.removeAttribute(attrName);
-                }
-            });
+            };
+
+            script.onerror = () => {
+                this._domPurifyPromise = null;
+                reject(new Error('Failed to load DOMPurify from CDN'));
+            };
+
+            document.head.appendChild(script);
         });
 
-        // Return the sanitized inner HTML of the body
-        return doc.body.innerHTML;
+        return this._domPurifyPromise;
+    }
+
+    /**
+     * Sanitize HTML using DOMPurify
+     */
+    sanitizeHTML(html) {
+        if (!html) return '';
+        if (!window.DOMPurify) {
+            throw new Error('DOMPurify is not loaded. Cannot safely sanitize HTML.');
+        }
+        return window.DOMPurify.sanitize(html);
     }
 
     /**
@@ -102,9 +114,16 @@ class ComponentLoader {
             return false;
         }
 
-        targetElement.innerHTML = this.sanitizeHTML(headerHtml);
-        this.highlightCurrentPage();
-        return true;
+        try {
+            await this.loadDOMPurify();
+            targetElement.innerHTML = this.sanitizeHTML(headerHtml);
+            this.highlightCurrentPage();
+            return true;
+        } catch (error) {
+            console.error('Security error: Failed to load DOMPurify for header sanitization.', error);
+            // Fail-closed: do not inject anything if sanitization is unavailable
+            return false;
+        }
     }
 
     /**
@@ -120,8 +139,15 @@ class ComponentLoader {
             return false;
         }
 
-        targetElement.innerHTML = this.sanitizeHTML(footerHtml);
-        return true;
+        try {
+            await this.loadDOMPurify();
+            targetElement.innerHTML = this.sanitizeHTML(footerHtml);
+            return true;
+        } catch (error) {
+            console.error('Security error: Failed to load DOMPurify for footer sanitization.', error);
+            // Fail-closed: do not inject anything if sanitization is unavailable
+            return false;
+        }
     }
 
     /**
