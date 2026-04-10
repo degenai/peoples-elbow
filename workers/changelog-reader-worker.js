@@ -35,16 +35,18 @@ export default {
         );
       }
 
-      // Query changelog entries from D1, ordered by date (newest first)
+      // Query changelog entries from D1, ordered by insertion id (newest first)
+      // id reflects git log --reverse insertion order, which is immune to
+      // timezone string comparison bugs that affect commit_date sorting
       const ps = env.CHANGELOG_DB.prepare(`
-        SELECT 
+        SELECT
           commit_hash,
           commit_message,
           commit_date,
           author_name,
           author_email
-        FROM changelog_entries 
-        ORDER BY commit_date DESC 
+        FROM changelog_entries
+        ORDER BY id DESC
         LIMIT ? OFFSET ?
       `);
 

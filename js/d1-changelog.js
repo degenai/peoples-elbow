@@ -141,20 +141,6 @@ class D1Changelog {
 
         const shortHash = entry.commit_hash.substring(0, 7);
 
-        if (isBot) {
-            // Minimized bot commit — collapsed by default, no full message block
-            item.innerHTML = `
-                <div class="timeline-marker timeline-marker--bot"></div>
-                <div class="timeline-content timeline-content--bot">
-                    <span class="commit-hash">${shortHash}</span>
-                    <span class="commit-date">${formattedDate}</span>
-                    <span class="commit-author commit-author--bot">${this.escapeHtml(entry.author_name)}</span>
-                    <span class="commit-message--bot">${this.escapeHtml(entry.commit_message.split('\n')[0])}</span>
-                </div>
-            `;
-            return item;
-        }
-
         // Extract commit title (first line) and full message
         const commitLines = entry.commit_message.split('\n');
         const commitTitle = commitLines[0] || entry.commit_message;
@@ -167,13 +153,21 @@ class D1Changelog {
         // Convert newlines to line breaks
         formattedFullMessage = formattedFullMessage.replace(/\n/g, '<br>');
 
+        const isDegenai = (entry.author_name || '').toLowerCase() === 'degenai';
+        const contentClass = isBot ? 'timeline-content timeline-content--bot'
+                           : isDegenai ? 'timeline-content timeline-content--degenai'
+                           : 'timeline-content';
+        const markerClass = isBot ? 'timeline-marker timeline-marker--bot' : 'timeline-marker';
+        const degenaiTag = isDegenai ? '<span class="degenai-badge">degenai</span>' : '';
+
         item.innerHTML = `
-            <div class="timeline-marker"></div>
-            <div class="timeline-content">
+            <div class="${markerClass}"></div>
+            <div class="${contentClass}">
                 <div class="timeline-header">
                     <span class="commit-hash">${shortHash}</span>
                     <span class="commit-date">${formattedDate}</span>
                     <span class="commit-author">${this.escapeHtml(entry.author_name)}</span>
+                    ${degenaiTag}
                 </div>
                 <div class="timeline-body">
                     <h3 class="commit-message">${this.escapeHtml(commitTitle)}</h3>
