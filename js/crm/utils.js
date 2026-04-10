@@ -21,7 +21,7 @@ export function getTimeSince(dateStr) {
   else if (diffDays === 1) formatted = 'Yesterday';
   else if (diffDays < 7) formatted = `${diffDays} days ago`;
   else if (diffWeeks === 1) formatted = '1 week ago';
-  else if (diffWeeks < 4) formatted = `${diffWeeks} weeks ago`;
+  else if (diffDays < 30) formatted = `${diffWeeks} weeks ago`;
   else if (diffMonths === 1) formatted = '1 month ago';
   else formatted = `${diffMonths} months ago`;
 
