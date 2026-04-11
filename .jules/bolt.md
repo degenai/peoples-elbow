@@ -14,3 +14,6 @@
 ## 2026-04-10 - [Sorting Performance Optimizations]
 **Learning:** Using `String.prototype.localeCompare` and `new Date()` inside an `Array.prototype.sort()` callback severely degrades performance due to repeated heavy object allocations and internationalization parsing overhead on every comparison.
 **Action:** Replace `new Date()` comparisons with simple string comparison for ISO-8601 strings (which sort perfectly lexicographically). Replace `localeCompare` with case-insensitive relational operators (`<` and `>`) to eliminate CPU bottlenecks during sorting operations in hot loops.
+## 2024-05-18 - Avoid array mapping and joining in render loops
+**Learning:** In tight rendering UI loops, chained array methods like `.map().join('')` or `.filter()` create intermediate arrays that contribute to memory allocations and GC stutter, slowing down the UI updates in large lists.
+**Action:** Replace functional array pipelines with simple `for` loops, building DOM strings natively with concatenation and accumulating elements inside pre-allocated arrays where necessary.
