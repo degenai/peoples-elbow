@@ -951,22 +951,22 @@ function renderFormContacts() {
         <div class="contact-card-fields">
           <div class="form-row">
             <div class="form-group flex-grow">
-              <label>Name</label>
-              <input type="text" value="${escapeHtml(contact.name)}" data-action="update-contact" data-index="${index}" data-field="name" placeholder="Contact name">
+              <label for="contact-name-${index}">Name</label>
+              <input type="text" id="contact-name-${index}" value="${escapeHtml(contact.name)}" data-action="update-contact" data-index="${index}" data-field="name" placeholder="Contact name">
             </div>
             <div class="form-group flex-grow">
-              <label>Role</label>
-              <input type="text" value="${escapeHtml(contact.role)}" data-action="update-contact" data-index="${index}" data-field="role" placeholder="Position/title">
+              <label for="contact-role-${index}">Role</label>
+              <input type="text" id="contact-role-${index}" value="${escapeHtml(contact.role)}" data-action="update-contact" data-index="${index}" data-field="role" placeholder="Position/title">
             </div>
           </div>
           <div class="form-row">
             <div class="form-group flex-grow">
-              <label>Phone</label>
-              <input type="tel" value="${escapeHtml(contact.phone)}" data-action="update-contact" data-index="${index}" data-field="phone" placeholder="Phone number">
+              <label for="contact-phone-${index}">Phone</label>
+              <input type="tel" id="contact-phone-${index}" value="${escapeHtml(contact.phone)}" data-action="update-contact" data-index="${index}" data-field="phone" placeholder="Phone number">
             </div>
             <div class="form-group flex-grow">
-              <label>Email</label>
-              <input type="email" value="${escapeHtml(contact.email)}" data-action="update-contact" data-index="${index}" data-field="email" placeholder="Email address">
+              <label for="contact-email-${index}">Email</label>
+              <input type="email" id="contact-email-${index}" value="${escapeHtml(contact.email)}" data-action="update-contact" data-index="${index}" data-field="email" placeholder="Email address">
             </div>
           </div>
         </div>
