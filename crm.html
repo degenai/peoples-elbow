@@ -67,7 +67,7 @@
           <h3>🔍 Filters</h3>
 
           <div class="filter-group">
-            <label>Status</label>
+            <label for="filterStatus">Status</label>
             <select id="filterStatus">
               <option value="all">All Status</option>
               <option value="active" selected>Active</option>
@@ -77,7 +77,7 @@
           </div>
 
           <div class="filter-group">
-            <label>Time Since Visit</label>
+            <label for="filterTime">Time Since Visit</label>
             <select id="filterTime">
               <option value="all">All Time</option>
               <option value="week">This Week</option>
@@ -90,20 +90,20 @@
           </div>
 
           <div class="filter-group">
-            <label>Neighborhood</label>
+            <label for="filterNeighborhood">Neighborhood</label>
             <select id="filterNeighborhood">
               <option value="all">All Areas</option>
             </select>
           </div>
 
           <div class="filter-group">
-            <label>Min Score</label>
+            <label for="filterMinScore">Min Score</label>
             <input type="range" id="filterMinScore" min="3" max="15" value="3">
             <span id="filterMinScoreValue">3+</span>
           </div>
 
           <div class="filter-group">
-            <label>Last Reception</label>
+            <label for="filterReception">Last Reception</label>
             <select id="filterReception">
               <option value="all">All</option>
               <option value="warm">🔥 Warm</option>
@@ -240,17 +240,17 @@
             <h3>Scores</h3>
             <div class="scores-grid">
               <div class="score-group">
-                <label>🪑 Space <span id="spaceValue">3</span>/5</label>
+                <label for="scoreSpace">🪑 Space <span id="spaceValue">3</span>/5</label>
                 <input type="range" id="scoreSpace" min="1" max="5" value="3">
                 <small>Room for chair massage setup</small>
               </div>
               <div class="score-group">
-                <label>👥 Traffic <span id="trafficValue">3</span>/5</label>
+                <label for="scoreTraffic">👥 Traffic <span id="trafficValue">3</span>/5</label>
                 <input type="range" id="scoreTraffic" min="1" max="5" value="3">
                 <small>Customer foot traffic</small>
               </div>
               <div class="score-group">
-                <label>✨ Vibes <span id="vibesValue">3</span>/5</label>
+                <label for="scoreVibes">✨ Vibes <span id="vibesValue">3</span>/5</label>
                 <input type="range" id="scoreVibes" min="1" max="5" value="3">
                 <small>Cultural fit / mutual aid alignment</small>
               </div>
@@ -263,7 +263,7 @@
           <div id="quickVisitSection" class="form-section">
             <h3>Quick Add Visit</h3>
             <div class="form-group">
-              <label>
+              <label for="addQuickVisit">
                 <input type="checkbox" id="addQuickVisit"> Log a visit now
               </label>
             </div>
