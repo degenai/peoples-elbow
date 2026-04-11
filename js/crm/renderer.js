@@ -208,8 +208,6 @@ const elements = {
   leadForm: document.getElementById('leadForm'),
   closeModalBtn: document.getElementById('closeModalBtn'),
   cancelModalBtn: document.getElementById('cancelModalBtn'),
-  aiLookupBtn: document.getElementById('aiLookupBtn'),
-  aiStatus: document.getElementById('aiStatus'),
 
   // Lead Form Fields
   leadId: document.getElementById('leadId'),
@@ -236,10 +234,6 @@ const elements = {
   quickVisitFields: document.getElementById('quickVisitFields'),
   quickVisitNotes: document.getElementById('quickVisitNotes'),
   quickVisitReception: document.getElementById('quickVisitReception'),
-
-  // AI Tags
-  addressAiTag: document.getElementById('addressAiTag'),
-  neighborhoodAiTag: document.getElementById('neighborhoodAiTag'),
 
   // Visit Modal
   visitModal: document.getElementById('visitModal'),
@@ -268,7 +262,6 @@ const elements = {
   settingsModal: document.getElementById('settingsModal'),
   closeSettingsModalBtn: document.getElementById('closeSettingsModalBtn'),
   saveSettingsBtn: document.getElementById('saveSettingsBtn'),
-  deepseekApiKey: document.getElementById('deepseekApiKey'),
   defaultLocation: document.getElementById('defaultLocation'),
   defaultZipcode: document.getElementById('defaultZipcode'),
   dataPathDisplay: document.getElementById('dataPathDisplay'),
@@ -296,7 +289,6 @@ async function init() {
 
   // Load config for settings
   const config = await CrmApi.getConfig();
-  elements.deepseekApiKey.value = config.deepseekApiKey || '';
   elements.defaultLocation.value = config.defaultLocation || '';
   elements.defaultZipcode.value = config.defaultZipcode || '';
 
@@ -352,7 +344,6 @@ function setupEventListeners() {
   elements.closeModalBtn.addEventListener('click', closeLeadModal);
   elements.cancelModalBtn.addEventListener('click', closeLeadModal);
   elements.leadForm.addEventListener('submit', handleLeadSubmit);
-  elements.aiLookupBtn.addEventListener('click', handleAiLookup);
   elements.leadList.addEventListener('click', handleLeadListClick);
   elements.detailContent.addEventListener('click', handleDetailContentClick);
   elements.contactsList.addEventListener('click', handleContactsListClick);
@@ -607,7 +598,6 @@ function renderDetailPanel(lead) {
     <div class="detail-section" style="color: var(--text-muted); font-size: 11px;">
       <p>Created: ${formatDate(lead.created)}</p>
       <p>Last Visit: ${lead.lastVisit ? formatDate(lead.lastVisit) : 'Never'}</p>
-      ${lead.aiEnhanced ? '<p>🤖 AI-enhanced data</p>' : ''}
     </div>
   `;
 }
@@ -914,9 +904,6 @@ function openLeadModal(lead = null) {
 
   // Reset form
   elements.leadForm.reset();
-  elements.aiStatus.classList.add('hidden');
-  elements.addressAiTag.classList.add('hidden');
-  elements.neighborhoodAiTag.classList.add('hidden');
   elements.quickVisitFields.classList.add('hidden');
 
   if (lead) {
@@ -928,8 +915,6 @@ function openLeadModal(lead = null) {
     elements.scoreSpace.value = lead.scores.space;
     elements.scoreTraffic.value = lead.scores.traffic;
     elements.scoreVibes.value = lead.scores.vibes;
-
-    // Load contacts
     formContacts = (lead.contacts || []).map(c => ({ ...c }));
   } else {
     elements.leadId.value = '';
@@ -1094,7 +1079,6 @@ async function closeLeadModal() {
   await animateModalClose(elements.leadModal);
   elements.leadForm.reset();
   formContacts = []; // Clear contacts to prevent stale data on next open
-  elements.aiStatus.classList.add('hidden'); // Hide any AI status messages
 }
 
 async function handleLeadSubmit(e) {
@@ -1128,7 +1112,6 @@ async function handleLeadSubmit(e) {
       traffic: parseInt(elements.scoreTraffic.value),
       vibes: parseInt(elements.scoreVibes.value)
     },
-    aiEnhanced: !elements.addressAiTag.classList.contains('hidden')
   };
 
   if (editMode && elements.leadId.value) {
@@ -1368,103 +1351,6 @@ async function handleDeleteVisitConfirm() {
 }
 
 // ============================================
-// AI LOOKUP
-// ============================================
-
-async function handleAiLookup() {
-  const businessName = elements.leadName.value.trim();
-  if (!businessName) {
-    showAiStatus('Please enter a business name first', 'error');
-    return;
-  }
-
-  elements.aiLookupBtn.disabled = true;
-  showAiStatus('🔍 Opening Google search...', 'loading');
-
-  try {
-    // Get config for location
-    const config = await CrmApi.getConfig();
-    const location = [config.defaultLocation, config.defaultZipcode].filter(Boolean).join(' ');
-
-    // Open the lookup window - this returns when user extracts data or cancels
-    const result = await CrmApi.openLookupWindow(businessName, location);
-
-    if (result.success && result.data) {
-      const data = result.data;
-      let appliedChanges = false;
-
-      // Update business name if AI found the correct spelling (e.g., Sucré instead of Sucre)
-      if (data.correctName && data.correctName !== businessName) {
-        elements.leadName.value = data.correctName;
-        appliedChanges = true;
-      }
-
-      if (data.address && !elements.leadAddress.value) {
-        elements.leadAddress.value = data.address;
-        elements.addressAiTag.classList.remove('hidden');
-        appliedChanges = true;
-      }
-
-      if (data.neighborhood && !elements.leadNeighborhood.value) {
-        elements.leadNeighborhood.value = data.neighborhood;
-        elements.neighborhoodAiTag.classList.remove('hidden');
-        // Show indicator if AI suggested a new neighborhood
-        if (data.isNewNeighborhood) {
-          elements.neighborhoodAiTag.textContent = 'AI (new)';
-          elements.neighborhoodAiTag.title = 'AI suggested a new neighborhood - review if needed';
-        } else {
-          elements.neighborhoodAiTag.textContent = 'AI';
-          elements.neighborhoodAiTag.title = '';
-        }
-        appliedChanges = true;
-      }
-
-      // If AI found a phone and we have no contacts yet, create one with "Main Phone" as name
-      if (data.phone && formContacts.length === 0) {
-        formContacts.push({
-          id: 'temp-' + Date.now(),
-          name: 'Main Phone',
-          role: '',
-          phone: data.phone,
-          email: '',
-          isPrimary: true
-        });
-        renderFormContacts();
-        appliedChanges = true;
-      }
-
-      // Show appropriate status based on confidence and warnings
-      if (result.warning) {
-        showAiStatus(`⚠️ ${result.warning}`, 'warning');
-      } else if (data.confidence === 'low') {
-        showAiStatus(`⚠️ Low confidence result - please verify${data.source ? ` (source: ${data.source})` : ''}`, 'warning');
-      } else if (data.confidence === 'medium') {
-        showAiStatus(`✅ Data extracted - verify if needed${data.source ? ` (${data.source})` : ''}`, 'success');
-      } else {
-        showAiStatus(`✅ Data extracted from Google!${data.source ? ` (${data.source})` : ''}`, 'success');
-      }
-      logActivity(`Business lookup completed for ${businessName}${appliedChanges ? '' : ' (no new fields applied)'}`);
-    } else if (result.error === 'Window closed') {
-      // User cancelled - just hide the status
-      showAiStatus('', '');
-      elements.aiStatus.classList.add('hidden');
-    } else {
-      showAiStatus(`⚠️ ${result.error || 'Could not find business info'}`, 'error');
-    }
-  } catch (error) {
-    showAiStatus(`❌ Error: ${error.message}`, 'error');
-  }
-
-  elements.aiLookupBtn.disabled = false;
-}
-
-function showAiStatus(message, type) {
-  elements.aiStatus.textContent = message;
-  elements.aiStatus.className = `ai-status ${type}`;
-  elements.aiStatus.classList.remove('hidden');
-}
-
-// ============================================
 // SETTINGS
 // ============================================
 
@@ -1478,7 +1364,6 @@ async function closeSettingsModal() {
 
 async function handleSaveSettings() {
   const config = {
-    deepseekApiKey: elements.deepseekApiKey.value.trim(),
     defaultLocation: elements.defaultLocation.value.trim(),
     defaultZipcode: elements.defaultZipcode.value.trim()
   };

@@ -275,7 +275,7 @@ export const CrmApi = {
     if (configStr) {
       try { return JSON.parse(configStr); } catch (e) { /* fall through */ }
     }
-    return { deepseekApiKey: '', defaultLocation: 'Woodstock, GA', defaultZipcode: '30188' };
+    return { defaultLocation: 'Woodstock, GA', defaultZipcode: '30188' };
   },
 
   async saveConfig(config) {

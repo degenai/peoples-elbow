@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://admin-auth.alex-adamczyk.workers.dev https://crm-worker.alex-adamczyk.workers.dev; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://api.deepseek.com https://cdnjs.cloudflare.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; connect-src 'self' https://admin-auth.alex-adamczyk.workers.dev https://crm-worker.alex-adamczyk.workers.dev https://api.deepseek.com https://nominatim.openstreetmap.org https://cloudflareinsights.com">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://admin-auth.alex-adamczyk.workers.dev https://crm-worker.alex-adamczyk.workers.dev; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; connect-src 'self' https://admin-auth.alex-adamczyk.workers.dev https://crm-worker.alex-adamczyk.workers.dev https://nominatim.openstreetmap.org https://cloudflareinsights.com">
   <title>Lead-o-Tron 5000 CRM</title>
   <link rel="shortcut icon" href="images/logo.png" type="image/png">
   <link rel="stylesheet" href="css/crm.css">
@@ -201,23 +201,18 @@
               <label for="leadName">Business Name *</label>
               <input type="text" id="leadName" required placeholder="Enter business name">
             </div>
-            <button type="button" id="aiLookupBtn" class="btn btn-ai" title="Look up with DeepSeek AI">
-              🤖 AI Lookup
-            </button>
           </div>
-
-          <div id="aiStatus" class="ai-status hidden"></div>
 
           <div class="form-row">
             <div class="form-group flex-grow">
-              <label for="leadAddress">Address <span class="ai-tag hidden" id="addressAiTag">AI</span></label>
+              <label for="leadAddress">Address</label>
               <input type="text" id="leadAddress" placeholder="Full address">
             </div>
           </div>
 
           <div class="form-row">
             <div class="form-group">
-              <label for="leadNeighborhood">Neighborhood <span class="ai-tag hidden" id="neighborhoodAiTag">AI</span></label>
+              <label for="leadNeighborhood">Neighborhood</label>
               <input type="text" id="leadNeighborhood" placeholder="Area/district" list="leadNeighborhoodOptions">
               <datalist id="leadNeighborhoodOptions"></datalist>
             </div>
@@ -363,19 +358,14 @@
         </div>
         <div class="modal-body">
           <div class="form-group">
-            <label for="deepseekApiKey">DeepSeek API Key</label>
-            <input type="password" id="deepseekApiKey" placeholder="Enter your API key">
-            <small>Used for AI-powered business lookup. <a href="https://platform.deepseek.com" target="_blank" rel="noopener noreferrer">Get API key</a></small>
-          </div>
-          <div class="form-group">
             <label for="defaultLocation">Default Location (City, State)</label>
             <input type="text" id="defaultLocation" placeholder="e.g., Woodstock, GA">
-            <small>City and state for AI business lookups</small>
+            <small>Used for geocoding in the route finder</small>
           </div>
           <div class="form-group">
             <label for="defaultZipcode">Default Zipcode</label>
             <input type="text" id="defaultZipcode" placeholder="e.g., 30188" maxlength="10">
-            <small>Optional - adds extra precision to lookups</small>
+            <small>Optional - adds precision to geocoding</small>
           </div>
           <div class="form-group" style="display: none;">
             <label>Data Location</label>

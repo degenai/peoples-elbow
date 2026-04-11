@@ -66,12 +66,6 @@ function normalizeLead(lead) {
     changed = true;
   }
 
-  const aiEnhanced = Boolean(rawLead.aiEnhanced);
-  if (rawLead.aiEnhanced !== aiEnhanced) {
-    changed = true;
-  }
-  rawLead.aiEnhanced = aiEnhanced;
-
   const { contacts, changed: contactsChanged, removedLegacyFields } = normalizeContacts(rawLead);
   if (contactsChanged || removedLegacyFields) {
     changed = true;
