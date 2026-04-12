@@ -268,7 +268,7 @@ const elements = {
 
   // Console
   consoleContent: document.getElementById('consoleContent'),
-  toggleConsoleBtn: document.getElementById('toggleConsoleBtn')
+  consoleHeader: document.querySelector('.console-header')
 };
 
 // ============================================
@@ -377,8 +377,8 @@ function setupEventListeners() {
   elements.closeSettingsModalBtn.addEventListener('click', closeSettingsModal);
   elements.saveSettingsBtn.addEventListener('click', handleSaveSettings);
 
-  // Console toggle
-  elements.toggleConsoleBtn.addEventListener('click', toggleConsole);
+  // Console toggle - whole header bar is clickable
+  document.querySelector('.console-header').addEventListener('click', toggleConsole);
 
   // Keyboard shortcuts
   document.addEventListener('keydown', (e) => {
@@ -1467,7 +1467,8 @@ function pulseStatCard(statElement) {
 function toggleConsole() {
   const panel = document.querySelector('.console-panel');
   panel.classList.toggle('collapsed');
-  elements.toggleConsoleBtn.textContent = panel.classList.contains('collapsed') ? '▲' : '▼';
+  const arrow = panel.querySelector('.console-toggle-arrow');
+  if (arrow) arrow.textContent = panel.classList.contains('collapsed') ? '▲' : '▼';
 }
 
 function logActivity(message, persist = true) {

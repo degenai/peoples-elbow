@@ -254,6 +254,7 @@ body {
 .main-content {
   display: flex;
   flex: 1;
+  min-height: 0;
   overflow: hidden;
 }
 
@@ -745,7 +746,7 @@ body {
    CONSOLE PANEL
    ============================================ */
 .console-panel {
-  height: 140px;
+  height: 150px;
   background: #111;
   border-top: 2px solid var(--pe-green);
   display: flex;
@@ -754,7 +755,12 @@ body {
 }
 
 .console-panel.collapsed {
-  height: 36px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 32px;
+  z-index: 100;
 }
 
 .console-panel.collapsed .console-content {
@@ -772,11 +778,20 @@ body {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 1px;
+  cursor: pointer;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.console-toggle-arrow {
+  font-size: 14px;
+  transition: transform 0.2s ease;
 }
 
 .console-content {
   flex: 1;
   overflow-y: auto;
+  min-height: 0;
   padding: var(--space-sm) var(--space-md);
   font-family: 'Consolas', 'Monaco', monospace;
   font-size: 12px;
