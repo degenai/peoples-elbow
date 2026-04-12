@@ -229,17 +229,18 @@ class D1Changelog {
 
     showLoading() {
         const timeline = document.getElementById('commit-timeline');
-        const existingLoader = timeline.querySelector('.loading-ring');
-        const existingMessage = timeline.querySelector('.loading-message');
-        
-        if (!existingLoader) {
-            timeline.innerHTML = `
-                <div class="loading-ring">
-                    <div></div><div></div><div></div><div></div>
-                </div>
-                <p class="loading-message">Fetching data from D1 database...</p>
-            `;
-        }
+        if (timeline.querySelector('.loading-ring')) return;
+
+        const ring = document.createElement('div');
+        ring.className = 'loading-ring';
+        ring.innerHTML = '<div></div><div></div><div></div><div></div>';
+
+        const msg = document.createElement('p');
+        msg.className = 'loading-message';
+        msg.textContent = 'Fetching data from D1 database...';
+
+        timeline.appendChild(ring);
+        timeline.appendChild(msg);
     }
 
     hideLoading() {

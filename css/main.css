@@ -700,6 +700,7 @@ nav ul li a:hover::after {
 
 .host-form {
     background: var(--pe-white);
+    color: var(--pe-green-dark);
     padding: var(--space-xl);
     border-radius: 15px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
