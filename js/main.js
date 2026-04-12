@@ -167,67 +167,56 @@ document.addEventListener('DOMContentLoaded', function() {
         const particlesContainer = document.getElementById('particles');
         if (!particlesContainer) return;
 
-        // Create sexy glowing particles with radial movement
         const colors = [
-            { bg: 'rgba(0, 105, 55, 0.8)', glow: '0, 105, 55' },   // Green
-            { bg: 'rgba(0, 68, 102, 0.8)', glow: '0, 68, 102' },   // Blue
-            { bg: 'rgba(255, 204, 0, 0.9)', glow: '255, 204, 0' }   // Yellow
+            { bg: 'rgba(0, 105, 55, 0.8)', glow: '0, 105, 55' },
+            { bg: 'rgba(0, 68, 102, 0.8)', glow: '0, 68, 102' },
+            { bg: 'rgba(255, 204, 0, 0.9)', glow: '255, 204, 0' }
         ];
+        const COUNT = 18;
 
-        for (let i = 0; i < 18; i++) {
-            const particle = document.createElement('div');
-            const color = colors[Math.floor(Math.random() * colors.length)];
-            const size = Math.random() * 8 + 4; // 4-12px
+        // Build all keyframes in a single style block
+        let keyframes = '';
+        const particles = [];
 
-            // Random starting position within 50px radius
-            const startAngle = Math.random() * Math.PI * 2;
-            const startRadius = Math.random() * 50;
-            const startX = Math.cos(startAngle) * startRadius;
-            const startY = Math.sin(startAngle) * startRadius;
-
-            particle.style.cssText = `
-                position: absolute;
-                width: ${size}px;
-                height: ${size}px;
-                background: radial-gradient(circle, ${color.bg} 0%, rgba(${color.glow}, 0.3) 70%, transparent 100%);
-                border-radius: 50%;
-                left: calc(50% + ${startX}px);
-                top: calc(50% + ${startY}px);
-                transform: translate(-50%, -50%);
-                animation: radialFloat${i} ${8 + Math.random() * 6}s infinite ease-out;
-                box-shadow: 0 0 ${size * 2}px rgba(${color.glow}, 0.4),
-                           0 0 ${size}px rgba(${color.glow}, 0.6);
-                filter: blur(0.5px);
-            `;
-            particlesContainer.appendChild(particle);
-
-            // Create radial outward movement with more lateral motion
-            const angle = (Math.PI * 2 / 18) * i + Math.random() * 1.2; // More random spread
-            const distance = 200 + Math.random() * 150; // 200-350px outward
+        for (let i = 0; i < COUNT; i++) {
+            const angle = (Math.PI * 2 / COUNT) * i + Math.random() * 1.2;
+            const distance = 200 + Math.random() * 150;
             const endX = Math.cos(angle) * distance;
             const endY = Math.sin(angle) * distance;
 
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes radialFloat${i} {
-                    0% {
-                        transform: translate(-50%, -50%) scale(0.2);
-                        opacity: 0;
-                    }
-                    15% {
-                        opacity: 0.8;
-                        transform: translate(-50%, -50%) scale(1);
-                    }
-                    85% {
-                        opacity: 0.6;
-                    }
-                    100% {
-                        transform: translate(calc(-50% + ${endX - startX}px), calc(-50% + ${endY - startY}px)) scale(0.3);
-                        opacity: 0;
-                    }
+            keyframes += `
+                @keyframes pFloat${i} {
+                    0%   { transform: translate(-50%,-50%) scale(0.2); opacity: 0; }
+                    15%  { transform: translate(-50%,-50%) scale(1);   opacity: 0.8; }
+                    85%  { opacity: 0.6; }
+                    100% { transform: translate(calc(-50% + ${endX}px), calc(-50% + ${endY}px)) scale(0.3); opacity: 0; }
                 }
             `;
-            document.head.appendChild(style);
+            particles.push({ angle, endX, endY });
+        }
+
+        const styleEl = document.createElement('style');
+        styleEl.textContent = keyframes;
+        document.head.appendChild(styleEl);
+
+        for (let i = 0; i < COUNT; i++) {
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            const size = Math.random() * 8 + 4;
+            const duration = 8 + Math.random() * 6;
+
+            const p = document.createElement('div');
+            p.style.cssText = `
+                position: absolute;
+                width: ${size}px; height: ${size}px;
+                background: radial-gradient(circle, ${color.bg} 0%, rgba(${color.glow}, 0.3) 70%, transparent 100%);
+                border-radius: 50%;
+                left: 50%; top: 50%;
+                transform: translate(-50%, -50%);
+                animation: pFloat${i} ${duration}s infinite ease-out;
+                box-shadow: 0 0 ${size * 2}px rgba(${color.glow}, 0.4), 0 0 ${size}px rgba(${color.glow}, 0.6);
+                filter: blur(0.5px);
+            `;
+            particlesContainer.appendChild(p);
         }
     }
 
