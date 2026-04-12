@@ -22,8 +22,13 @@ input:focus-visible, a:focus-visible, button:focus-visible {
 
 ## Bolt
 
-### Do not replace functional array methods with imperative loops for readability loss
-`.filter()`, `.map()`, `.reduce()` are preferred over `for` loops when they make the code shorter or equally readable. Only replace them if the loop version is genuinely simpler or reduces lines of code. This CRM manages ~200 leads; there is no performance-critical hot path. Do not introduce `let`/`continue`/`push` patterns that are longer and harder to read than the functional equivalent they replace.
+### STOP replacing functional array methods with imperative loops
+This has been proposed and rejected TWICE. Do not do it again. `.filter()`, `.map()`, `.reduce()` are preferred in this codebase. The CRM manages ~200 leads. There is no hot path. Specifically banned:
+- `.filter()` → `for`/`continue`/`push` in `getFilteredLeads()`
+- `.map().join('')` → `for` loop string concat in `renderLeadList()`, `renderActivityLog()`, `renderDetailPanel()`
+- IIFE wrappers inside template literals to avoid `.map()`
+
+Only propose a loop replacement if it **reduces total line count** AND **improves readability**. If the diff adds lines, it will be rejected.
 
 ## Sentinel
 

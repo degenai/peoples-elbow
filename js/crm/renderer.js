@@ -377,8 +377,15 @@ function setupEventListeners() {
   elements.closeSettingsModalBtn.addEventListener('click', closeSettingsModal);
   elements.saveSettingsBtn.addEventListener('click', handleSaveSettings);
 
-  // Console toggle - whole header bar is clickable
-  document.querySelector('.console-header').addEventListener('click', toggleConsole);
+  // Console toggle - whole header bar is clickable + keyboard accessible
+  const consoleHeader = document.querySelector('.console-header');
+  consoleHeader.addEventListener('click', toggleConsole);
+  consoleHeader.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      toggleConsole();
+    }
+  });
 
   // Keyboard shortcuts
   document.addEventListener('keydown', (e) => {
