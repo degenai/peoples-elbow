@@ -1482,3 +1482,11 @@ input:focus, textarea:focus, select:focus {
   box-shadow: 0 0 0 2px rgba(255, 199, 44, 0.3);
   transition: box-shadow 0.2s ease;
 }
+
+/* Keyboard-only focus ring for a11y */
+input:focus-visible, textarea:focus-visible, select:focus-visible,
+a:focus-visible, button:focus-visible {
+  outline: 2px solid var(--pe-gold);
+  outline-offset: 2px;
+  border-radius: 4px;
+}

@@ -164,8 +164,8 @@ class D1Changelog {
             <div class="${markerClass}"></div>
             <div class="${contentClass}">
                 <div class="timeline-header">
-                    <span class="commit-hash">${shortHash}</span>
-                    <span class="commit-date">${formattedDate}</span>
+                    <span class="commit-hash">${this.escapeHtml(shortHash)}</span>
+                    <span class="commit-date">${this.escapeHtml(formattedDate)}</span>
                     <span class="${authorClass}">${this.escapeHtml(entry.author_name)}</span>
                 </div>
                 <div class="timeline-body">
@@ -177,9 +177,9 @@ class D1Changelog {
                         </div>
                         <hr>
                         <div class="commit-metadata">
-                            <p><strong>Full Hash:</strong> ${entry.commit_hash}</p>
-                            <p><strong>Author Email:</strong> ${entry.author_email || 'N/A'}</p>
-                            <p><strong>Commit Date:</strong> ${new Date(entry.commit_date).toLocaleString()}</p>
+                            <p><strong>Full Hash:</strong> ${this.escapeHtml(entry.commit_hash)}</p>
+                            <p><strong>Author Email:</strong> ${this.escapeHtml(entry.author_email || 'N/A')}</p>
+                            <p><strong>Commit Date:</strong> ${this.escapeHtml(new Date(entry.commit_date).toLocaleString())}</p>
                         </div>
                     </div>
                     <button class="toggle-details">Show Details</button>
@@ -251,14 +251,27 @@ class D1Changelog {
 
     showError(message) {
         const timeline = document.getElementById('commit-timeline');
-        timeline.innerHTML = `
-            <div class="error-message">
-                <i class="fas fa-exclamation-triangle"></i>
-                <h3>Error Loading D1 Changelog</h3>
-                <p>${this.escapeHtml(message)}</p>
-                <button onclick="location.reload()" class="retry-btn">Retry</button>
-            </div>
-        `;
+        timeline.innerHTML = '';
+
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'error-message';
+
+        const icon = document.createElement('i');
+        icon.className = 'fas fa-exclamation-triangle';
+
+        const heading = document.createElement('h3');
+        heading.textContent = 'Error Loading D1 Changelog';
+
+        const para = document.createElement('p');
+        para.textContent = message;
+
+        const retryBtn = document.createElement('button');
+        retryBtn.className = 'retry-btn';
+        retryBtn.textContent = 'Retry';
+        retryBtn.onclick = () => location.reload();
+
+        errorDiv.append(icon, heading, para, retryBtn);
+        timeline.appendChild(errorDiv);
     }
 
     escapeHtml(text) {
