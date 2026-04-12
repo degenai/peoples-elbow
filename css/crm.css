@@ -1510,3 +1510,13 @@ a:focus-visible, button:focus-visible {
   outline-offset: 2px;
   border-radius: 4px;
 }
+
+.loading-spinner {
+  display: none;
+  animation: spin 1s linear infinite;
+  margin-left: 0.5rem;
+}
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}

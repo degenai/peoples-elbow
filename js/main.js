@@ -33,8 +33,12 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Show loading state
             const submitButton = hostForm.querySelector('button[type="submit"]');
-            const originalButtonText = submitButton.textContent;
-            submitButton.textContent = 'Sending...';
+            const btnText = submitButton.querySelector('span');
+            const spinner = submitButton.querySelector('.loading-spinner');
+            const originalButtonText = btnText.textContent;
+
+            btnText.textContent = 'Sending...';
+            if (spinner) spinner.style.display = 'inline-block';
             submitButton.disabled = true;
             
             try {
@@ -60,7 +64,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 showFormMessage(hostForm, 'There was an error sending your request. Please try again later.', 'error');
             } finally {
                 // Restore button state
-                submitButton.textContent = originalButtonText;
+                btnText.textContent = originalButtonText;
+                if (spinner) spinner.style.display = 'none';
                 submitButton.disabled = false;
             }
         });
@@ -72,8 +77,12 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Show loading state
             const submitButton = contactForm.querySelector('button[type="submit"]');
-            const originalButtonText = submitButton.textContent;
-            submitButton.textContent = 'Sending...';
+            const btnText = submitButton.querySelector('span');
+            const spinner = submitButton.querySelector('.loading-spinner');
+            const originalButtonText = btnText.textContent;
+
+            btnText.textContent = 'Sending...';
+            if (spinner) spinner.style.display = 'inline-block';
             submitButton.disabled = true;
             
             // Create FormData object
@@ -100,7 +109,8 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .finally(() => {
                 // Restore button state
-                submitButton.textContent = originalButtonText;
+                btnText.textContent = originalButtonText;
+                if (spinner) spinner.style.display = 'none';
                 submitButton.disabled = false;
             });
         });
