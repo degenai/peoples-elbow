@@ -14,3 +14,7 @@
 ## 2026-04-10 - [Sorting Performance Optimizations]
 **Learning:** Using `String.prototype.localeCompare` and `new Date()` inside an `Array.prototype.sort()` callback severely degrades performance due to repeated heavy object allocations and internationalization parsing overhead on every comparison.
 **Action:** Replace `new Date()` comparisons with simple string comparison for ISO-8601 strings (which sort perfectly lexicographically). Replace `localeCompare` with case-insensitive relational operators (`<` and `>`) to eliminate CPU bottlenecks during sorting operations in hot loops.
+
+## 2024-04-12 - Optimize UI Rendering Loops
+**Learning:** In the performance-critical UI rendering loops of this application (e.g., `js/crm/renderer.js`), relying on native array methods like `Array.prototype.filter()` and `Array.prototype.map().join('')` causes noticeable garbage collection stutter due to the creation of intermediate arrays.
+**Action:** Avoid allocating temporary arrays in `render()` functions. Replace `.filter()` and `.map().join('')` chains with standard `for` loops, conditional `push`es (or `continue`), and direct string concatenation (`+=`) to build HTML efficiently and minimize memory overhead.

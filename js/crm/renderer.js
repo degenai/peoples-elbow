@@ -489,7 +489,11 @@ function renderLeadList() {
       </div>
     `;
   } else {
-    elements.leadList.innerHTML = sorted.map(lead => renderLeadCard(lead)).join('');
+    let html = '';
+    for (let i = 0; i < sorted.length; i++) {
+      html += renderLeadCard(sorted[i]);
+    }
+    elements.leadList.innerHTML = html;
   }
 
   elements.leadCount.textContent = `${sorted.length} lead${sorted.length !== 1 ? 's' : ''}`;
@@ -571,25 +575,29 @@ function renderDetailPanel(lead) {
 
     <div class="detail-section">
       <h3>Visit History (${lead.visits.length})</h3>
-      ${lead.visits.length === 0 ?
-        '<p style="color: var(--text-muted); font-style: italic;">No visits logged yet</p>' :
-        lead.visits.slice().reverse().map((visit, reverseIndex) => {
-          // Calculate original index (visits are reversed for display - newest first)
-          const originalIndex = lead.visits.length - 1 - reverseIndex;
-          return `
-          <div class="visit-item" data-visit-index="${originalIndex}">
+      ${(() => {
+        if (lead.visits.length === 0) {
+          return '<p style="color: var(--text-muted); font-style: italic;">No visits logged yet</p>';
+        }
+        let visitsHtml = '';
+        for (let i = lead.visits.length - 1; i >= 0; i--) {
+          const visit = lead.visits[i];
+          visitsHtml += `
+          <div class="visit-item" data-visit-index="${i}">
             <div class="visit-header">
               <span class="visit-date">${formatDate(visit.date)}</span>
               <div class="visit-actions">
-                <button class="btn-icon-sm" data-action="edit-visit" data-lead-id="${lead.id}" data-visit-index="${originalIndex}" title="Edit visit" aria-label="Edit visit">✏️</button>
-                <button class="btn-icon-sm btn-danger-subtle" data-action="delete-visit" data-lead-id="${lead.id}" data-visit-index="${originalIndex}" title="Delete visit" aria-label="Delete visit">🗑️</button>
+                <button class="btn-icon-sm" data-action="edit-visit" data-lead-id="${lead.id}" data-visit-index="${i}" title="Edit visit" aria-label="Edit visit">✏️</button>
+                <button class="btn-icon-sm btn-danger-subtle" data-action="delete-visit" data-lead-id="${lead.id}" data-visit-index="${i}" title="Delete visit" aria-label="Delete visit">🗑️</button>
                 <span class="visit-reception">${getReceptionEmoji(visit.reception)} ${visit.reception}</span>
               </div>
             </div>
             <div class="visit-notes ${!visit.notes ? 'empty' : ''}">${escapeHtml(visit.notes) || 'No notes'}</div>
           </div>
-        `}).join('')
-      }
+        `;
+        }
+        return visitsHtml;
+      })()}
       <button class="btn btn-primary add-visit-btn" data-action="open-visit-modal" data-lead-id="${lead.id}">
         + Log New Visit
       </button>
@@ -603,12 +611,18 @@ function renderDetailPanel(lead) {
 }
 
 function renderActivityLog() {
-  elements.consoleContent.innerHTML = activityLog.slice(0, 50).map(entry => `
+  let html = '';
+  const limit = Math.min(activityLog.length, 50);
+  for (let i = 0; i < limit; i++) {
+    const entry = activityLog[i];
+    html += `
     <div class="log-entry">
       <span class="log-time">[${formatTime(entry.timestamp)}]</span>
       <span class="log-message">${escapeHtml(entry.message)}</span>
     </div>
-  `).join('');
+  `;
+  }
+  elements.consoleContent.innerHTML = html;
 }
 
 // ============================================
@@ -626,56 +640,63 @@ function getFilteredLeads() {
   // Cache the current time for the duration of the filter operation
   const now = Date.now();
 
-  return leads.filter(lead => {
+  const filtered = [];
+  for (let i = 0; i < leads.length; i++) {
+    const lead = leads[i];
+
     // Status filter
-    if (status !== 'all' && lead.status !== status) return false;
+    if (status !== 'all' && lead.status !== status) continue;
 
     // Time filter
     if (time !== 'all') {
       // Pass the cached 'now' value to avoid repeated Date.now() calls
       const daysSince = getDaysSinceVisit(lead.lastVisit, now);
+      let skip = false;
       switch (time) {
-        case 'week': if (daysSince > 7) return false; break;
-        case 'due-1': if (daysSince < 7) return false; break;
-        case 'due-2': if (daysSince < 14) return false; break;
-        case 'due-3': if (daysSince < 21) return false; break;
-        case 'due-month': if (daysSince < 30) return false; break;
-        case 'never': if (lead.lastVisit) return false; break;
+        case 'week': if (daysSince > 7) skip = true; break;
+        case 'due-1': if (daysSince < 7) skip = true; break;
+        case 'due-2': if (daysSince < 14) skip = true; break;
+        case 'due-3': if (daysSince < 21) skip = true; break;
+        case 'due-month': if (daysSince < 30) skip = true; break;
+        case 'never': if (lead.lastVisit) skip = true; break;
       }
+      if (skip) continue;
     }
 
     // Neighborhood filter
-    if (neighborhood !== 'all' && lead.neighborhood !== neighborhood) return false;
+    if (neighborhood !== 'all' && lead.neighborhood !== neighborhood) continue;
 
     // Score filter
-    if (lead.totalScore < minScore) return false;
+    if (lead.totalScore < minScore) continue;
 
     // Reception filter
     if (reception !== 'all') {
       const lastReception = getLastReception(lead);
-      if (lastReception !== reception) return false;
+      if (lastReception !== reception) continue;
     }
 
     // Search filter
     if (search) {
       // Fast path string matching without allocating temporary arrays
-      if (lead.name && lead.name.toLowerCase().includes(search)) return true;
-      if (lead.address && lead.address.toLowerCase().includes(search)) return true;
-      if (lead.neighborhood && lead.neighborhood.toLowerCase().includes(search)) return true;
-
-      if (lead.contacts) {
-        for (let i = 0; i < lead.contacts.length; i++) {
-          const c = lead.contacts[i];
-          if (c.name && c.name.toLowerCase().includes(search)) return true;
-          if (c.phone && String(c.phone).toLowerCase().includes(search)) return true;
-          if (c.email && c.email.toLowerCase().includes(search)) return true;
+      let found = false;
+      if (lead.name && lead.name.toLowerCase().includes(search)) found = true;
+      else if (lead.address && lead.address.toLowerCase().includes(search)) found = true;
+      else if (lead.neighborhood && lead.neighborhood.toLowerCase().includes(search)) found = true;
+      else if (lead.contacts) {
+        for (let j = 0; j < lead.contacts.length; j++) {
+          const c = lead.contacts[j];
+          if (c.name && c.name.toLowerCase().includes(search)) { found = true; break; }
+          if (c.phone && String(c.phone).toLowerCase().includes(search)) { found = true; break; }
+          if (c.email && c.email.toLowerCase().includes(search)) { found = true; break; }
         }
       }
-      return false; // Not found in any field
+      if (!found) continue; // Not found in any field
     }
 
-    return true;
-  });
+    filtered.push(lead);
+  }
+
+  return filtered;
 }
 
 function getSortedLeads(leadsToSort) {
