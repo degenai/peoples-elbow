@@ -162,62 +162,74 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
 
-    // Initialize particle effect
+    // Initialize particle effect — orbit rings + pulse rings combo
     function initParticles() {
-        const particlesContainer = document.getElementById('particles');
-        if (!particlesContainer) return;
+        const container = document.getElementById('particles');
+        if (!container) return;
 
-        const colors = [
-            { bg: 'rgba(0, 105, 55, 0.8)', glow: '0, 105, 55' },
-            { bg: 'rgba(0, 68, 102, 0.8)', glow: '0, 68, 102' },
-            { bg: 'rgba(255, 204, 0, 0.9)', glow: '255, 204, 0' }
+        // — Orbit —
+        const rings = [
+            { r: 55,  n: 4, spd: 7,  color: '255,204,0',  size: 7 },
+            { r: 95,  n: 6, spd: 13, color: '0,160,70',   size: 5 },
+            { r: 138, n: 9, spd: 21, color: '0,120,200',  size: 4 },
         ];
-        const COUNT = 18;
 
-        // Build all keyframes in a single style block
-        let keyframes = '';
-        const particles = [];
+        let css = '';
+        rings.forEach((ring, ri) => {
+            css += `@keyframes orb${ri} {
+                from { transform: rotate(0deg) translateX(${ring.r}px) rotate(0deg); }
+                to   { transform: rotate(360deg) translateX(${ring.r}px) rotate(-360deg); }
+            }`;
+        });
 
-        for (let i = 0; i < COUNT; i++) {
-            const angle = (Math.PI * 2 / COUNT) * i + Math.random() * 1.2;
-            const distance = 200 + Math.random() * 150;
-            const endX = Math.cos(angle) * distance;
-            const endY = Math.sin(angle) * distance;
-
-            keyframes += `
-                @keyframes pFloat${i} {
-                    0%   { transform: translate(-50%,-50%) scale(0.2); opacity: 0; }
-                    15%  { transform: translate(-50%,-50%) scale(1);   opacity: 0.8; }
-                    85%  { opacity: 0.6; }
-                    100% { transform: translate(calc(-50% + ${endX}px), calc(-50% + ${endY}px)) scale(0.3); opacity: 0; }
-                }
-            `;
-            particles.push({ angle, endX, endY });
-        }
+        // — Pulse rings —
+        css += `@keyframes pulse {
+            0%   { transform: translate(-50%,-50%) scale(.05); opacity:0; }
+            8%   { opacity:.7; }
+            100% { transform: translate(-50%,-50%) scale(2.4); opacity:0; }
+        }`;
 
         const styleEl = document.createElement('style');
-        styleEl.textContent = keyframes;
+        styleEl.textContent = css;
         document.head.appendChild(styleEl);
 
-        for (let i = 0; i < COUNT; i++) {
-            const color = colors[Math.floor(Math.random() * colors.length)];
-            const size = Math.random() * 8 + 4;
-            const duration = 8 + Math.random() * 6;
+        // Orbit particles
+        const center = document.createElement('div');
+        center.style.cssText = 'position:absolute;top:50%;left:50%;width:0;height:0;';
+        container.appendChild(center);
 
-            const p = document.createElement('div');
-            p.style.cssText = `
-                position: absolute;
-                width: ${size}px; height: ${size}px;
-                background: radial-gradient(circle, ${color.bg} 0%, rgba(${color.glow}, 0.3) 70%, transparent 100%);
-                border-radius: 50%;
-                left: 50%; top: 50%;
-                transform: translate(-50%, -50%);
-                animation: pFloat${i} ${duration}s infinite ease-out;
-                box-shadow: 0 0 ${size * 2}px rgba(${color.glow}, 0.4), 0 0 ${size}px rgba(${color.glow}, 0.6);
-                filter: blur(0.5px);
+        rings.forEach((ring, ri) => {
+            for (let i = 0; i < ring.n; i++) {
+                const delay = -((ring.spd / ring.n) * i);
+                const size = ring.size;
+                const p = document.createElement('div');
+                p.style.cssText = `
+                    position:absolute;
+                    width:${size}px; height:${size}px;
+                    margin:${-size/2}px;
+                    background:radial-gradient(circle, rgba(${ring.color},.95) 0%, rgba(${ring.color},.25) 65%, transparent 100%);
+                    border-radius:50%;
+                    box-shadow:0 0 ${size*2}px rgba(${ring.color},.65);
+                    animation:orb${ri} ${ring.spd}s ${delay}s linear infinite;
+                `;
+                center.appendChild(p);
+            }
+        });
+
+        // Pulse rings
+        const palette = ['206,156,0', '0,105,55', '0,100,180', '206,156,0', '0,140,60', '50,150,220'];
+        palette.forEach((c, i) => {
+            const ring = document.createElement('div');
+            ring.style.cssText = `
+                position:absolute; top:50%; left:50%;
+                width:160px; height:160px;
+                border:2px solid rgba(${c},0.65);
+                border-radius:50%;
+                animation:pulse 3s ${(i * 0.5).toFixed(1)}s ease-out infinite;
+                animation-fill-mode:backwards;
             `;
-            particlesContainer.appendChild(p);
-        }
+            container.appendChild(ring);
+        });
     }
 
     // Initialize parallax effect
