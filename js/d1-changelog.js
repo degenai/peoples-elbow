@@ -99,22 +99,24 @@ class D1Changelog {
 
     displayChangelog() {
         const timeline = document.getElementById('commit-timeline');
-        
-        // Clear existing content except loading indicators
-        const existingEntries = timeline.querySelectorAll('.timeline-item');
-        existingEntries.forEach(item => item.remove());
 
-        if (this.allData.length === 0) {
+        // Remove old load-more button
+        const oldBtn = timeline.querySelector('.load-more-btn');
+        if (oldBtn) oldBtn.remove();
+
+        // Count already-rendered items to only append new ones
+        const renderedCount = timeline.querySelectorAll('.timeline-item').length;
+
+        if (this.allData.length === 0 && renderedCount === 0) {
             timeline.innerHTML = '<p class="no-data">No changelog entries found in D1 database.</p>';
             return;
         }
 
         const fragment = document.createDocumentFragment();
 
-        this.allData.forEach((entry, index) => {
-            const timelineItem = this.createTimelineItem(entry, index);
-            fragment.appendChild(timelineItem);
-        });
+        for (let i = renderedCount; i < this.allData.length; i++) {
+            fragment.appendChild(this.createTimelineItem(this.allData[i], i));
+        }
 
         timeline.appendChild(fragment);
 

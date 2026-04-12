@@ -41,7 +41,7 @@ export default {
         }
 
         // Compare with Cloudflare Secret
-        if (password === env.ADMIN_PASSWORD) {
+        if (timingSafeEqual(password, env.ADMIN_PASSWORD)) {
           // In a real production app, use JWT. For this static site context,
           // a hashed representation of the secret mixed with a salt is enough for simple gatekeeping.
           // Since the validation is done on the worker side, this acts as an opaque token.
@@ -81,7 +81,7 @@ export default {
         const expectedTokenStr = `${env.ADMIN_PASSWORD}_authenticated_token_salt_xyz`;
         const expectedToken = await hashToken(expectedTokenStr);
 
-        if (token === expectedToken) {
+        if (timingSafeEqual(token, expectedToken)) {
           return new Response(JSON.stringify({ success: true }), {
             status: 200,
             headers: getCorsHeaders(request)
@@ -154,4 +154,17 @@ async function hashToken(message) {
   const hashArray = Array.from(new Uint8Array(hashBuffer));
   const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
   return hashHex;
+}
+
+/**
+ * Constant-time string comparison to prevent timing attacks
+ */
+function timingSafeEqual(a, b) {
+  if (typeof a !== 'string' || typeof b !== 'string') return false;
+  if (a.length !== b.length) return false;
+  let mismatch = 0;
+  for (let i = 0; i < a.length; i++) {
+    mismatch |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return mismatch === 0;
 }
