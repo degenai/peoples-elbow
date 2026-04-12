@@ -1108,6 +1108,10 @@ async function handleLeadSubmit(e) {
     cleanedContacts[0].isPrimary = true;
   }
 
+  const saveBtn = document.getElementById('saveLeadBtn');
+  setButtonLoading(saveBtn, true);
+
+  try {
   const leadData = {
     name: elements.leadName.value.trim(),
     address: elements.leadAddress.value.trim(),
@@ -1178,6 +1182,9 @@ async function handleLeadSubmit(e) {
   renderLeadList(); // Just an edit, no list change
   updateStats();
   updateNeighborhoodControls();
+  } finally {
+    setButtonLoading(saveBtn, false);
+  }
 }
 
 async function handleDeleteLead() {
@@ -1262,6 +1269,10 @@ async function handleVisitSubmit(e) {
   const visitIndexStr = elements.visitIndex.value;
   const isEditMode = visitIndexStr !== '';
 
+  const visitBtn = document.getElementById('visitSubmitBtn');
+  setButtonLoading(visitBtn, true);
+
+  try {
   const visitData = {
     date: new Date(elements.visitDate.value).toISOString(),
     notes: elements.visitNotes.value.trim(),
@@ -1297,6 +1308,9 @@ async function handleVisitSubmit(e) {
   }
 
   closeVisitModal();
+  } finally {
+    setButtonLoading(visitBtn, false);
+  }
 }
 
 // Delete Visit Confirmation
@@ -1464,6 +1478,25 @@ function pulseStatCard(statElement) {
       duration: 300,
       ease: 'outQuad'
     });
+  }
+}
+
+// ============================================
+// UI HELPERS
+// ============================================
+
+function setButtonLoading(button, loading) {
+  const text = button.querySelector('span');
+  const spinner = button.querySelector('.loading-spinner');
+  if (loading) {
+    button._originalText = text?.textContent;
+    if (text) text.textContent = 'Saving...';
+    if (spinner) spinner.style.display = 'inline-block';
+    button.disabled = true;
+  } else {
+    if (text && button._originalText) text.textContent = button._originalText;
+    if (spinner) spinner.style.display = 'none';
+    button.disabled = false;
   }
 }
 

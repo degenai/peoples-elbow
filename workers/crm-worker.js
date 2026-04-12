@@ -138,5 +138,18 @@ async function verifyToken(providedToken, adminPassword) {
   const hashArray = Array.from(new Uint8Array(hashBuffer));
   const expectedToken = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
-  return providedToken === expectedToken;
+  return timingSafeEqual(providedToken, expectedToken);
+}
+
+/**
+ * Constant-time string comparison to prevent timing attacks
+ */
+function timingSafeEqual(a, b) {
+  if (typeof a !== 'string' || typeof b !== 'string') return false;
+  if (a.length !== b.length) return false;
+  let mismatch = 0;
+  for (let i = 0; i < a.length; i++) {
+    mismatch |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return mismatch === 0;
 }

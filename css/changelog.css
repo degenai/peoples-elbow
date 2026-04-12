@@ -507,6 +507,8 @@
     font-weight: bold;
     font-size: 1rem;
     transition: background-color 0.3s ease;
+    position: relative;
+    z-index: 1;
 }
 
 .load-more-btn:hover {
