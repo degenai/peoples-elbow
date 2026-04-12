@@ -20,3 +20,7 @@ The following changes have been proposed and rejected TWICE (2026-04-11, 2026-04
 - Replacing `.map().join('')` with `for` loop string concatenation in `renderLeadList()` or `renderActivityLog()` — no measurable performance difference at this scale
 - Wrapping template literal sections in IIFEs to avoid `.map().join('')` — makes code harder to read for zero gain
 - Any change that increases line count without improving readability or fixing a real bottleneck
+
+## 2026-04-12 - [Client-Side Data Caching with sessionStorage]
+**Learning:** For application views populated by external API calls (e.g., the D1 changelog or statically loaded components), fetching the same unchanging data on every page navigation causes redundant network requests and slower rendering.
+**Action:** Use `sessionStorage` to cache API responses and component states locally within the browser session, allowing near-instantaneous re-renders when users navigate back to the page.
