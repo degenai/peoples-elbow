@@ -112,11 +112,12 @@ function handleCors(request) {
 function getCorsHeaders(request) {
   const origin = request.headers.get('Origin') || '';
 
-  // Check if the origin is in our allowed list, localhost (dev), or a Pages PR preview
+  // Check if the origin is in our allowed list, localhost (dev), or a valid Pages PR preview subdomain
+  // Use a strict regex to prevent malicious subdomains like 'https://attacker.peoples-elbow.pages.dev'
   const isAllowedOrigin = ALLOWED_ORIGINS.includes(origin) ||
                           origin.startsWith('http://localhost:') ||
                           origin.startsWith('http://127.0.0.1:') ||
-                          origin.endsWith('.peoples-elbow.pages.dev');
+                          /^https:\/\/[a-zA-Z0-9-]+\.peoples-elbow\.pages\.dev$/.test(origin);
 
   return {
     'Access-Control-Allow-Origin': isAllowedOrigin ? origin : ALLOWED_ORIGINS[0],
