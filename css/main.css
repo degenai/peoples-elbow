@@ -1664,6 +1664,15 @@ nav ul li a.active {
     text-align: center;
 }
 
+.countdown-sub {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #888;
+    text-align: center;
+    margin-top: 0.25rem;
+}
+
 @media (max-width: 480px) {
     .countdown-timer {
         gap: 1rem;
