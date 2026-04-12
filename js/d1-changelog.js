@@ -27,6 +27,26 @@ class D1Changelog {
     async loadChangelog(page = 0) {
         if (this.isLoading) return;
         
+        // 1. Try to load from sessionStorage cache if page 0
+        if (page === 0) {
+            try {
+                const cachedData = sessionStorage.getItem('d1_changelog_cache');
+                if (cachedData) {
+                    const parsed = JSON.parse(cachedData);
+                    this.allData = parsed.allData;
+                    this.totalCount = parsed.totalCount;
+                    this.hasMore = parsed.hasMore;
+                    this.currentPage = parsed.currentPage;
+                    this.displayVersionNumber();
+                    this.displayChangelog();
+                    return; // Skip fetch since we have cached data
+                }
+            } catch (e) {
+                console.warn('Failed to parse changelog cache:', e);
+                // Continue to fetch if cache fails
+            }
+        }
+
         this.isLoading = true;
         this.showLoading();
 
@@ -56,6 +76,18 @@ class D1Changelog {
             this.hasMore = data.pagination.hasMore;
             this.currentPage = page;
             
+            // 2. Save to sessionStorage cache after updating state
+            try {
+                sessionStorage.setItem('d1_changelog_cache', JSON.stringify({
+                    allData: this.allData,
+                    totalCount: this.totalCount,
+                    hasMore: this.hasMore,
+                    currentPage: this.currentPage
+                }));
+            } catch (e) {
+                console.warn('Failed to save changelog cache:', e);
+            }
+
             this.displayChangelog();
             
         } catch (error) {
