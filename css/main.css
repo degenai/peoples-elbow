@@ -1676,3 +1676,12 @@ nav ul li a.active {
 }
 
 /* Who section responsive styles are handled by inline styles in HTML */
+.loading-spinner {
+  display: none;
+  animation: spin 1s linear infinite;
+  margin-left: 0.5rem;
+}
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}

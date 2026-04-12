@@ -1108,8 +1108,19 @@ async function handleLeadSubmit(e) {
     cleanedContacts[0].isPrimary = true;
   }
 
-  const leadData = {
-    name: elements.leadName.value.trim(),
+  // Show loading state
+  const submitButton = document.getElementById('saveLeadBtn');
+  const btnText = submitButton.querySelector('span');
+  const spinner = submitButton.querySelector('.loading-spinner');
+  const originalButtonText = btnText.textContent;
+
+  btnText.textContent = 'Saving...';
+  if (spinner) spinner.style.display = 'inline-block';
+  submitButton.disabled = true;
+
+  try {
+    const leadData = {
+      name: elements.leadName.value.trim(),
     address: elements.leadAddress.value.trim(),
     neighborhood: elements.leadNeighborhood.value.trim(),
     contacts: cleanedContacts,
@@ -1150,34 +1161,40 @@ async function handleLeadSubmit(e) {
 
     logActivity(`Added new lead: ${newLead.name}`);
 
-    // Animate the new lead card after render
+      // Animate the new lead card after render
+      closeLeadModal();
+      renderLeadList(); // We'll animate just the new card
+
+      // Find and animate the new card
+      requestAnimationFrame(() => {
+        const newCard = document.querySelector(`.lead-card[data-id="${newLead.id}"]`);
+        if (newCard) {
+          anime.set(newCard, { opacity: 0, translateY: -30, scale: 0.95 });
+          anime({ targets: newCard,
+            opacity: [0, 1],
+            translateY: [-30, 0],
+            scale: [0.95, 1],
+            duration: 500,
+            ease: 'outBack'
+          });
+        }
+      });
+
+      updateStats();
+      updateNeighborhoodControls();
+      return;
+    }
+
     closeLeadModal();
-    renderLeadList(); // We'll animate just the new card
-
-    // Find and animate the new card
-    requestAnimationFrame(() => {
-      const newCard = document.querySelector(`.lead-card[data-id="${newLead.id}"]`);
-      if (newCard) {
-        anime.set(newCard, { opacity: 0, translateY: -30, scale: 0.95 });
-        anime({ targets: newCard,
-          opacity: [0, 1],
-          translateY: [-30, 0],
-          scale: [0.95, 1],
-          duration: 500,
-          ease: 'outBack'
-        });
-      }
-    });
-
+    renderLeadList(); // Just an edit, no list change
     updateStats();
     updateNeighborhoodControls();
-    return;
+  } finally {
+    // Restore button state
+    btnText.textContent = originalButtonText;
+    if (spinner) spinner.style.display = 'none';
+    submitButton.disabled = false;
   }
-
-  closeLeadModal();
-  renderLeadList(); // Just an edit, no list change
-  updateStats();
-  updateNeighborhoodControls();
 }
 
 async function handleDeleteLead() {
@@ -1262,8 +1279,19 @@ async function handleVisitSubmit(e) {
   const visitIndexStr = elements.visitIndex.value;
   const isEditMode = visitIndexStr !== '';
 
-  const visitData = {
-    date: new Date(elements.visitDate.value).toISOString(),
+  // Show loading state
+  const submitButton = document.getElementById('visitSubmitBtn');
+  const btnText = submitButton.querySelector('span');
+  const spinner = submitButton.querySelector('.loading-spinner');
+  const originalButtonText = btnText.textContent;
+
+  btnText.textContent = 'Saving...';
+  if (spinner) spinner.style.display = 'inline-block';
+  submitButton.disabled = true;
+
+  try {
+    const visitData = {
+      date: new Date(elements.visitDate.value).toISOString(),
     notes: elements.visitNotes.value.trim(),
     reception: elements.visitReception.value
   };
@@ -1284,19 +1312,25 @@ async function handleVisitSubmit(e) {
     }
   }
 
-  if (updated) {
-    const index = leads.findIndex(l => l.id === updated.id);
-    if (index !== -1) leads[index] = updated;
+    if (updated) {
+      const index = leads.findIndex(l => l.id === updated.id);
+      if (index !== -1) leads[index] = updated;
 
-    if (selectedLeadId === updated.id) {
-      renderDetailPanel(updated);
+      if (selectedLeadId === updated.id) {
+        renderDetailPanel(updated);
+      }
+
+      renderLeadList(); // Just data update, no filter change
+      updateStats();
     }
 
-    renderLeadList(); // Just data update, no filter change
-    updateStats();
+    closeVisitModal();
+  } finally {
+    // Restore button state
+    btnText.textContent = originalButtonText;
+    if (spinner) spinner.style.display = 'none';
+    submitButton.disabled = false;
   }
-
-  closeVisitModal();
 }
 
 // Delete Visit Confirmation
