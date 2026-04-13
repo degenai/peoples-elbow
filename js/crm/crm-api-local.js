@@ -13,95 +13,195 @@ function getSeedData() {
     leads: [
       {
         id: 'demo-001',
-        name: 'Hustle House Gym',
-        address: '9580 Main St, Woodstock, GA 30188',
+        name: 'Ironwood Taproom',
+        address: '412 Mill Creek Rd, Woodstock, GA 30188',
         neighborhood: 'Woodstock',
         status: 'active',
         scores: { space: 5, traffic: 4, vibes: 5 },
         totalScore: 14,
-        notes: 'Wednesday evening residency, going on 7 weeks. Family gym — owners are genuinely invested in the community angle, not just the novelty. Consistent clients week over week, some regulars emerging. S. (trainer) was an early client who just liked it and kept coming back. Pre-existing relationship with the owners makes this the anchor venue — not replicable elsewhere but sets the template.',
+        notes: 'Craft taproom with long communal tables and a covered patio. Crowd is exactly the demographic — people who work desk jobs, drink IPAs on a Thursday, and lean their whole spine into a wooden chair for two hours. Manager Denise was immediately into it. Working toward a regular Thursday slot. Anchor venue potential if the residency takes.',
         contacts: [
-          { name: 'Matt R.', phone: '', email: '', isPrimary: true },
-          { name: 'Erica R.', phone: '', email: '', isPrimary: false }
+          { name: 'Denise K.', phone: '', email: '', isPrimary: true }
         ],
         visits: [
-          { date: daysAgo(3),  notes: '', reception: 'warm' },
-          { date: daysAgo(10), notes: '', reception: 'warm' },
-          { date: daysAgo(17), notes: '', reception: 'warm' },
-          { date: daysAgo(24), notes: '', reception: 'warm' },
-          { date: daysAgo(31), notes: '', reception: 'warm' },
-          { date: daysAgo(38), notes: '', reception: 'warm' },
-          { date: daysAgo(45), notes: '', reception: 'warm' }
+          { date: daysAgo(35), notes: 'First cold walk-in. Talked to the bartender first, got pointed to Denise. Explained the 50/50 split concept. She asked if I had photos — I didn\'t. Said come back with documentation.', reception: 'lukewarm' },
+          { date: daysAgo(22), notes: 'Came back with a printed one-pager and the Instagram up on my phone. Denise said she\'d bring it to the owner. Feels like a yes in slow motion.', reception: 'warm' },
+          { date: daysAgo(8), notes: 'Owner Jamie was there. Thirty-second pitch, he said Thursday evenings work for him. Nothing signed, but verbal green light. Following up next week to nail down a date.', reception: 'warm' }
         ],
-        lastVisit: daysAgo(3),
-        created: daysAgo(50)
+        lastVisit: daysAgo(8),
+        created: daysAgo(38)
       },
       {
         id: 'demo-002',
-        name: 'House Wolf Records',
-        address: '784 Marietta St NW, Atlanta, GA 30318',
-        neighborhood: 'Atlanta',
+        name: 'Hilltop Market Hall',
+        address: '89 Commerce Dr, Marietta, GA 30060',
+        neighborhood: 'Marietta',
         status: 'converted',
-        scores: { space: 4, traffic: 4, vibes: 5 },
-        totalScore: 13,
-        notes: 'Record Store Day booking — April 18. First fully independent cold-visit booking after roughly 60 doors. Fundraiser for a local animal rescue (501c3). Chair setup outside serving the line. Money is not the primary metric here — this is the proof of concept, the resume piece, the first photo op that shows the thing actually works in the wild.',
+        scores: { space: 4, traffic: 5, vibes: 5 },
+        totalScore: 14,
+        notes: 'Indoor artisan market, open Thursdays and Saturdays. Mix of local vendors, food, live music some weekends. Foot traffic on a Saturday is the best of anything on this list — people dwell for an hour, not five minutes. Pitched the market coordinator who manages vendor space. Booked a Saturday trial slot. Went well. Re-booking pending.',
         contacts: [
-          { name: 'Laura W.', phone: '', email: '', isPrimary: true }
+          { name: 'Carol F.', phone: '', email: '', isPrimary: true }
         ],
         visits: [
-          { date: daysAgo(8), notes: 'Cold pitch. Walked in, introduced the concept, explained the 50/50 split model. Owner said yes on the spot. Booked April 18. This is the one.', reception: 'warm' },
-          { date: daysAgo(2), notes: 'Stopped in to confirm. Event goes 8am–6pm, chair setup outside serving the line. Good to go.', reception: 'warm' }
+          { date: daysAgo(55), notes: 'Scouted on a Thursday. Light traffic but laid out well — wide aisles, natural gathering spots near the coffee vendor. Talked to Carol who manages vendor relations. She was receptive, asked about liability insurance.', reception: 'warm' },
+          { date: daysAgo(48), notes: 'Followed up with proof of licensure and a one-page overview. Carol booked a Saturday trial slot for two weeks out. No cut — just permission to set up and work the crowd.', reception: 'warm' },
+          { date: daysAgo(34), notes: 'Trial day. Busy. Did 9 sessions in 4 hours, $140 in donations. Carol stopped by twice to check in — both times smiling. Said to reach out about a recurring slot.', reception: 'warm' }
         ],
-        lastVisit: daysAgo(2),
-        created: daysAgo(8)
+        lastVisit: daysAgo(34),
+        created: daysAgo(58)
       },
       {
         id: 'demo-003',
-        name: 'Giga-Bites Cafe',
-        address: '1851 Roswell Rd, Marietta, GA 30062',
-        neighborhood: 'Marietta',
+        name: 'The Foundry Tap',
+        address: '1840 Westside Ave SW, Atlanta, GA 30310',
+        neighborhood: 'Atlanta',
         status: 'active',
-        scores: { space: 4, traffic: 4, vibes: 5 },
-        totalScore: 13,
-        notes: 'Primary next cold-pitch target. Friday Night Magic drafts, beer and food, 18-year community institution. The crowd is exactly right: regulars, nerds, people who sit hunched over cards for 4 hours straight. They need this. Haven\'t pitched yet — want to go on a Friday to scope the layout first.',
-        contacts: [],
-        visits: [],
-        lastVisit: null,
-        created: daysAgo(14)
+        scores: { space: 5, traffic: 5, vibes: 4 },
+        totalScore: 14,
+        notes: 'Enormous taproom in a converted warehouse — probably 8000 sq ft of floor space. Weekend crowds are massive. The scale is the whole appeal: one Saturday here could be worth three Woodstock events. The pitch is harder because you\'re not talking to an owner, you\'re talking to an events coordinator who has a process. Got a business card from a manager named Theo. Email follow-up sent, no response yet.',
+        contacts: [
+          { name: 'Theo M.', phone: '', email: '', isPrimary: true }
+        ],
+        visits: [
+          { date: daysAgo(18), notes: 'Showed up on a Saturday afternoon to scope the space and catch a manager. Place was packed. Talked to Theo at the bar — friendly, said event bookings go through their coordinator and handed me a card. Not a no, just a process.', reception: 'lukewarm' }
+        ],
+        lastVisit: daysAgo(18),
+        created: daysAgo(20)
       },
       {
         id: 'demo-004',
-        name: 'Trefoil Gardens',
-        address: 'Kingsridge West, Woodstock, GA 30188',
-        neighborhood: 'Woodstock',
+        name: 'Ridgeline Brewing',
+        address: '114 E Main St, Canton, GA 30114',
+        neighborhood: 'Canton',
         status: 'active',
-        scores: { space: 2, traffic: 4, vibes: 5 },
+        scores: { space: 3, traffic: 3, vibes: 5 },
         totalScore: 11,
-        notes: 'Woodstock CSA — community garden plots on converted residential lots, shareholders get free weekly produce, surplus goes to the farmers market. Pre-existing relationship with the organizer. Values alignment is about as good as it gets. Real barrier: vendor space at the Woodstock Farmers Market is a premium bought well in advance — can\'t just show up. Need to either get on the waitlist or find another angle in (market day volunteer, shareholder event, etc.).',
+        notes: 'Small neighborhood taproom, genuinely community-oriented. Owner Ryan runs it almost solo on weeknights. Space is tight — probably one chair max in any comfortable configuration — but the vibe is exactly right and Ryan was the most immediately enthusiastic owner I\'ve talked to. His words: "this is exactly the kind of thing I want in here." Logistics are the only obstacle.',
         contacts: [
-          { name: 'Rob M.', phone: '', email: '', isPrimary: true }
+          { name: 'Ryan H.', phone: '', email: '', isPrimary: true }
         ],
-        visits: [],
-        lastVisit: null,
-        created: daysAgo(7)
+        visits: [
+          { date: daysAgo(12), notes: 'Cold walk-in on a Tuesday. Three other customers in the place. Ryan came out from behind the bar, I gave the thirty-second pitch and he was sold before I finished it. We talked for twenty minutes about the mutual aid angle. Wants to make it work but acknowledged the space problem. Brainstormed a patio setup for warmer months.', reception: 'warm' }
+        ],
+        lastVisit: daysAgo(12),
+        created: daysAgo(14)
       },
       {
         id: 'demo-005',
-        name: 'Dixie Speedway',
-        address: '900 Dixie Speedway, Woodstock, GA 30188',
+        name: 'Millwork Arts Center',
+        address: '230 Creekside Blvd, Woodstock, GA 30188',
         neighborhood: 'Woodstock',
         status: 'active',
-        scores: { space: 5, traffic: 5, vibes: 3 },
+        scores: { space: 4, traffic: 2, vibes: 5 },
+        totalScore: 11,
+        notes: 'Community arts nonprofit — classes, gallery, performance space. Values alignment is near-perfect. The problem is baseline foot traffic is low; revenue would depend on scheduled events, not walk-ins. Pitched the programming director about tying sessions to opening nights or workshop days. She was warm but said event scheduling is six weeks out minimum. On the calendar follow-up list.',
+        contacts: [
+          { name: 'Priya N.', phone: '', email: '', isPrimary: true }
+        ],
+        visits: [
+          { date: daysAgo(27), notes: 'Dropped in during an afternoon gallery opening. Light crowd but engaged people. Talked to Priya between greeting guests. She understood the concept immediately — said the board would love the mutual aid framing. Asked me to email a proposal for their spring event series.', reception: 'warm' },
+          { date: daysAgo(14), notes: 'Sent the email a week ago, followed up in person today. Priya says programming committee meets monthly. She\'ll bring it to the April meeting. Feels like a slow yes.', reception: 'warm' }
+        ],
+        lastVisit: daysAgo(14),
+        created: daysAgo(30)
+      },
+      {
+        id: 'demo-006',
+        name: 'Static Bar & Records',
+        address: '2210 Glenwood Ave SE, Atlanta, GA 30316',
+        neighborhood: 'Atlanta',
+        status: 'active',
+        scores: { space: 4, traffic: 5, vibes: 4 },
         totalScore: 13,
-        notes: 'Dirt track racing venue. This is a joke that is also not a joke. Racing crowds are enormous, the demographics skew working class, and the human body takes a beating at a speedway — drivers, pit crews, fans standing on concrete bleachers for 4 hours. Chairs fold up, setup is flexible, the concourse has space. The bit writes itself. "Fighting the Forces of Tension at 90mph." Haven\'t pitched yet. Need a plan for how to approach this one without getting laughed out of the parking lot — or maybe lean into that.',
+        notes: 'East side bar with a back patio and live music most weekends. Crowd skews young, creative, exactly the audience that gets what this is about. The bartender was enthusiastic. The manager on duty was skeptical — "we have a lot going on back there" — which is fair, the patio was being set up for a show. Need to come back on a non-show night and find whoever actually books events.',
+        contacts: [
+          { name: 'Bar staff (name TBD)', phone: '', email: '', isPrimary: false }
+        ],
+        visits: [
+          { date: daysAgo(9), notes: 'Saturday evening, bad timing in retrospect. Patio was being used for sound check. Pitched the bartender who was into it and went to find a manager. Manager came out, politely said the back is committed through summer. Didn\'t shut the door but didn\'t open it either. Coming back on a Tuesday.', reception: 'lukewarm' }
+        ],
+        lastVisit: daysAgo(9),
+        created: daysAgo(11)
+      },
+      {
+        id: 'demo-007',
+        name: 'Cherokee Pines Farmers Market',
+        address: 'Olde Town Park, 200 Rope Mill Rd, Woodstock, GA 30188',
+        neighborhood: 'Woodstock',
+        status: 'active',
+        scores: { space: 3, traffic: 4, vibes: 5 },
+        totalScore: 12,
+        notes: 'Saturday morning outdoor market, April through October. Foot traffic is solid for a mid-size suburban market. The challenge is vendor space is allocated annually in January — walk-in vending isn\'t possible without coordinator permission. Emailed the market manager about a demonstration / non-vendor appearance. No response yet. Long game.',
         contacts: [],
         visits: [],
         lastVisit: null,
-        created: daysAgo(2)
+        created: daysAgo(21)
+      },
+      {
+        id: 'demo-008',
+        name: 'Copperhead Brewing',
+        address: '3100 Piedmont Hwy, Marietta, GA 30066',
+        neighborhood: 'Marietta',
+        status: 'archived',
+        scores: { space: 3, traffic: 3, vibes: 2 },
+        totalScore: 8,
+        notes: 'Second visit confirmed what the first suggested — not the right fit. Clientele is mostly sports bar regulars, TVs everywhere, energy is loud and distracted rather than settled. Nobody there is looking for a quiet ten minutes. The concept isn\'t wrong for breweries generally, it\'s wrong for this one. Archiving. Not worth a third visit.',
+        contacts: [],
+        visits: [
+          { date: daysAgo(42), notes: 'First visit. Game was on, place was loud. Pitched the bartender anyway — she said to talk to the owner but he wasn\'t in. Vibe felt off but wanted to give it a fair second look.', reception: 'lukewarm' },
+          { date: daysAgo(29), notes: 'Second visit, midweek, quieter. Same energy though. Talked to who I think was the owner — he wasn\'t rude but he was clearly just humoring me. Not the crowd, not the room. Calling it.', reception: 'cold' }
+        ],
+        lastVisit: daysAgo(29),
+        created: daysAgo(45)
+      },
+      {
+        id: 'demo-009',
+        name: 'Second Chance Animal Rescue',
+        address: '78 Towne Lake Pkwy, Woodstock, GA 30189',
+        neighborhood: 'Woodstock',
+        status: 'active',
+        scores: { space: 2, traffic: 2, vibes: 5 },
+        totalScore: 9,
+        notes: 'Local animal rescue nonprofit. Zero foot traffic at the facility itself — it\'s an office, not a storefront. The angle is their fundraising events: adoption days, annual gala, fall festival. If I can get on their vendor list for events, the values alignment alone makes this worth pursuing. A massage fundraiser for animal rescue is a very easy pitch to anyone within earshot.',
+        contacts: [
+          { name: 'Sandra B.', phone: '', email: '', isPrimary: true }
+        ],
+        visits: [
+          { date: daysAgo(16), notes: 'Stopped by the office unannounced — probably not the move but it worked. Sandra is the volunteer coordinator. She immediately got it and was excited. Said they have an adoption event next month and would love to have something like this. Gave me her email.', reception: 'warm' }
+        ],
+        lastVisit: daysAgo(16),
+        created: daysAgo(18)
+      },
+      {
+        id: 'demo-010',
+        name: 'Southside Commons Market',
+        address: '520 Brownwood Ave SE, Atlanta, GA 30316',
+        neighborhood: 'Atlanta',
+        status: 'converted',
+        scores: { space: 4, traffic: 5, vibes: 5 },
+        totalScore: 14,
+        notes: 'Saturday outdoor market, May through December. One of the best foot traffic environments I\'ve been in — people linger, browse, drink coffee, bring dogs. The crowd is young, progressive, and spending money intentionally. Market coordinator Marcus said yes with almost no convincing. Second booking already confirmed. Closest thing to a recurring urban slot on the list.',
+        contacts: [
+          { name: 'Marcus T.', phone: '', email: '', isPrimary: true }
+        ],
+        visits: [
+          { date: daysAgo(50), notes: 'Scouted as a visitor first. Spent an hour watching flow — where people stopped, how long they stayed, vibe near the edges vs. center. Found Marcus at the info table and pitched him directly. He said he\'d been thinking about adding wellness vendors anyway.', reception: 'warm' },
+          { date: daysAgo(43), notes: 'Confirmed the booking. Marcus said a regular vendor had space issues so there\'s a gap in the layout that fits a chair setup without crowding the aisles. Lucky timing.', reception: 'warm' },
+          { date: daysAgo(36), notes: 'First market day. Long. Did 11 sessions between 9am and 1pm, $180 in donations split 50/50 with the market\'s community fund. Marcus said I was one of the most popular new additions in a while. Re-booked on the spot for three more dates.', reception: 'warm' },
+          { date: daysAgo(15), notes: 'Second booking. Slower start (cold morning), picked up after 10am. 7 sessions, $110 total. One client was a chiropractor — she tipped $20 and said "you\'re doing it right." That\'s going in the notes.', reception: 'warm' }
+        ],
+        lastVisit: daysAgo(15),
+        created: daysAgo(52)
       }
     ],
     activityLog: [
-      { timestamp: new Date().toISOString(), message: 'Demo initialized. All data is local — nothing leaves your browser.' }
+      { timestamp: new Date().toISOString(), message: 'Demo initialized. All data is local — nothing leaves your browser.' },
+      { timestamp: daysAgo(8), message: 'Ironwood Taproom — verbal green light from owner Jamie for Thursday evenings.' },
+      { timestamp: daysAgo(15), message: 'Southside Commons Market — second booking complete, 7 sessions, $110 raised.' },
+      { timestamp: daysAgo(16), message: 'Second Chance Animal Rescue — adoption event angle being explored.' },
+      { timestamp: daysAgo(29), message: 'Copperhead Brewing — archived after two visits. Wrong venue for this concept.' },
+      { timestamp: daysAgo(34), message: 'Hilltop Market Hall — trial day: 9 sessions, $140 raised. Re-booking pending.' }
     ]
   };
 }
@@ -198,6 +298,9 @@ export const CrmApi = {
     const lead = this.localState.leads.find(l => l.id === leadId);
     if (lead && lead.visits[visitIndex]) {
       lead.visits.splice(visitIndex, 1);
+      lead.lastVisit = lead.visits.length > 0
+        ? lead.visits.reduce((max, v) => v.date > max ? v.date : max, lead.visits[0].date)
+        : null;
       await this.saveState();
       return lead;
     }

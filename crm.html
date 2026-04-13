@@ -3,43 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://admin-auth.alex-adamczyk.workers.dev https://crm-worker.alex-adamczyk.workers.dev; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; connect-src 'self' https://admin-auth.alex-adamczyk.workers.dev https://crm-worker.alex-adamczyk.workers.dev https://nominatim.openstreetmap.org https://cloudflareinsights.com">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://static.cloudflareinsights.com https://accounts.google.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; connect-src 'self' https://www.googleapis.com https://oauth2.googleapis.com https://accounts.google.com https://nominatim.openstreetmap.org https://cloudflareinsights.com; frame-src https://accounts.google.com">
   <title>Lead-o-Tron 5000 CRM</title>
   <link rel="shortcut icon" href="images/logo.png" type="image/png">
   <link rel="stylesheet" href="css/crm.css">
 
-  <!-- Auth Check Script - Runs immediately before page renders -->
-  <style id="auth-shield">
-      body { display: none !important; }
-  </style>
-  <script>
-      // Check for token before revealing content
-      const token = sessionStorage.getItem('admin_token');
-      if (!token) {
-          window.location.replace('login.html');
-      } else {
-          // Validate token asynchronously and unhide body on success
-          fetch('https://admin-auth.alex-adamczyk.workers.dev', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ action: 'verify', token: token })
-          })
-          .then(res => res.json())
-          .then(data => {
-              if (!data.success) {
-                  sessionStorage.removeItem('admin_token');
-                  window.location.replace('login.html');
-              } else {
-                  document.getElementById('auth-shield').remove();
-              }
-          })
-          .catch(() => {
-              console.warn('Could not verify token with server');
-              sessionStorage.removeItem('admin_token');
-              window.location.replace('login.html');
-          });
-      }
-  </script>
+  <!-- Google Identity Services — OAuth for Drive sync -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body class="page-loading">
   <div id="app">
@@ -54,10 +24,26 @@
         <button id="settingsBtn" class="btn btn-icon" title="Settings" aria-label="Settings">⚙️</button>
         <button id="exportBtn" class="btn btn-secondary">Export JSON</button>
         <button id="importBtn" class="btn btn-secondary">Import JSON</button>
+        <!-- Drive auth UI — toggled by crm-auth.js -->
+        <button id="driveSignInBtn" class="btn btn-secondary" title="Sign in with Google to sync CRM to Drive">☁ Sign in</button>
+        <span id="driveStatusBadge" class="drive-status-badge hidden" title="CRM data is syncing to your Google Drive">☁ Synced</span>
+        <button id="driveSignOutBtn" class="btn btn-secondary hidden" title="Disconnect Google Drive sync">Sign out</button>
         <button id="addLeadBtn" class="btn btn-primary">+ New Lead</button>
-        <a href="dashboard.html" class="btn btn-secondary">Back to Dashboard</a>
+        <a href="index.html" class="btn btn-secondary">← Back to Site</a>
       </div>
     </header>
+
+    <!-- Demo data banner — hidden once Drive connects or data is cleared -->
+    <div id="demo-banner" class="demo-banner hidden">
+      <div class="demo-banner-text">
+        <strong>Demo mode</strong> — you're viewing fictional sample data.
+        <span class="demo-banner-options">
+          Sign in with Google to load your real leads and sync to Drive.
+          Or <button id="importBtnBanner" class="demo-banner-link">import a JSON file</button> to use the CRM locally without Google.
+          <button id="clearDemoBtn" class="demo-banner-link">Clear demo data</button> to start with an empty CRM.
+        </span>
+      </div>
+    </div>
 
     <!-- Main Content -->
     <main class="main-content">
@@ -213,8 +199,7 @@
           <div class="form-row">
             <div class="form-group">
               <label for="leadNeighborhood">Neighborhood</label>
-              <input type="text" id="leadNeighborhood" placeholder="Area/district" list="leadNeighborhoodOptions">
-              <datalist id="leadNeighborhoodOptions"></datalist>
+              <select id="leadNeighborhood"></select>
             </div>
             <div class="form-group">
               <label for="leadStatus">Status</label>
@@ -381,6 +366,7 @@
 
   <!-- anime.js v4 UMD build -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+  <script type="module" src="js/crm/crm-auth.js"></script>
   <script type="module" src="js/crm/renderer.js"></script>
 </body>
 </html>

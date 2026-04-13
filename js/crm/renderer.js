@@ -214,7 +214,6 @@ const elements = {
   leadName: document.getElementById('leadName'),
   leadAddress: document.getElementById('leadAddress'),
   leadNeighborhood: document.getElementById('leadNeighborhood'),
-  leadNeighborhoodOptions: document.getElementById('leadNeighborhoodOptions'),
   leadStatus: document.getElementById('leadStatus'),
 
   // Contacts
@@ -317,6 +316,14 @@ function setupEventListeners() {
   elements.importBtn.addEventListener('click', handleImport);
   elements.settingsBtn.addEventListener('click', () => openSettingsModal());
   elements.utilityBeltBtn.addEventListener('click', () => CrmApi.openUtilityBelt());
+
+  // Drive sync: reload leads from Drive data after sign-in
+  document.addEventListener('crm:drive-connected', async () => {
+    await loadData();
+    renderLeadList();
+    updateDashboardStats();
+    updateNeighborhoodControls();
+  });
 
   // Filters
   elements.filterStatus.addEventListener('change', renderLeadList);
@@ -773,11 +780,15 @@ function updateNeighborhoodFilter() {
   }
 }
 
-function updateNeighborhoodSelect() {
+function updateNeighborhoodSelect(currentValue) {
   const neighborhoods = getUniqueNeighborhoods();
-  elements.leadNeighborhoodOptions.innerHTML = neighborhoods
-    .map(n => `<option value="${escapeHtml(n)}"></option>`)
-    .join('');
+  // Include currentValue even if not yet in leads (new/custom neighborhood)
+  const all = currentValue && !neighborhoods.includes(currentValue)
+    ? [...neighborhoods, currentValue].sort()
+    : neighborhoods;
+  elements.leadNeighborhood.innerHTML =
+    '<option value="">-- select area --</option>' +
+    all.map(n => `<option value="${escapeHtml(n)}"${n === currentValue ? ' selected' : ''}>${escapeHtml(n)}</option>`).join('');
 }
 
 function updateNeighborhoodControls() {
@@ -917,7 +928,7 @@ function openLeadModal(lead = null) {
     elements.leadId.value = lead.id;
     elements.leadName.value = lead.name;
     elements.leadAddress.value = lead.address;
-    elements.leadNeighborhood.value = lead.neighborhood;
+    updateNeighborhoodSelect(lead.neighborhood);
     elements.leadStatus.value = lead.status;
     elements.scoreSpace.value = lead.scores.space;
     elements.scoreTraffic.value = lead.scores.traffic;
@@ -929,11 +940,11 @@ function openLeadModal(lead = null) {
     elements.scoreTraffic.value = 3;
     elements.scoreVibes.value = 3;
     formContacts = [];
+    updateNeighborhoodSelect();
   }
 
   renderFormContacts();
   updateScoreDisplay();
-  updateNeighborhoodSelect();
   animateModalOpen(elements.leadModal);
   elements.leadName.focus();
 }

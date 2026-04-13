@@ -130,6 +130,55 @@ body {
   align-items: center;
 }
 
+.demo-banner {
+  background: rgba(255, 199, 44, 0.1);
+  border-bottom: 1px solid rgba(255, 199, 44, 0.3);
+  padding: 10px var(--space-lg);
+  font-size: 13px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.demo-banner strong {
+  color: var(--pe-gold);
+}
+
+.demo-banner-options {
+  margin-left: 6px;
+}
+
+.demo-banner-link {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--pe-gold);
+  cursor: pointer;
+  font-size: inherit;
+  text-decoration: underline;
+  font-family: inherit;
+}
+
+.demo-banner-link:hover {
+  color: var(--pe-gold-light);
+}
+
+.drive-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: var(--space-sm) var(--space-md);
+  background: rgba(0, 160, 70, 0.15);
+  color: #4caf50;
+  border: 1px solid rgba(0, 160, 70, 0.3);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: default;
+}
+
 /* ============================================
    BUTTONS
    ============================================ */

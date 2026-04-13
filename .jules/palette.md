@@ -1,3 +1,3 @@
-## 2026-04-10 - Adding :focus-visible to interactive elements
-**Learning:** Implementing `:focus-visible` styles using existing brand colors (like `var(--pe-gold)`) provides a huge accessibility win for keyboard navigation while maintaining visual design for mouse users, a practice often overlooked in custom UI.
-**Action:** Always verify keyboard focus states and add `:focus-visible` to interactive elements like buttons and links to ensure keyboard navigation is clear and accessible.
+## 2025-04-09 - Native Button vs Div for Mobile Menu Toggle
+**Learning:** When adding accessibility to legacy custom components (like a mobile menu toggle), it's highly preferred to refactor `div` elements into semantic `<button>` elements rather than adding `role="button"` and `tabindex="0"`. Native `<button>` elements inherently handle keyboard interactions (Space and Enter keys) and focus states, reducing custom JavaScript and styling overhead.
+**Action:** Prioritize transforming interactive `div`s into `<button>`s with necessary CSS resets (`background: none; border: none; padding: 0; color: inherit; font: inherit;`) over piling ARIA attributes onto non-semantic elements.
