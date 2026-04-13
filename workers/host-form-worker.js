@@ -1,8 +1,8 @@
 /**
  * The People's Elbow - Form Handler Worker
- * 
- * Handles form submissions, stores data in D1 database,
- * and sends email notifications
+ *
+ * Handles form submissions and sends email notifications.
+ * No data is stored server-side -- submissions go straight to email.
  */
 
 // Import statements for Workers functionality
@@ -11,7 +11,7 @@ import { EmailMessage } from 'cloudflare:email';
 /**
  * Main handler for all incoming requests
  * @param {Request} request
- * @param {Env} env - Environment containing D1 bindings
+ * @param {Env} env - Environment containing MAIL binding
  * @param {ExecutionContext} ctx - Worker execution context
  */
 export default {
@@ -42,7 +42,7 @@ function handleCors() {
 /**
  * Main request handler
  * @param {Request} request
- * @param {Env} env - Environment containing D1 bindings
+ * @param {Env} env - Environment containing MAIL binding
  */
 async function handleRequest(request, env) {
   // Only allow POST requests
@@ -70,57 +70,38 @@ async function handleRequest(request, env) {
 
 
 /**
- * Generic helper to handle D1 database insertion and email notification
- * @param {Object} options - Configuration options
- * @param {Object} options.env - Environment containing D1 bindings and MAIL
- * @param {string} options.table - D1 database table name
- * @param {Object} options.data - Key-value pairs of data to insert
+ * Process a form submission by sending an email notification.
+ * Returns success only if the email was actually sent.
+ * @param {Object} options
+ * @param {Object} options.env - Environment containing MAIL binding
  * @param {string} options.subject - Email subject
  * @param {string} options.emailContent - Email body
  * @param {string} options.successMessage - Message for successful response
  */
-async function processFormSubmission({ env, table, data, subject, emailContent, successMessage }) {
+async function processFormSubmission({ env, subject, emailContent, successMessage }) {
   try {
-    // Get current date/time as ISO string
-    const createdAt = new Date().toISOString();
-
-    // Add createdAt to data
-    const insertData = { ...data, created_at: createdAt };
-    const columns = Object.keys(insertData);
-    const values = Object.values(insertData);
-    const placeholders = columns.map(() => '?').join(', ');
-
-    // 1. Store in D1 database
-    if (env && env.FORMS_DB) {
-      await env.FORMS_DB.prepare(
-        `INSERT INTO ${table} (${columns.join(', ')}) VALUES (${placeholders})`
-      )
-      .bind(...values)
-      .run();
-    } else {
-      console.warn('D1 database not available');
-    }
-
-    // 2. Send email notification
-    await sendEmail(
+    const sent = await sendEmail(
       'peoples.elbow.massage@gmail.com',
       subject,
       emailContent,
       env
     );
 
-    // Return success response
+    if (!sent) {
+      return errorResponse('Your message could not be sent. Please email info@peoples-elbow.com directly.');
+    }
+
     return successResponse(successMessage);
   } catch (error) {
-    console.error(`Error processing ${table} submission:`, error);
-    return errorResponse('There was an error processing your request. Please try again later.');
+    console.error('Error processing form submission:', error);
+    return errorResponse('Your message could not be sent. Please email info@peoples-elbow.com directly.');
   }
 }
 
 /**
  * Handle host connection form submissions
  * @param {FormData} formData
- * @param {Env} env - Environment containing D1 bindings
+ * @param {Env} env - Environment containing MAIL binding
  */
 async function handleHostForm(formData, env) {
   // Extract form fields
@@ -150,14 +131,6 @@ async function handleHostForm(formData, env) {
   
   return processFormSubmission({
     env,
-    table: 'host_submissions',
-    data: {
-      venue_name: venueName,
-      contact_name: contactName,
-      contact_email: contactEmail,
-      venue_type: venueType,
-      message: message
-    },
     subject: `New Host Request: ${venueName}`,
     emailContent,
     successMessage: 'Your hosting request has been received! We\'ll be in touch soon.'
@@ -167,7 +140,7 @@ async function handleHostForm(formData, env) {
 /**
  * Handle contact form submissions
  * @param {FormData} formData
- * @param {Env} env - Environment containing D1 bindings
+ * @param {Env} env - Environment containing MAIL binding
  */
 async function handleContactForm(formData, env) {
   // Extract form fields
@@ -193,12 +166,6 @@ async function handleContactForm(formData, env) {
   
   return processFormSubmission({
     env,
-    table: 'contact_submissions',
-    data: {
-      name: name,
-      email: email,
-      message: message
-    },
     subject: `New Contact Form Message from ${name}`,
     emailContent,
     successMessage: 'Your message has been received! We\'ll get back to you soon.'

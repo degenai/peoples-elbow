@@ -10,7 +10,7 @@ This project has no backend database, no user accounts, no analytics, no trackin
 
 The site is static HTML/CSS/JS hosted on Cloudflare Pages. The only server-side components are:
 
-- **Contact forms** route through a Cloudflare Worker that emails submissions and stores them in a D1 database solely for responding to inquiries. That's it.
+- **Contact forms** route through a Cloudflare Worker that emails submissions directly to us. Nothing is stored in a database. Your message goes to our inbox and that's it.
 - **The Lead-o-Tron CRM** stores all data in **your browser's localStorage** or **your own Google Drive** (if you choose to sign in). The CRM uses Google's `drive.file` scope, which means it can only access files it created in your Drive. We cannot see, read, or access your data. It never touches our infrastructure.
 
 There is no analytics beyond Cloudflare's built-in aggregate traffic metrics (page views, not identities). There is no Google Analytics, no Meta Pixel, no Hotjar, no nothing.
