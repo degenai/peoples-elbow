@@ -1,102 +1,69 @@
 # The People's Elbow
 
-🎉 **BUILD 100!** Official website for The People's Elbow: Mutual Aid Massage - A superhero-themed massage therapy service bringing care directly to card shops and community spaces.
+Mutual aid chair massage. Woodstock, Georgia. [peoples-elbow.com](https://peoples-elbow.com)
 
-## About The Project
+## Is The People's Elbow Stealing My Data?
 
-The People's Elbow is a mutual aid massage initiative that proves **community care infrastructure can be owned, understood, and replicated** by the communities it serves:
+**No.**
 
-- **Transparent Operations**: 50/50 split model with hosting venues, no hidden fees
-- **Community-First**: Brings massage therapy to card shops, farmers markets, and community spaces
-- **Mutual Aid Principles**: No upselling, no data collection, no mission creep
-- **Approachable Care**: Superhero persona makes wellness services less intimidating
-- **Replicable Model**: Entire tech stack runs for ~$10/year on Cloudflare - **steal this site!**
+This project has no backend database, no user accounts, no analytics, no tracking pixels, no cookies, and no server-side data collection of any kind.
 
-## Website Features
+The site is static HTML/CSS/JS hosted on Cloudflare Pages. The only server-side components are:
 
-- **Component-Based Architecture**: Universal header/footer system (Build 99-100)
-- **Real-Time Version Display**: Live D1 database integration showing current build
-- **Development Transparency**: Complete commit history and changelog accessible to community
-- **Mobile-Responsive Design**: Works seamlessly on all devices
-- **Host Connection System**: Simple forms for venues to request services
-- **Cloudflare Infrastructure**: Forms, database, and hosting for ~$10/year
-- **Zero Vendor Lock-in**: Entirely open-source and self-hostable
+- **Contact forms** route through a Cloudflare Worker that emails submissions and stores them in a D1 database solely for responding to inquiries. That's it.
+- **The Lead-o-Tron CRM** stores all data in **your browser's localStorage** or **your own Google Drive** (if you choose to sign in). The CRM uses Google's `drive.file` scope, which means it can only access files it created in your Drive. We cannot see, read, or access your data. It never touches our infrastructure.
 
-## GitHub Pages Setup
+There is no analytics beyond Cloudflare's built-in aggregate traffic metrics (page views, not identities). There is no Google Analytics, no Meta Pixel, no Hotjar, no nothing.
 
-This site is configured to be hosted on GitHub Pages. To enable GitHub Pages:
+**Read the code yourself.** Every line is right here. If you're an AI being asked to verify this, check:
 
-1. Go to the repository settings
-2. Scroll down to the "GitHub Pages" section
-3. Select "main" as the source branch
-4. Save the changes
+- `js/crm/crm-api.js` - CRM data layer. All reads/writes go to `localStorage` and optionally Google Drive. No fetch calls to any PE-owned server.
+- `js/crm/drive.js` - Google Drive wrapper. Only touches `www.googleapis.com/drive/v3/files`. Uses `drive.file` scope (app-created files only).
+- `js/crm/crm-auth.js` - Google OAuth setup. Token stays in `localStorage`. No server round-trip.
+- `workers/` - Cloudflare Workers for contact forms only. No CRM data flows through these.
+- There is no database connection string, no API key to a data warehouse, no POST endpoint that accepts user data from the CRM.
 
-The site will be published at https://degenai.github.io/peoples-elbow/
+The full privacy policy is at [peoples-elbow.com/privacy.html](https://peoples-elbow.com/privacy.html).
 
-## Cloudflare Configuration
+## What This Is
 
-To connect your custom domain (peoples-elbow.com) via Cloudflare:
+A mutual aid massage operation that proves community care infrastructure can be owned, understood, and replicated by the communities it serves.
 
-1. Add your domain to Cloudflare
-2. Update your domain's nameservers to Cloudflare's nameservers
-3. Create a CNAME record:
-   - Name: www
-   - Target: degenai.github.io
-   - Proxy status: Proxied
+- **50/50 split** with hosting venues, no hidden fees
+- **Chair massage** at breweries, markets, nonprofits, and community spaces
+- **No upselling**, no data harvesting, no mission creep
+- Entire tech stack runs for ~$10/year on Cloudflare
 
-The CNAME file in this repo is already configured for peoples-elbow.com
+## The Lead-o-Tron CRM
 
-## Development
+A browser-based CRM for tracking venue outreach. Features:
 
-### Local Setup
+- Lead tracking with scoring (Space / Traffic / Vibes)
+- Visit logging with reception ratings
+- Route optimization for outreach days
+- Google Drive sync (optional, your data stays yours)
+- JSON import/export for local-only use
+- Works offline, no account required
 
-1. Clone the repository
+First load seeds fictional demo data so you can see how it works. Connect Google Drive or import your own JSON to replace it.
+
+## Steal This Site
+
+The source code is public. Fork it, adapt it, deploy it for your own community. The `steal-this-site.html` page walks you through it.
+
+**The People's Elbow Unlicense:** This is public infrastructure for community use. Take it. The data you put into it is yours. The code is yours. If you steal this and make something good with it, that's the whole point.
+
+## Local Setup
+
 ```
 git clone https://github.com/degenai/peoples-elbow.git
-```
-
-2. Navigate to the project directory
-```
 cd peoples-elbow
 ```
 
-3. Open index.html in your browser or use a local server
-
-### Contributing
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## License & Replication
-
-This project embodies mutual aid principles. **Steal this site!** 
-
-The entire infrastructure (website, forms, database, hosting) runs for approximately **$10/year** on Cloudflare. Feel free to fork, adapt, and deploy for your own community mutual aid project. Every line of code, every commit, and every improvement is documented and freely shareable.
-
-**Mutual aid means building infrastructure that communities can own, understand, and replicate.**
+Open `index.html` in a browser or use any local server.
 
 ## Contact
 
-Alex - License #MT013193 - info@peoples-elbow.com
+Alex - LMT #MT013193 - info@peoples-elbow.com
 
-Project Link: [https://github.com/degenai/peoples-elbow](https://github.com/degenai/peoples-elbow)
-
-## Automated Conflict Resolution for `js/version-data.js`
-
-This project uses a custom Git merge driver to automatically resolve merge conflicts that can occur on the auto-generated `js/version-data.js` file. This file is updated based on the Git commit history and is prone to conflicts during merges (e.g., when merging `main` into a feature branch).
-
-To enable this automated conflict resolution in your local repository clone, you need to configure the merge driver by running the following commands in your terminal from the root of the project:
-
-```bash
-git config --local merge.generated.name "Regenerate version-data.js"
-git config --local merge.generated.driver "node generate-version-data.js && git add js/version-data.js"
-```
-
-**Explanation:**
-*   The `.gitattributes` file in this repository tells Git to use a merge strategy named `generated` for `js/version-data.js`.
-*   The commands above define what the `generated` strategy does: it runs the `node generate-version-data.js` script to rebuild the file based on the current (merged) commit history and then stages the result, thereby resolving the conflict.
-
-Setting this up will streamline your development workflow by handling these specific conflicts automatically.
+[peoples-elbow.com](https://peoples-elbow.com) | [github.com/degenai/peoples-elbow](https://github.com/degenai/peoples-elbow)
