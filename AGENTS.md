@@ -33,4 +33,4 @@ Only propose a loop replacement if it **reduces total line count** AND **improve
 ## Sentinel
 
 ### Scope of innerHTML escaping
-When fixing unescaped `innerHTML` interpolation, also check `crm-demo.html` and the demo renderer -- the demo and production CRM share patterns and both need fixes.
+When fixing unescaped `innerHTML` interpolation, check the CRM renderer (`js/crm/renderer.js`) and related modules. The demo page (`crm-demo.html`) has been deprecated -- `crm.html` now serves as both demo and production CRM via Google OAuth.
