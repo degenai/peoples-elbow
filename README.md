@@ -51,7 +51,7 @@ First load seeds fictional demo data so you can see how it works. Connect Google
 
 The source code is public. Fork it, adapt it, deploy it for your own community. The `steal-this-site.html` page walks you through it.
 
-**The People's Elbow Unlicense:** This is public infrastructure for community use. Take it. The data you put into it is yours. The code is yours. If you steal this and make something good with it, that's the whole point.
+**The People's Elbow Unlicense:** This is public infrastructure for community use. Take it. The data you put into it is yours. The code is yours. If you steal this and make something good with it, that's the whole point. Legally, the code is released under the [0BSD license](https://opensource.org/license/0bsd) -- do anything, no attribution required, no strings.
 
 ## Local Setup
 
