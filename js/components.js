@@ -168,20 +168,10 @@ class ComponentLoader {
      * Initialize features that depend on components being loaded
      */
     initializeComponentFeatures() {
-        // Re-initialize mobile menu if it exists in main.js
-        if (window.initializeMobileMenu && typeof window.initializeMobileMenu === 'function') {
-            window.initializeMobileMenu();
-        }
-
-        // Re-initialize version display if it exists
-        if (window.initializeVersionDisplay && typeof window.initializeVersionDisplay === 'function') {
-            window.initializeVersionDisplay();
-        }
-
         // Initialize version number update after header is loaded
         this.initializeVersionNumber();
 
-        // Re-initialize mobile menu functionality
+        // Initialize mobile menu after header component is injected
         this.initializeMobileMenu();
     }
 

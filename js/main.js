@@ -4,25 +4,9 @@
 */
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Mobile menu toggle
-    const menuToggle = document.querySelector('.menu-toggle');
-    const navMenu = document.querySelector('nav ul');
-    
-    if (menuToggle && navMenu) {
-        menuToggle.addEventListener('click', function() {
-            navMenu.classList.toggle('mobile-menu-active');
-        });
-        
-        // Reset menu state on window resize
-        window.addEventListener('resize', function() {
-            if (window.innerWidth > 768) {
-                // Desktop view - remove mobile classes and inline styles
-                navMenu.classList.remove('mobile-menu-active');
-                navMenu.style.display = '';
-            }
-        });
-    }
-    
+    // Worker endpoint for form submissions
+    const WORKER_URL = 'https://peoples-elbow.alex-adamczyk.workers.dev';
+
     // Form submission handlers
     const hostForm = document.getElementById('host-interest-form');
     const contactForm = document.getElementById('contact-form');
@@ -45,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const formData = new FormData(hostForm);
                 
                 // Send to Cloudflare Worker
-                const response = await fetch('https://peoples-elbow.alex-adamczyk.workers.dev', {
+                const response = await fetch(WORKER_URL, {
                     method: 'POST',
                     body: formData
                 });
@@ -71,10 +55,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     if (contactForm) {
-        contactForm.addEventListener('submit', function(e) {
+        contactForm.addEventListener('submit', async function(e) {
             e.preventDefault();
-            
-            // Show loading state
+
             const submitButton = contactForm.querySelector('button[type="submit"]');
             const btnText = submitButton.querySelector('span');
             const spinner = submitButton.querySelector('.loading-spinner');
@@ -82,35 +65,29 @@ document.addEventListener('DOMContentLoaded', function() {
             if (btnText) btnText.textContent = 'Sending...';
             if (spinner) spinner.style.display = 'inline-block';
             submitButton.disabled = true;
-            
-            // Create FormData object
-            const formData = new FormData(contactForm);
-            
-            // Send to Cloudflare Worker
-            fetch('https://peoples-elbow.alex-adamczyk.workers.dev', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                // Show success message
+
+            try {
+                const formData = new FormData(contactForm);
+                const response = await fetch(WORKER_URL, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+
                 if (data.success) {
                     showFormMessage(contactForm, data.message, 'success');
                     contactForm.reset();
                 } else {
                     showFormMessage(contactForm, data.message, 'error');
                 }
-            })
-            .catch(error => {
+            } catch (error) {
                 console.error('Error:', error);
                 showFormMessage(contactForm, 'There was an error sending your message. Please try again later.', 'error');
-            })
-            .finally(() => {
-                // Restore button state
+            } finally {
                 if (btnText) btnText.textContent = originalButtonText;
                 if (spinner) spinner.style.display = 'none';
                 submitButton.disabled = false;
-            });
+            }
         });
     }
     

@@ -16,7 +16,8 @@
     --pe-blue: #008ecc;
     --pe-red: #8B0000;
     --pe-light-gray: #f9f9f9;
-    
+    --pe-text-dark: #333;
+
     /* Fonts */
     --font-heading: 'Bangers', cursive;
     --font-body: 'Open Sans', sans-serif;
@@ -163,7 +164,6 @@ header {
     justify-content: space-between;
     align-items: center;
     padding: var(--space-sm) var(--space-lg);
-    position: relative;
 }
 
 .logo-container {
@@ -923,11 +923,6 @@ nav ul li a:hover::after {
     height: 200%;
     background: radial-gradient(circle, rgba(255,215,0,0.1) 0%, transparent 70%);
     animation: rotate 20s linear 1;
-}
-
-@keyframes rotate {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
 }
 
 .map-coming-soon {

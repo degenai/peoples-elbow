@@ -5,7 +5,7 @@
 
 // ============================================
 // ANIME.JS SETUP & UTILITIES
-// anime.js v4 is loaded via script tag as window.anime
+// anime.js v3 UMD build loaded via script tag (v4 migration TBD)
 // ============================================
 
 import { STATUS, RECEPTION } from './constants.js';

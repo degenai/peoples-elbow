@@ -483,11 +483,11 @@ export const CrmApi = {
     window.open('utility.html', '_blank');
   },
 
-  addActivityLog(message) {
+  async addActivityLog(message) {
     const logEntry = { timestamp: new Date().toISOString(), message };
     this.localState.activityLog.unshift(logEntry);
     if (this.localState.activityLog.length > 100) this.localState.activityLog.pop();
-    this.saveState();
+    await this.saveState();
     return logEntry;
   },
 
