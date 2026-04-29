@@ -7,6 +7,7 @@
 :root {
     /* Color palette based on the logo */
     --pe-green: #006937;
+    --pe-green-rgb: 0, 105, 55;
     --pe-green-light: #008a47;
     --pe-green-dark: #004225;
     --pe-gold: #ffcc00;
@@ -744,7 +745,7 @@ nav ul li a:hover::after {
 .form-group textarea:focus {
     outline: none;
     border-color: var(--pe-green);
-    box-shadow: 0 0 0 3px rgba(0, 105, 55, 0.1);
+    box-shadow: 0 0 0 3px rgba(var(--pe-green-rgb), 0.1);
 }
 
 .form-group select {
@@ -773,7 +774,7 @@ nav ul li a:hover::after {
 
 .form-group button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 105, 55, 0.3);
+    box-shadow: 0 4px 12px rgba(var(--pe-green-rgb), 0.3);
 }
 
 /* Contact Form Styling */
@@ -1275,7 +1276,7 @@ footer {
 .stay-updated {
     margin-top: var(--space-lg);
     padding: var(--space-md);
-    background: linear-gradient(135deg, rgba(0, 105, 55, 0.1) 0%, rgba(0, 105, 55, 0.05) 100%);
+    background: linear-gradient(135deg, rgba(var(--pe-green-rgb), 0.1) 0%, rgba(var(--pe-green-rgb), 0.05) 100%);
     border-radius: 8px;
     border-left: 4px solid var(--pe-green);
 }
@@ -1335,7 +1336,7 @@ nav ul li a.active {
     align-items: center;
     justify-content: center;
     margin: 0 auto var(--space-lg) auto;
-    box-shadow: 0 4px 12px rgba(0, 105, 55, 0.3);
+    box-shadow: 0 4px 12px rgba(var(--pe-green-rgb), 0.3);
 }
 
 .dashboard-card .card-icon i {
@@ -1404,7 +1405,7 @@ nav ul li a.active {
     margin-right: var(--space-lg);
     margin-top: var(--space-xs);
     flex-shrink: 0;
-    box-shadow: 0 0 0 4px rgba(0, 105, 55, 0.2);
+    box-shadow: 0 0 0 4px rgba(var(--pe-green-rgb), 0.2);
 }
 
 .timeline-item:not(:last-child) .timeline-dot::after {
@@ -1580,6 +1581,14 @@ nav ul li a.active {
     flex-direction: column;
     align-items: center;
     gap: 1.5rem;
+    background: var(--pe-white);
+    padding: 2.25rem 1.75rem;
+    border-radius: 14px;
+    box-shadow: 0 12px 32px rgba(var(--pe-green-rgb), 0.14), 0 3px 8px rgba(0, 0, 0, 0.06);
+    width: 100%;
+    max-width: 680px;
+    margin: 0 auto;
+    border-top: 4px solid var(--pe-gold);
 }
 
 .countdown-event-info {
@@ -1590,22 +1599,45 @@ nav ul li a.active {
     text-align: center;
 }
 
+.countdown-event-overline {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--pe-gold);
+    background: var(--pe-green);
+    padding: 0.3rem 0.75rem;
+    border-radius: 4px;
+    box-shadow: 0 2px 6px rgba(var(--pe-green-rgb), 0.25);
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
+}
+
 .countdown-event-name {
     font-family: 'Bangers', cursive;
-    font-size: 2rem;
+    font-size: 2.25rem;
     color: var(--pe-green);
+    letter-spacing: 1px;
+    line-height: 1.05;
+    margin-top: 0.25rem;
+}
+
+.countdown-event-when {
+    font-family: 'Bangers', cursive;
+    font-size: 1.5rem;
+    color: var(--pe-green-dark);
     letter-spacing: 1px;
 }
 
-.countdown-event-detail {
+.countdown-event-where {
     font-size: 1rem;
     font-weight: 600;
-    color: #333;
+    color: var(--pe-text-dark);
 }
 
 .countdown-event-cause {
     font-size: 0.875rem;
     color: #666;
+    font-style: italic;
 }
 
 .countdown-timer {
@@ -1625,6 +1657,7 @@ nav ul li a.active {
     font-size: 3rem;
     color: var(--pe-green);
     line-height: 1;
+    text-shadow: 0 2px 4px rgba(var(--pe-green-rgb), 0.18);
 }
 
 .countdown-label {
@@ -1638,7 +1671,8 @@ nav ul li a.active {
 .countdown-residency {
     font-size: 0.9rem;
     color: #666;
-    margin-top: 0.5rem;
+    margin-top: 1.5rem;
+    text-align: center;
 }
 
 .countdown-residency a {
@@ -1668,6 +1702,80 @@ nav ul li a.active {
     margin-top: 0.25rem;
 }
 
+.upcoming-events {
+    list-style: none;
+    margin: 2rem auto 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+    width: 100%;
+    max-width: 760px;
+}
+
+.upcoming-event {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 1.1rem 1.2rem;
+    border: 2px solid var(--pe-green);
+    border-radius: 10px;
+    background: var(--pe-white);
+    box-shadow: 0 6px 16px rgba(var(--pe-green-rgb), 0.1), 0 2px 4px rgba(0, 0, 0, 0.04);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.upcoming-event:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 24px rgba(var(--pe-green-rgb), 0.18), 0 4px 8px rgba(0, 0, 0, 0.06);
+}
+
+.upcoming-events-header {
+    grid-column: 1 / -1;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: #888;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+}
+
+.upcoming-event-when {
+    font-family: 'Bangers', cursive;
+    font-size: 1.05rem;
+    color: var(--pe-gold);
+    letter-spacing: 1px;
+    background: var(--pe-green);
+    padding: 0.4rem 0.7rem;
+    border-radius: 4px;
+    align-self: flex-start;
+    box-shadow: 0 2px 6px rgba(var(--pe-green-rgb), 0.25);
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
+}
+
+.upcoming-event-name {
+    font-family: 'Bangers', cursive;
+    font-size: 1.4rem;
+    color: var(--pe-green);
+    letter-spacing: 1px;
+    line-height: 1.1;
+    margin-top: 0.2rem;
+}
+
+.upcoming-event-where {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--pe-text-dark);
+}
+
+.upcoming-event-cause {
+    font-size: 0.8rem;
+    color: #666;
+    font-style: italic;
+}
+
 @media (max-width: 480px) {
     .countdown-timer {
         gap: 1rem;
@@ -1677,6 +1785,9 @@ nav ul li a.active {
     }
     .countdown-unit {
         min-width: 48px;
+    }
+    .upcoming-events {
+        grid-template-columns: 1fr;
     }
 }
 

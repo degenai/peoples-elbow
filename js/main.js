@@ -316,46 +316,133 @@ document.addEventListener('DOMContentLoaded', function() {
     // Try to update version immediately
     updateVersionNumber();
 
-    // House Wolf Records countdown — Record Store Day, April 18 2026, 8 AM EDT
-    const countdownTarget = new Date('2026-04-18T12:00:00Z');
-    const countdownTimer = document.getElementById('countdown-timer');
+    // Upcoming appearances. Featured slot = next firm-dated event, ticks live.
+    // List slot = remaining future events. When featured passes, next event auto-promotes.
+    const upcomingEvents = [
+        {
+            name: 'Rock the Block Party',
+            where: 'with Stauffer Chiropractic',
+            when: 'Sun May 17, 2026 &middot; 1 PM',
+            date: new Date('2026-05-17T17:00:00Z'),
+            cause: null,
+        },
+        {
+            name: 'Murph Memorial Workout',
+            where: 'at Hustle House Gym',
+            when: 'Sat May 23, 2026 &middot; 9 AM',
+            date: new Date('2026-05-23T13:00:00Z'),
+            cause: 'Honoring fallen service members',
+        },
+        {
+            name: 'FlexFest',
+            where: 'Downtown Woodstock',
+            when: 'Mid-August 2026 (date TBC)',
+            date: new Date('2026-08-15T16:00:00Z'),
+            cause: null,
+        },
+        {
+            name: 'Golfing for Respite',
+            where: 'Iron Horse Golf Club, Milton GA',
+            when: 'Mon Oct 5, 2026 &middot; 9 AM',
+            date: new Date('2026-10-05T13:00:00Z'),
+            cause: 'Benefiting Special Needs Respite (501c3)',
+        },
+    ];
 
-    if (countdownTimer) {
+    const featured = document.getElementById('featured-event');
+    const list = document.getElementById('upcoming-events');
+
+    if (featured && list) {
         let tickInterval = null;
 
-        function updateCountdown() {
-            const diff = countdownTarget - new Date();
-
-            if (diff <= 0) {
-                clearInterval(tickInterval);
-                const elapsed = Math.abs(diff);
-                const days    = Math.floor(elapsed / 864e5);
-                const hours   = Math.floor((elapsed % 864e5) / 36e5);
-                const minutes = Math.floor((elapsed % 36e5) / 6e4);
-
-                let ago = '';
-                if (days > 0) ago += `${days}d `;
-                if (hours > 0 || days > 0) ago += `${hours}h `;
-                ago += `${minutes}m`;
-
-                countdownTimer.innerHTML =
-                    `<p class="countdown-live">EVENT HAPPENED ${ago.trim()} AGO</p>` +
-                    `<p class="countdown-sub">STAY TUNED FOR STATS AND MORE TIMERS</p>`;
-                return;
-            }
-
-            const days    = Math.floor(diff / 864e5);
-            const hours   = Math.floor((diff % 864e5) / 36e5);
-            const minutes = Math.floor((diff % 36e5) / 6e4);
-            const seconds = Math.floor((diff % 6e4) / 1e3);
-
-            document.getElementById('countdown-days').textContent    = String(days).padStart(2, '0');
-            document.getElementById('countdown-hours').textContent   = String(hours).padStart(2, '0');
-            document.getElementById('countdown-minutes').textContent = String(minutes).padStart(2, '0');
-            document.getElementById('countdown-seconds').textContent = String(seconds).padStart(2, '0');
+        function renderFeatured(ev) {
+            featured.innerHTML =
+                `<div class="countdown-event-info">` +
+                    `<span class="countdown-event-overline">Up Next</span>` +
+                    `<span class="countdown-event-name">${ev.name}</span>` +
+                    `<span class="countdown-event-when">${ev.when}</span>` +
+                    `<span class="countdown-event-where">${ev.where}</span>` +
+                    (ev.cause ? `<span class="countdown-event-cause">${ev.cause}</span>` : '') +
+                `</div>` +
+                `<div class="countdown-timer" id="countdown-timer">` +
+                    `<div class="countdown-unit"><span class="countdown-number" id="countdown-days">--</span><span class="countdown-label">Days</span></div>` +
+                    `<div class="countdown-unit"><span class="countdown-number" id="countdown-hours">--</span><span class="countdown-label">Hours</span></div>` +
+                    `<div class="countdown-unit"><span class="countdown-number" id="countdown-minutes">--</span><span class="countdown-label">Minutes</span></div>` +
+                    `<div class="countdown-unit"><span class="countdown-number" id="countdown-seconds">--</span><span class="countdown-label">Seconds</span></div>` +
+                `</div>`;
         }
 
-        updateCountdown();
-        tickInterval = setInterval(updateCountdown, 1000);
+        function renderList(events) {
+            if (!events.length) {
+                list.innerHTML = '';
+                return;
+            }
+            const header = `<li class="upcoming-events-header">Also On The Calendar</li>`;
+            const items = events.map(ev =>
+                `<li class="upcoming-event">` +
+                    `<span class="upcoming-event-when">${ev.when}</span>` +
+                    `<span class="upcoming-event-name">${ev.name}</span>` +
+                    `<span class="upcoming-event-where">${ev.where}</span>` +
+                    (ev.cause ? `<span class="upcoming-event-cause">${ev.cause}</span>` : '') +
+                `</li>`
+            ).join('');
+            list.innerHTML = header + items;
+        }
+
+        function selectAndRender() {
+            if (tickInterval) {
+                clearInterval(tickInterval);
+                tickInterval = null;
+            }
+
+            const now = new Date();
+            const future = upcomingEvents
+                .filter(e => !e.date || e.date > now)
+                .sort((a, b) => {
+                    if (!a.date) return 1;
+                    if (!b.date) return -1;
+                    return a.date - b.date;
+                });
+
+            const featuredEvent = future.find(e => e.date);
+            const rest = future.filter(e => e !== featuredEvent);
+
+            if (featuredEvent) {
+                renderFeatured(featuredEvent);
+                startTimer(featuredEvent);
+            } else if (future.length) {
+                featured.innerHTML =
+                    `<p class="countdown-live">DATES TO BE ANNOUNCED</p>` +
+                    `<p class="countdown-sub">CHECK BACK SOON</p>`;
+            } else {
+                featured.innerHTML =
+                    `<p class="countdown-live">NO UPCOMING APPEARANCES</p>` +
+                    `<p class="countdown-sub">STAY TUNED</p>`;
+            }
+
+            renderList(rest);
+        }
+
+        function startTimer(ev) {
+            function tick() {
+                const diff = ev.date - new Date();
+                if (diff <= 0) {
+                    selectAndRender();
+                    return;
+                }
+                const days    = Math.floor(diff / 864e5);
+                const hours   = Math.floor((diff % 864e5) / 36e5);
+                const minutes = Math.floor((diff % 36e5) / 6e4);
+                const seconds = Math.floor((diff % 6e4) / 1e3);
+                document.getElementById('countdown-days').textContent    = String(days).padStart(2, '0');
+                document.getElementById('countdown-hours').textContent   = String(hours).padStart(2, '0');
+                document.getElementById('countdown-minutes').textContent = String(minutes).padStart(2, '0');
+                document.getElementById('countdown-seconds').textContent = String(seconds).padStart(2, '0');
+            }
+            tick();
+            tickInterval = setInterval(tick, 1000);
+        }
+
+        selectAndRender();
     }
 });
