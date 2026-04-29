@@ -33,3 +33,6 @@ out/
 .next/
 devring_overhaul.md
 node_modules
+
+# Claude Code session state
+.claude/
