@@ -9,6 +9,37 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Montserrat:wght@400;700&display=swap">
     <link rel="stylesheet" href="css/main.css">
+
+    <!-- Auth Check Script - Runs immediately before page renders -->
+    <style id="auth-shield">
+        body { display: none !important; }
+    </style>
+    <script>
+        const token = sessionStorage.getItem('admin_token');
+        if (!token) {
+            window.location.replace('login.html');
+        } else {
+            fetch('https://admin-auth.alex-adamczyk.workers.dev', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'verify', token: token })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (!data.success) {
+                    sessionStorage.removeItem('admin_token');
+                    window.location.replace('login.html');
+                } else {
+                    document.getElementById('auth-shield').remove();
+                }
+            })
+            .catch(() => {
+                console.warn('Could not verify token with server');
+                sessionStorage.removeItem('admin_token');
+                window.location.replace('login.html');
+            });
+        }
+    </script>
 </head>
 <body>
     <div id="header-placeholder"></div>
