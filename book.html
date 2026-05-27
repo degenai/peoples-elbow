@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book a Session | The People's Elbow</title>
+    <meta name="description" content="Book a chair or table massage session with The People's Elbow. Licensed massage therapy in Woodstock, GA and the Atlanta metro.">
+    <link rel="canonical" href="https://peoples-elbow.com/book.html">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://peoples-elbow.com/book.html">
+    <meta property="og:title" content="Book a Session | The People's Elbow">
+    <meta property="og:description" content="Online booking for licensed chair and table massage in Woodstock, GA. No upselling, no membership traps.">
+    <meta property="og:image" content="https://peoples-elbow.com/images/logo.png">
+
+    <link rel="shortcut icon" href="images/logo.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Open+Sans:wght@400;700&display=swap">
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+    <!-- Universal Header Component -->
+    <div id="header-placeholder"></div>
+
+    <main>
+        <section class="book-hero">
+            <div class="container">
+                <h1>Book a Session</h1>
+                <p class="book-tagline">Pick a time. Drop the tension. Walk out lighter.</p>
+            </div>
+        </section>
+
+        <section class="book-widget-section">
+            <div class="container">
+                <!-- Availability note slot. Populated by JS when the Square API proxy is wired up. Hidden by default. -->
+                <div id="book-availability" class="book-availability-note" hidden></div>
+
+                <p class="book-location-note">
+                    <i class="fas fa-info-circle" aria-hidden="true"></i>
+                    All sessions book for <strong>Hustle House Health &amp; Wellness</strong>, Woodstock GA &middot; Wednesdays only.
+                </p>
+
+                <div class="book-widget-container" id="book-widget-container">
+                    <!-- Start Square Appointments Embed Code -->
+                    <script src="https://square.site/appointments/buyer/widget/nxipfwu0q8gx9k/L9ZZX52ET3XGJ.js"></script>
+                    <!-- End Square Appointments Embed Code -->
+                </div>
+
+                <p class="book-fallback">
+                    <i class="fas fa-external-link-alt" aria-hidden="true"></i>
+                    Prefer the full Square experience, or the widget is not loading?
+                    <a href="https://peoples-elbow.square.site" target="_blank" rel="noopener noreferrer">Book direct on Square &rarr;</a>
+                </p>
+            </div>
+        </section>
+
+        <section class="book-info">
+            <div class="container">
+                <h2 class="section-title">What to Expect</h2>
+                <div class="book-info-grid">
+                    <div class="book-info-item">
+                        <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
+                        <h3>Where</h3>
+                        <p>Woodstock, GA. Weekly residency at Hustle House Gym every Wednesday, plus mobile bookings across the Atlanta metro and Cherokee/Cobb counties.</p>
+                    </div>
+                    <div class="book-info-item">
+                        <i class="fas fa-id-card" aria-hidden="true"></i>
+                        <h3>Who</h3>
+                        <p>Licensed Massage Therapist #013193. Trained hands, real credentials, no upselling and no membership traps.</p>
+                    </div>
+                    <div class="book-info-item">
+                        <i class="fas fa-hand-holding-usd" aria-hidden="true"></i>
+                        <h3>How It Works</h3>
+                        <p>Payment runs through Square at the time of service. Reschedule or cancel up to 24 hours ahead at no charge.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Universal Footer Component -->
+    <div id="footer-placeholder"></div>
+
+    <!-- JavaScript -->
+    <script src="js/components.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

@@ -320,20 +320,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // List slot = remaining future events. When featured passes, next event auto-promotes.
     const upcomingEvents = [
         {
-            name: 'Rock the Block Party',
-            where: 'with Stauffer Chiropractic',
-            when: 'Sun May 17, 2026 &middot; 1 PM',
-            date: new Date('2026-05-17T17:00:00Z'),
-            cause: null,
-        },
-        {
-            name: 'Murph Memorial Workout',
-            where: 'at Hustle House Gym',
-            when: 'Sat May 23, 2026 &middot; 9 AM',
-            date: new Date('2026-05-23T13:00:00Z'),
-            cause: 'Honoring fallen service members',
-        },
-        {
             name: 'FlexFest',
             where: 'Downtown Woodstock',
             when: 'Mid-Aug 2026 &middot; TBC',
