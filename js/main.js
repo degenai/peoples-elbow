@@ -328,9 +328,9 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         {
             name: 'Golfing for Respite',
-            where: 'Iron Horse Golf Club, Milton GA',
-            when: 'Mon Oct 5, 2026 &middot; 9 AM',
-            date: new Date('2026-10-05T13:00:00Z'),
+            where: 'Iron Horse Golf Club, Alpharetta GA',
+            when: 'Mon Oct 5, 2026 &middot; 8:30 AM',
+            date: new Date('2026-10-05T12:30:00Z'),
             cause: 'Benefiting Special Needs Respite (501c3)',
         },
     ];
