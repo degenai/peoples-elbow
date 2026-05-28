@@ -2155,23 +2155,30 @@ nav ul li a.active {
 }
 
 /* Past Events Page (/past-events.html) */
-.past-events-link {
+.past-events-callout {
+    max-width: 640px;
+    margin: var(--space-xl) auto 0;
+    padding: var(--space-lg);
     text-align: center;
-    margin-top: var(--space-lg);
-    font-size: 0.95rem;
+    background: var(--pe-white);
+    border: 2px solid var(--pe-green);
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
-.past-events-link a {
-    color: var(--pe-green);
-    text-decoration: none;
-    border-bottom: 1px dotted var(--pe-green);
-    padding-bottom: 1px;
-    transition: color 0.2s ease, border-color 0.2s ease;
+.past-events-callout h3 {
+    font-family: var(--font-heading);
+    font-size: 1.7rem;
+    color: var(--pe-green-dark);
+    letter-spacing: 0.5px;
+    margin-bottom: var(--space-sm);
 }
 
-.past-events-link a:hover {
-    color: var(--pe-gold);
-    border-bottom-color: var(--pe-gold);
+.past-events-callout p {
+    margin-bottom: var(--space-md);
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--pe-text-dark);
 }
 
 .past-events-list {
