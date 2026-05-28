@@ -273,16 +273,18 @@ class ComponentLoader {
             
             // Store handler reference for cleanup
             this.menuToggleHandler = function() {
-                navMenu.classList.toggle('mobile-menu-active');
+                const isOpen = navMenu.classList.toggle('mobile-menu-active');
+                menuToggle.setAttribute('aria-expanded', String(isOpen));
             };
-            
+
             menuToggle.addEventListener('click', this.menuToggleHandler);
-            
+
             // Reset menu state on window resize
             window.addEventListener('resize', function() {
                 if (window.innerWidth > 768) {
                     navMenu.classList.remove('mobile-menu-active');
                     navMenu.style.display = '';
+                    menuToggle.setAttribute('aria-expanded', 'false');
                 }
             });
         }
