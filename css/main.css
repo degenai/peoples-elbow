@@ -1281,6 +1281,73 @@ footer {
     border-left: 4px solid var(--pe-green);
 }
 
+/* Events hub (calendar.html) */
+.calendar-hub {
+    padding: var(--space-xl) 0;
+    background: var(--pe-white);
+}
+
+.calendar-hub .section-title {
+    text-align: center;
+}
+
+.calendar-hub-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: var(--space-lg);
+    max-width: 1100px;
+    margin: var(--space-xl) auto 0;
+}
+
+.calendar-hub-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--pe-light-gray);
+    border-radius: 10px;
+    padding: var(--space-lg);
+    text-align: center;
+    color: var(--pe-text-dark);
+    border-bottom: 4px solid var(--pe-gold);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.calendar-hub-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+    color: var(--pe-text-dark);
+}
+
+.calendar-hub-card i {
+    font-size: 2.4rem;
+    color: var(--pe-green);
+    margin-bottom: var(--space-md);
+}
+
+.calendar-hub-card h3 {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    color: var(--pe-green-dark);
+    letter-spacing: 0.5px;
+    margin-bottom: var(--space-sm);
+}
+
+.calendar-hub-card p {
+    font-size: 0.95rem;
+    line-height: 1.55;
+    flex-grow: 1;
+    margin-bottom: var(--space-md);
+}
+
+.calendar-hub-cta {
+    font-weight: 700;
+    color: var(--pe-green);
+}
+
+.calendar-hub-card:hover .calendar-hub-cta {
+    color: var(--pe-green-dark);
+}
+
 .stay-updated a {
     color: var(--pe-green);
     text-decoration: underline;

@@ -3,15 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Community Calendar | The People's Elbow</title>
+    <title>Events &amp; Calendar | The People's Elbow</title>
+    <meta name="description" content="Where The People's Elbow is headed and where we've been. Live countdown to upcoming appearances, a photo archive of past events, and online booking for Woodstock GA sessions.">
+    <link rel="canonical" href="https://peoples-elbow.com/calendar.html">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://peoples-elbow.com/calendar.html">
+    <meta property="og:title" content="Events &amp; Calendar | The People's Elbow">
+    <meta property="og:description" content="Live countdown to upcoming appearances, a photo archive of past events, and online booking for Woodstock GA sessions.">
+    <meta property="og:image" content="https://peoples-elbow.com/images/logo.png">
+
     <link rel="shortcut icon" href="images/logo.png" type="image/png">
-    
+
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
+
     <!-- Google Fonts -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Open+Sans:wght@400;700&display=swap">
-    
+
     <!-- Main CSS -->
     <link rel="stylesheet" href="css/main.css">
 </head>
@@ -22,32 +32,41 @@
     <main>
         <section class="calendar-hero">
             <div class="container">
-                <h1>Community Calendar</h1>
-                <p class="calendar-tagline">Upcoming events, workshops, and community gatherings for The People's Elbow mutual aid network.</p>
+                <h1>Events &amp; Calendar</h1>
+                <p class="calendar-tagline">Where The People's Elbow is headed, where we've been, and how to book.</p>
             </div>
         </section>
 
-        <section class="coming-soon-content">
+        <section class="calendar-hub">
             <div class="container">
-                <div class="construction-notice">
-                    <div class="construction-icon">🚧</div>
-                    <h2>Calendar Coming Soon</h2>
-                    <p>We're building an integrated calendar system to keep our community connected and informed about upcoming events.</p>
-                    
-                    <div class="planned-features">
-                        <h3>What's Coming:</h3>
-                        <ul>
-                            <li>Event scheduling and management</li>
-                            <li>Workshop announcements</li>
-                            <li>Community gathering coordination</li>
-                            <li>Mobile-friendly interface</li>
-                            <li>Integration with our booking system</li>
-                        </ul>
-                    </div>
+                <h2 class="section-title">Up Next</h2>
+                <!-- Live countdown. main.js auto-populates these IDs from its upcomingEvents array. -->
+                <div class="event-countdown" id="featured-event"></div>
+                <ul class="upcoming-events" id="upcoming-events"></ul>
 
-                    <div class="stay-updated">
-                        <p><strong>For Now:</strong> Follow us on <a href="https://www.instagram.com/peoples_elbow_massage/" target="_blank" rel="noopener noreferrer">Instagram</a> or <a href="index.html#contact">contact us directly</a> for event updates.</p>
-                    </div>
+                <div class="calendar-hub-grid">
+                    <a href="book.html" class="calendar-hub-card">
+                        <i class="fas fa-calendar-check" aria-hidden="true"></i>
+                        <h3>Book a Session</h3>
+                        <p>Reserve a chair or table massage. Wednesdays at Hustle House Health &amp; Wellness, plus mobile bookings across the Atlanta metro.</p>
+                        <span class="calendar-hub-cta">Book now &rarr;</span>
+                    </a>
+                    <a href="past-events.html" class="calendar-hub-card">
+                        <i class="fas fa-photo-film" aria-hidden="true"></i>
+                        <h3>Past Appearances</h3>
+                        <p>Photos and recaps from the events we've already shown up for.</p>
+                        <span class="calendar-hub-cta">See the archive &rarr;</span>
+                    </a>
+                    <a href="index.html#impact" class="calendar-hub-card">
+                        <i class="fas fa-bullhorn" aria-hidden="true"></i>
+                        <h3>Full Lineup</h3>
+                        <p>The complete run of upcoming appearances on the home page, each with a live countdown.</p>
+                        <span class="calendar-hub-cta">See what's coming &rarr;</span>
+                    </a>
+                </div>
+
+                <div class="stay-updated">
+                    <p><strong>Stay in the loop:</strong> Follow us on <a href="https://www.instagram.com/peoples_elbow_massage/" target="_blank" rel="noopener noreferrer">Instagram</a> or <a href="index.html#contact">get in touch</a> for event updates.</p>
                 </div>
             </div>
         </section>
