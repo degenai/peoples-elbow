@@ -33,6 +33,16 @@ import { animate, utils } from './vendor/anime.esm.min.js';
     let lastThumb = null;
     let isOpen = false;
 
+    // Background containers made inert while the lightbox is open (so the aria-modal contract holds).
+    const bgEls = ['#header-placeholder', 'main', '#footer-placeholder']
+        .map((s) => document.querySelector(s)).filter(Boolean);
+    function setBackgroundInert(on) {
+        bgEls.forEach((el) => { if (on) el.setAttribute('inert', ''); else el.removeAttribute('inert'); });
+    }
+    function focusables() {
+        return [btnClose, btnPrev, btnNext].filter((b) => b.style.display !== 'none');
+    }
+
     // Group thumbnails by their gallery so prev/next stays within one event.
     thumbs.forEach((img) => {
         img.addEventListener('click', () => {
@@ -60,7 +70,7 @@ import { animate, utils } from './vendor/anime.esm.min.js';
 
     function whenReady(fn) {
         if (lbImg.complete && lbImg.naturalWidth) requestAnimationFrame(fn);
-        else lbImg.onload = () => requestAnimationFrame(fn);
+        else lbImg.addEventListener('load', () => requestAnimationFrame(fn), { once: true });
     }
 
     function render() {
@@ -79,6 +89,7 @@ import { animate, utils } from './vendor/anime.esm.min.js';
         render();
         overlay.classList.add('is-open');
         document.body.style.overflow = 'hidden';
+        setBackgroundInert(true);
         utils.set(lbImg, { opacity: 0 });
         utils.set(backdrop, { opacity: 0 });
         animate(backdrop, { opacity: 1, duration: 300, ease: 'outQuad' });
@@ -92,6 +103,7 @@ import { animate, utils } from './vendor/anime.esm.min.js';
         document.body.style.overflow = '';
         const finish = () => {
             overlay.classList.remove('is-open');
+            setBackgroundInert(false);
             utils.set(lbImg, { x: 0, y: 0, scale: 1, opacity: 1 });
             if (lastThumb && typeof lastThumb.focus === 'function') lastThumb.focus();
         };
@@ -116,8 +128,18 @@ import { animate, utils } from './vendor/anime.esm.min.js';
     btnNext.addEventListener('click', (e) => { e.stopPropagation(); step(1); });
     document.addEventListener('keydown', (e) => {
         if (!isOpen) return;
-        if (e.key === 'Escape') close();
-        else if (e.key === 'ArrowLeft') step(-1);
-        else if (e.key === 'ArrowRight') step(1);
+        if (e.key === 'Escape') { close(); return; }
+        if (e.key === 'ArrowLeft') { step(-1); return; }
+        if (e.key === 'ArrowRight') { step(1); return; }
+        if (e.key === 'Tab') {
+            const f = focusables();
+            if (!f.length) return;
+            e.preventDefault();
+            const i = f.indexOf(document.activeElement);
+            const next = e.shiftKey
+                ? (i <= 0 ? f.length - 1 : i - 1)
+                : (i >= f.length - 1 ? 0 : i + 1);
+            f[next].focus();
+        }
     });
 })();
