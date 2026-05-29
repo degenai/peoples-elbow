@@ -49,9 +49,11 @@ First load seeds fictional demo data so you can see how it works. Connect Google
 
 ## Steal This Site
 
-The source code is public. Fork it, adapt it, deploy it for your own community. The `steal-this-site.html` page walks you through it.
+You probably don't need to fork this line by line. **Hand [`STEAL-THIS-SITE.md`](STEAL-THIS-SITE.md) to your AI coding agent and talk about it**, or open a fresh AI session and just say *"I want to make a Cloudflare and GitHub Pages website."* This whole site was built that way. Treat the repo as a working reference, not a template to clone. Build your own $10 solution. The flavor has to be yours.
 
-**The People's Elbow Unlicense:** This is public infrastructure for community use. Take it. The data you put into it is yours. The code is yours. If you steal this and make something good with it, that's the whole point. Legally, the code is released under the [0BSD license](https://opensource.org/license/0bsd) -- do anything, no attribution required, no strings.
+Full guide: [`STEAL-THIS-SITE.md`](STEAL-THIS-SITE.md). Prefer click-by-click? `steal-this-site.html` on the live site walks through fork-and-deploy.
+
+**The People's Elbow Unlicense:** This is public infrastructure for community use. Take it. The data you put into it is yours. The code is yours. If you steal this and make something good with it, that's the whole point. Legally, the code is released under the [0BSD license](https://opensource.org/license/0bsd): do anything, no attribution required, no strings.
 
 ## Local Setup
 
