@@ -67,7 +67,7 @@ body {
 img { max-width: 100%; height: auto; display: block; }
 a { color: var(--navy); text-decoration: none; transition: color .2s var(--ease); }
 ul { list-style: none; }
-:focus-visible { outline: 3px solid var(--gold); outline-offset: 3px; border-radius: 4px; }
+:focus-visible { outline: 3px solid var(--navy); outline-offset: 3px; box-shadow: 0 0 0 6px rgba(246,243,236,.6); border-radius: 4px; }
 
 /* ---------- Type ---------- */
 h1, h2, h3, h4 { font-family: var(--f-display); font-weight: 500; line-height: 1.08; color: var(--navy); letter-spacing: -0.01em; }
@@ -80,7 +80,7 @@ p { margin-bottom: 1rem; }
 .eyebrow {
   display: inline-flex; align-items: center; gap: .55rem;
   font-family: var(--f-body); font-weight: 600; font-size: .8rem;
-  letter-spacing: .18em; text-transform: uppercase; color: var(--gold-deep);
+  letter-spacing: .18em; text-transform: uppercase; color: #8a6a2e;
 }
 .eyebrow::before { content: ""; width: 26px; height: 1px; background: var(--gold); display: inline-block; }
 .eyebrow.center::after { content: ""; width: 26px; height: 1px; background: var(--gold); display: inline-block; }
@@ -193,7 +193,7 @@ section { position: relative; }
 .er-hero { position: relative; overflow: hidden; background: radial-gradient(120% 130% at 80% -10%, #21365e 0%, var(--navy-deep) 45%, var(--navy-900) 100%); color: #eaf0fb; padding: clamp(7rem, 13vw, 10rem) 0 clamp(4rem, 8vw, 7rem); }
 .er-hero::before { /* faint gold mark watermark */
   content: ""; position: absolute; right: -6%; top: 50%; transform: translateY(-50%);
-  width: min(60vw, 720px); aspect-ratio: 1; background: url("../images/elbowroom/mark-gold.png") center/contain no-repeat;
+  width: min(60vw, 720px); aspect-ratio: 1; background: url("../images/elbowroom/mark-gold-400.png") center/contain no-repeat;
   opacity: .06; pointer-events: none;
 }
 .er-orb { position: absolute; border-radius: 50%; filter: blur(60px); opacity: .5; pointer-events: none; }
@@ -293,7 +293,7 @@ section { position: relative; }
 
 /* ---------- CTA band ---------- */
 .er-cta { background: linear-gradient(125deg, var(--navy-deep), var(--navy-900)); color: #fff; border-radius: clamp(20px, 4vw, 36px); padding: clamp(2.6rem, 6vw, 4.6rem); text-align: center; position: relative; overflow: hidden; }
-.er-cta::after { content: ""; position: absolute; right: -40px; bottom: -60px; width: 320px; height: 320px; background: url("../images/elbowroom/mark-gold.png") center/contain no-repeat; opacity: .08; }
+.er-cta::after { content: ""; position: absolute; right: -40px; bottom: -60px; width: 320px; height: 320px; background: url("../images/elbowroom/mark-gold-400.png") center/contain no-repeat; opacity: .08; }
 .er-cta h2 { color: #fff; position: relative; }
 .er-cta .lead { color: #c4cfe3; position: relative; max-width: 56ch; margin-inline: auto; }
 
@@ -327,7 +327,7 @@ section { position: relative; }
 }
 .swatch-row { display: flex; flex-wrap: wrap; gap: .9rem; }
 .swatch { border-radius: var(--r-md); padding: 1rem; min-width: 120px; flex: 1; color: #fff; box-shadow: var(--shadow-sm); }
-.swatch small { display: block; opacity: .85; font-size: .72rem; letter-spacing: .04em; }
+.swatch small { display: block; font-size: .72rem; letter-spacing: .04em; }
 .swatch b { font-family: var(--f-body); font-weight: 700; }
 
 /* ---------- Footer ---------- */
@@ -339,14 +339,14 @@ section { position: relative; }
 @media (max-width: 460px) { .er-foot-grid { grid-template-columns: 1fr; } }
 .er-foot-brand img { height: 46px; margin-bottom: 1rem; }
 .er-foot-brand p { font-size: .92rem; max-width: 34ch; }
-.er-foot col, .er-foot-col h4 { color: #fff; }
+.er-foot-col h4 { color: #fff; }
 .er-foot-col h4 { font-family: var(--f-body); font-weight: 700; font-size: .82rem; letter-spacing: .14em; text-transform: uppercase; margin-bottom: 1rem; color: #fff; }
 .er-foot-col a { display: block; padding: .3rem 0; font-size: .95rem; }
 .er-foot-bottom { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 1rem; padding-top: 1.6rem; font-size: .85rem; color: #8090ac; }
 .er-foot-social { display: flex; gap: .6rem; }
 .er-foot-social a { width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(255,255,255,.16); display: grid; place-items: center; color: #cdd6e7; transition: all .2s; }
 .er-foot-social a:hover { background: var(--gold); color: var(--navy-900); border-color: var(--gold); transform: translateY(-2px); }
-.er-disclaim { font-size: .8rem; color: #6b7a96; max-width: 60ch; margin-top: 1rem; }
+.er-disclaim { font-size: .8rem; color: #7a89a6; max-width: 60ch; margin-top: 1rem; }
 
 /* ---------- Reveal (progressive enhancement) ----------
    Elements are VISIBLE by default. js/elbowroom.js seeds the hidden state itself
@@ -360,7 +360,7 @@ section { position: relative; }
 
 /* page hero (interior pages) */
 .page-hero { background: radial-gradient(120% 130% at 80% -20%, #21365e, var(--navy-deep) 55%, var(--navy-900)); color: #eaf0fb; padding: clamp(6rem, 11vw, 9rem) 0 clamp(3rem, 6vw, 5rem); position: relative; overflow: hidden; }
-.page-hero::after { content: ""; position: absolute; right: -3%; bottom: -20%; width: 360px; height: 360px; background: url("../images/elbowroom/mark-gold.png") center/contain no-repeat; opacity: .07; }
+.page-hero::after { content: ""; position: absolute; right: -3%; bottom: -20%; width: 360px; height: 360px; background: url("../images/elbowroom/mark-gold-400.png") center/contain no-repeat; opacity: .07; }
 .page-hero h1 { color: #fff; }
 .page-hero .lead { color: #c4cfe3; max-width: 60ch; }
 .page-hero .crumbs { font-size: .85rem; color: #93a1bd; margin-bottom: 1rem; }
