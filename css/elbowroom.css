@@ -337,7 +337,7 @@ section { position: relative; }
 .er-foot-grid { display: grid; grid-template-columns: 1.4fr repeat(3, 1fr); gap: 2rem; padding-bottom: 2.4rem; border-bottom: 1px solid rgba(255,255,255,.1); }
 @media (max-width: 760px) { .er-foot-grid { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 460px) { .er-foot-grid { grid-template-columns: 1fr; } }
-.er-foot-brand img { height: 46px; margin-bottom: 1rem; }
+.er-foot-brand img { height: 46px; width: auto; margin-bottom: 1rem; }
 .er-foot-brand p { font-size: .92rem; max-width: 34ch; }
 .er-foot-col h4 { color: #fff; }
 .er-foot-col h4 { font-family: var(--f-body); font-weight: 700; font-size: .82rem; letter-spacing: .14em; text-transform: uppercase; margin-bottom: 1rem; color: #fff; }
