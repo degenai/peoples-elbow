@@ -14,8 +14,11 @@
   body{margin:0;min-height:100vh;background:linear-gradient(160deg,#004225,#006937 55%,#008a47);color:#fff;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;display:flex;flex-direction:column;align-items:center;padding:30px 18px 50px}
   h1{font-family:'Bangers',system-ui,cursive;font-size:clamp(34px,9vw,52px);letter-spacing:1px;margin:6px 0 2px;text-align:center;text-shadow:2px 2px 0 var(--green-dark)}
   .belt{height:5px;width:120px;background:var(--gold);border-radius:4px;margin:8px 0 18px}
-  p.sub{margin:0 0 26px;text-align:center;opacity:.92;max-width:520px;font-size:15px;line-height:1.4}
-  .files{width:100%;max-width:480px;display:flex;flex-direction:column;gap:14px}
+  p.sub{margin:0 0 22px;text-align:center;opacity:.92;max-width:520px;font-size:15px;line-height:1.4}
+  .wrap{width:100%;max-width:480px}
+  .grouplbl{font-family:'Bangers',cursive;letter-spacing:1px;font-size:22px;color:var(--gold);margin:24px 0 12px;display:flex;align-items:center;gap:10px}
+  .grouplbl::after{content:"";flex:1;height:3px;background:rgba(255,215,0,.45);border-radius:3px}
+  .files{display:flex;flex-direction:column;gap:14px}
   a.file{display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.08);border:2px solid var(--gold);border-radius:14px;padding:16px 18px;text-decoration:none;color:#fff;transition:transform .08s ease,background .15s ease}
   a.file:active{transform:scale(.98);background:rgba(255,255,255,.18)}
   .tag{font-family:'Bangers',cursive;font-size:13px;letter-spacing:1px;color:var(--green-dark);background:var(--gold);border-radius:8px;padding:5px 9px;white-space:nowrap}
@@ -29,23 +32,47 @@
   <h1>FREE 15-MIN MASSAGE</h1>
   <div class="belt"></div>
   <p class="sub">Promo flyers &mdash; unlisted. Tap to open or download in the field.</p>
-  <div class="files">
-    <a class="file" href="hustle-house-flyer.png" target="_blank" rel="noopener">
-      <span class="tag">PNG</span>
-      <span><span class="label">Flyer image</span><span class="desc">For sharing, phone screens, posts</span></span>
-      <span class="meta">&#8595;</span>
-    </a>
-    <a class="file" href="hustle-house-flyer-1up.pdf" target="_blank" rel="noopener">
-      <span class="tag">PDF &middot; 1-up</span>
-      <span><span class="label">Single flyer (print)</span><span class="desc">One full-page flyer, US Letter @ 300dpi</span></span>
-      <span class="meta">&#8595;</span>
-    </a>
-    <a class="file" href="hustle-house-flyer-4up.pdf" target="_blank" rel="noopener">
-      <span class="tag">PDF &middot; 4-up</span>
-      <span><span class="label">Four-cut sheet (print)</span><span class="desc">4 quarter-page flyers per sheet &mdash; cut on the cross</span></span>
-      <span class="meta">&#8595;</span>
-    </a>
+
+  <div class="wrap">
+    <div class="grouplbl">Generic / events</div>
+    <div class="files">
+      <a class="file" href="generic-flyer.png" target="_blank" rel="noopener">
+        <span class="tag">PNG</span>
+        <span><span class="label">Flyer image</span><span class="desc">For sharing, phone screens, posts</span></span>
+        <span class="meta">&#8595;</span>
+      </a>
+      <a class="file" href="generic-flyer-1up.pdf" target="_blank" rel="noopener">
+        <span class="tag">PDF &middot; 1-up</span>
+        <span><span class="label">Single flyer (print)</span><span class="desc">One full-page flyer, US Letter @ 300dpi</span></span>
+        <span class="meta">&#8595;</span>
+      </a>
+      <a class="file" href="generic-flyer-4up.pdf" target="_blank" rel="noopener">
+        <span class="tag">PDF &middot; 4-up</span>
+        <span><span class="label">Four-cut sheet (print)</span><span class="desc">4 quarter-page flyers per sheet &mdash; cut on the dashed cross</span></span>
+        <span class="meta">&#8595;</span>
+      </a>
+    </div>
+
+    <div class="grouplbl">Hustle House &middot; Wednesdays</div>
+    <div class="files">
+      <a class="file" href="hustle-house-flyer.png" target="_blank" rel="noopener">
+        <span class="tag">PNG</span>
+        <span><span class="label">Flyer image</span><span class="desc">For sharing, phone screens, posts</span></span>
+        <span class="meta">&#8595;</span>
+      </a>
+      <a class="file" href="hustle-house-flyer-1up.pdf" target="_blank" rel="noopener">
+        <span class="tag">PDF &middot; 1-up</span>
+        <span><span class="label">Single flyer (print)</span><span class="desc">One full-page flyer, US Letter @ 300dpi</span></span>
+        <span class="meta">&#8595;</span>
+      </a>
+      <a class="file" href="hustle-house-flyer-4up.pdf" target="_blank" rel="noopener">
+        <span class="tag">PDF &middot; 4-up</span>
+        <span><span class="label">Four-cut sheet (print)</span><span class="desc">4 quarter-page flyers per sheet &mdash; cut on the cross</span></span>
+        <span class="meta">&#8595;</span>
+      </a>
+    </div>
   </div>
+
   <footer>The People's Elbow &middot; peoples-elbow.com</footer>
 </body>
 </html>
