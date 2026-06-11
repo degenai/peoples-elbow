@@ -21,7 +21,7 @@
 // it ships (users are at most one load behind), and navigations are network-first
 // so crm.html is never stale online. Bump this VERSION to FORCE an immediate full
 // purge of the old cache on activate (e.g. for a breaking app-shell change).
-const VERSION = 'lot-v2.0.0';
+const VERSION = 'lot-v2.0.1';
 const CACHE_NAME = VERSION; // one cache per version keeps cleanup trivial.
 
 // The app shell: everything the CRM needs to boot offline. We add each file
