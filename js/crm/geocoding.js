@@ -65,11 +65,12 @@ async function geocodeQuery(query, countrycodes = DEFAULT_COUNTRY_CODES) {
     const results = await response.json();
 
     if (results && results.length > 0) {
-      return {
-        lat: parseFloat(results[0].lat),
-        lon: parseFloat(results[0].lon),
-        displayName: results[0].display_name
-      };
+      const lat = parseFloat(results[0].lat);
+      const lon = parseFloat(results[0].lon);
+      // A malformed row could parse to NaN; never hand back {lat:NaN,lon:NaN} —
+      // it'd pass typeof-number checks downstream and poison haversine math.
+      if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
+      return { lat, lon, displayName: results[0].display_name };
     }
 
     return null;
@@ -275,14 +276,17 @@ async function geocodeLeads(leads, onProgress = null, options = {}) {
   let failed = 0;
   let skipped = 0;
 
+  // Number.isFinite (not falsy checks) so a legitimate 0 coordinate isn't treated
+  // as "missing", and a NaN isn't treated as "present" — matches the typeof-number
+  // checks in route.js / route-finder.js and normalizeCoords in the normalizer.
   const leadsNeedingGeocode = leads.filter(lead =>
     lead.address &&
     lead.address.trim() &&
-    (!lead.coords || !lead.coords.lat || !lead.coords.lon)
+    (!lead.coords || !Number.isFinite(lead.coords.lat) || !Number.isFinite(lead.coords.lon))
   );
 
   const leadsWithCoords = leads.filter(lead =>
-    lead.coords && lead.coords.lat && lead.coords.lon
+    lead.coords && Number.isFinite(lead.coords.lat) && Number.isFinite(lead.coords.lon)
   );
 
   skipped = leadsWithCoords.length;

@@ -82,6 +82,19 @@ function escapeHtml(text) {
     .replace(/'/g, '&#39;');
 }
 
+// Detect a bare "lat, lon" pair (what "Use my location" drops into the start box)
+// and parse it to coords. Nominatim's free-text search can't reliably resolve raw
+// coordinates, so we use them directly instead of round-tripping through a geocoder.
+function parseLatLon(text) {
+  const m = String(text || '').trim().match(/^(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)$/);
+  if (!m) return null;
+  const lat = parseFloat(m[1]);
+  const lon = parseFloat(m[2]);
+  if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
+  if (lat < -90 || lat > 90 || lon < -180 || lon > 180) return null;
+  return { lat, lon };
+}
+
 export function createRoute({ store }) {
   // --- DOM handles. Grabbed once; the view markup is static. ---------------
   const el = {
@@ -315,9 +328,14 @@ export function createRoute({ store }) {
     if (el.calcBtn) el.calcBtn.disabled = true;
 
     try {
-      // 1. Geocode the start point. No start coords -> no route.
-      setProgress('Geocoding starting address…');
-      const startCoords = await geocodeAddress(startAddress, { countrycodes });
+      // 1. Resolve the start point to coords. A bare "lat, lon" pair (from "Use my
+      //    location") is used directly — Nominatim's text search can't parse raw
+      //    coordinates, so geocoding it would fail. Otherwise geocode the address.
+      setProgress('Locating the starting address…');
+      let startCoords = parseLatLon(startAddress);
+      if (!startCoords) {
+        startCoords = await geocodeAddress(startAddress, { countrycodes });
+      }
       if (!startCoords) {
         throw new Error('Could not locate the starting address.');
       }

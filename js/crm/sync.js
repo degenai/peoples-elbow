@@ -54,7 +54,22 @@ export function createSync({ store, auth, drive = Drive, onStatus } = {}) {
   async function pushTo(fileId, token) {
     const res = await drive.update(fileId, store.exportData(), token);
     if (res.ok) { dirty = false; setStatus('synced'); return true; }
-    if (res.status === 401) { setStatus('local-only'); return false; } // token died mid-flight
+    if (res.status === 401) {
+      // Token rejected server-side even though our clock thought it valid. Expire
+      // it so flush() stops re-firing against a dead token every 2s (the next
+      // flush sees no token and bails without rescheduling) and the user is
+      // prompted to reconnect. dirty stays queued for after reconnect.
+      setStatus('local-only');
+      auth.invalidate?.();
+      return false;
+    }
+    if (res.status === 404) {
+      // The Drive file was deleted out from under us. Drop the stale id so the
+      // next cycle re-creates it instead of erroring against a ghost file forever.
+      setFileId(null);
+      setStatus('pending');
+      return false;
+    }
     setStatus('error');
     return false;
   }

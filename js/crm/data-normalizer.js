@@ -44,8 +44,12 @@ function isSafeId(value) {
 // (e.g. 3.7, or 99), which then poisoned totalScore and the sorting UI. We coerce
 // hard here so the rest of the app can trust scores are 1-5 ints.
 function clampScore(value) {
-  if (!Number.isFinite(value)) return DEFAULT_SCORE;
-  const rounded = Math.round(value);
+  // Coerce numeric strings first — imported/migrated data (v1 exports, hand-edited
+  // JSON) often stores scores as "5". Without this, Number.isFinite('5') is false
+  // and a real 5 gets silently replaced with the default 3.
+  const n = typeof value === 'string' ? Number(value) : value;
+  if (!Number.isFinite(n)) return DEFAULT_SCORE;
+  const rounded = Math.round(n);
   if (rounded < 1) return 1;
   if (rounded > 5) return 5;
   return rounded;

@@ -114,8 +114,17 @@ export function createAuth({
     if (accessToken && Date.now() >= expiresAt - SKEW_MS) { clear(); onExpired?.(); }
   }
 
+  // Force-expire NOW even if our clock still thinks the token is valid — e.g. Drive
+  // returned 401 (the token was revoked server-side). Clears it and fires onExpired
+  // once, so the sync engine stops retrying and the user is prompted to reconnect.
+  function invalidate() {
+    if (!accessToken) return;
+    clear();
+    onExpired?.();
+  }
+
   return {
     ready, init, signIn, signInForce, signOut,
-    getToken, isAuthed, checkExpiry,
+    getToken, isAuthed, checkExpiry, invalidate,
   };
 }

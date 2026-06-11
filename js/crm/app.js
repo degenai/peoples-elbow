@@ -46,8 +46,14 @@ const store = createStore();
 const auth = createAuth({
   clientId: CLIENT_ID,
   // A fresh token arrived → establish/refresh the Drive link. connect() MERGES,
-  // it never overwrites local captures (see sync.js).
-  onToken: () => { sync.connect(); reflectAuthUI(); },
+  // it never overwrites local captures (see sync.js). If we're still showing demo
+  // data, clear it first so signing in NEVER pushes the fictional demo set to the
+  // user's Drive — connect() then merges any real Drive file in, or creates empty.
+  onToken: () => {
+    if (store.isDemo()) store.clearDemo();
+    sync.connect();
+    reflectAuthUI();
+  },
   // The token lapsed. Drop to local-only and nudge a reconnect; capture is fine.
   onExpired: () => {
     setSyncStatus('local-only');
@@ -239,8 +245,15 @@ const sheetStack = [];
 function openSheet(id, opener) {
   const sheet = byId(id);
   if (!sheet) return;
+  // Already open? Do nothing. A double-trigger must never push a duplicate stack
+  // entry — that desyncs Escape/backdrop/focus-trap against a phantom sheet.
+  if (sheetStack.some((s) => s.id === id)) return;
+
+  const wasEmpty = sheetStack.length === 0;
   sheet.hidden = false;
   sheetStack.push({ id, opener: opener || document.activeElement });
+  // Lock page scroll while any sheet is open so the list behind can't scroll.
+  if (wasEmpty) document.body.classList.add('crm-modal-open');
 
   // Focus the first sensible control inside the panel.
   const focusable = getFocusable(sheet);
@@ -262,6 +275,8 @@ function closeSheet(id) {
   if (entry && entry.opener && typeof entry.opener.focus === 'function') {
     entry.opener.focus();
   }
+  // Unlock page scroll once the last sheet closes (nested sheets keep it locked).
+  if (sheetStack.length === 0) document.body.classList.remove('crm-modal-open');
 }
 
 function topSheet() {
@@ -743,13 +758,8 @@ byId('use-location-btn').addEventListener('click', () => {
     toast('Location captured for this venue.', 'success');
   });
 });
-// In the route view: drop the coords into the start address field as "lat, lon".
-byId('use-location-route').addEventListener('click', () => {
-  withPosition((lat, lon) => {
-    byId('route-start').value = `${lat.toFixed(6)}, ${lon.toFixed(6)}`;
-    toast('Using your current location as the start.', 'success');
-  });
-});
+// (#use-location-route is owned by route.js's wire() — NOT wired here, so a tap
+// doesn't fire geolocation twice from two modules.)
 
 // ── route view ↔ list view (hash-routed) ────────────────────────
 // The hash is the source of truth so the PWA / a deep-link to '#route' works and
@@ -769,9 +779,10 @@ function applyHash() {
 }
 byId('route-btn').addEventListener('click', () => { location.hash = 'route'; });
 byId('route-back-btn').addEventListener('click', () => {
-  // Clear the hash without adding a history entry that re-triggers #route.
-  if (location.hash === '#route') history.replaceState(null, '', location.pathname + location.search);
-  showList();
+  // Pop the pushed #route entry so the browser's own Back stays coherent with the
+  // in-app Back; the resulting hashchange runs applyHash() -> showList().
+  if (location.hash === '#route') history.back();
+  else showList();
 });
 window.addEventListener('hashchange', applyHash);
 
@@ -799,6 +810,8 @@ store.init();
 // Reflect a restored session's auth state, then once GIS is ready, connect Drive
 // if we already hold a valid token (a reload mid-session shouldn't need a click).
 reflectAuthUI();
+// Paint the sync badge from the engine's actual state, not the HTML literal.
+setSyncStatus(sync.getStatus());
 auth.ready(() => {
   reflectAuthUI();
   if (auth.isAuthed()) sync.connect();

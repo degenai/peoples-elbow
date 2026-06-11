@@ -1462,6 +1462,10 @@
   .crm-toast { transition: none; }
 }
 
+/* Lock page scroll while any sheet is open so the list behind can't scroll under
+   the modal. app.js toggles this when the sheet stack goes 0<->1. */
+body.crm-modal-open { overflow: hidden; }
+
 /* ----------------------------------------------------------------------------
    UTILITIES
    -------------------------------------------------------------------------- */

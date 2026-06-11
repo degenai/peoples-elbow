@@ -182,6 +182,11 @@ export function createStore({ storage } = {}) {
 
   // ── activity log (capped; single write — no second persist like v1) ─
   function logActivity(message) {
+    // Never write while showing demo data: persist() saves the whole envelope
+    // (demo leads included), and on next load that blob reads back as real. Every
+    // real caller logs AFTER a mutator that already cleared demo, so this only
+    // blocks a stray log-before-mutate from defeating the demo guard.
+    if (demo) return;
     state.activityLog.unshift({ timestamp: nowISO(), message: String(message) });
     state.activityLog = state.activityLog.slice(0, 100);
     persist();

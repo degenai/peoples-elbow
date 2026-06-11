@@ -258,11 +258,16 @@ async function sendEmail(to, subject, body, env) {
       const date = new Date().toUTCString();
       const messageId = `<${Date.now()}.${Math.random().toString(36).substring(2)}@peoples-elbow.com>`;
       
+      // Strip CR/LF from the subject before it goes into a header line. The
+      // subject carries user input (venue/contact name); a newline in it would
+      // inject arbitrary headers (Bcc, Reply-To, early body) into the raw RFC822.
+      const safeSubject = String(subject).replace(/[\r\n]+/g, ' ').trim();
+
       // Format email with proper headers and MIME format
       const rawEmail = [
         `From: The People's Elbow <${fromEmail}>`,
         `To: <${to}>`,
-        `Subject: ${subject}`,
+        `Subject: ${safeSubject}`,
         'MIME-Version: 1.0',
         'Content-Type: text/plain; charset=utf-8',
         `Date: ${date}`,
