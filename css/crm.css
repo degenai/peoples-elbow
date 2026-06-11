@@ -1,1578 +1,1570 @@
-/* ============================================
-   LEAD-O-TRON 5000
-   The People's Elbow CRM
-   Theme: Wrestling Green & Gold
-   ============================================ */
+/* ============================================================================
+   LEAD-O-TRON v2 — crm.css
+   The People's Elbow field CRM. Mobile-first, phone is the home turf.
 
-/* CSS Variables - People's Elbow Theme */
+   STEAL THIS SITE: every rule here is namespaced .crm-* / --crm-*. We never
+   touch main.css's tokens — we *inherit* them. main.css loads first and owns
+   --pe-green (#006937), --pe-gold (#ffcc00), --font-heading (Bangers),
+   --font-body (Open Sans), --space-* and the base .btn/.form-group rules.
+   This file only adds the CRM screen on top. Want to fork the CRM? You can
+   lift this whole file and the brand comes with it through those vars.
+
+   WHY mobile-first: the whole point of the CRM is capturing a venue lead while
+   you're standing in it with a phone in one hand. So the base (no media query)
+   styles target a ~390px phone: one column, the lead list is the screen, taps
+   are 44px+, inputs are 16px+ so iOS doesn't zoom on focus. The desktop layout
+   is the *enhancement*, added back at >=992px.
+
+   Z-INDEX MAP (shared with the site): sticky site header = 1000, our FAB = 1500,
+   our sheets/overlays = 2000+ (site lightbox also lives at 2000). Nothing here
+   should slip under the header or over a sheet.
+   ============================================================================ */
+
+/* ----------------------------------------------------------------------------
+   Tokens — all --crm-* so they can't collide with main.css. We reference the
+   --pe-* brand vars but only ever READ them; we never reassign them.
+   Gold note: main.css's --pe-gold is #ffcc00 (great on green as a fill). For
+   small TEXT on the green hero we step up to #ffd700, which clears WCAG AA on
+   #006937 where #ffcc00 is borderline. That's the only place we override gold.
+   -------------------------------------------------------------------------- */
 :root {
-  /* Primary Colors */
-  --pe-green-dark: #0a4d24;
-  --pe-green: #0d5c2e;
-  --pe-green-light: #147a3c;
-  --pe-green-lighter: #1a9e4d;
+  --crm-page-bg: #f4f4f4;          /* matches main.css body bg */
+  --crm-card-bg: #ffffff;
+  --crm-card-bg-alt: #f8f9fa;      /* subtle inset panels, matches site */
+  --crm-border: #e3e6e3;
+  --crm-border-strong: #cfd4cf;
+  --crm-text: #333;                /* main.css body text */
+  --crm-text-muted: #6b726b;
+  --crm-text-faint: #9aa09a;
+  --crm-gold-text: #ffd700;        /* gold that passes contrast on green */
 
-  /* Accent Colors */
-  --pe-gold: #ffc72c;
-  --pe-gold-light: #ffd966;
-  --pe-gold-dark: #d4a017;
+  /* The site's house card shadow + the gold-border hover lift. */
+  --crm-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  --crm-shadow-lift: 0 6px 18px rgba(0, 0, 0, 0.12);
+  --crm-radius: 10px;
+  --crm-radius-sm: 6px;
+  --crm-radius-pill: 999px;
 
-  /* Neutrals */
-  --bg-dark: #0a0a0a;
-  --bg-card: #1a1a1a;
-  --bg-card-hover: #252525;
-  --text-primary: #ffffff;
-  --text-secondary: #b0b0b0;
-  --text-muted: #707070;
-  --border-color: #333;
+  /* Drive sync status colors — calm, readable, not alarmist. */
+  --crm-status-local: #6b726b;     /* grey: only on this phone */
+  --crm-status-pending: #b8860b;   /* amber: changes waiting to flush */
+  --crm-status-synced: #006937;    /* green: backed up to Drive */
+  --crm-status-error: #8B0000;     /* red: something went wrong */
 
-  /* Semantic Colors */
-  --success: #22c55e;
-  --warning: #f59e0b;
-  --danger: #ef4444;
-  --info: #3b82f6;
+  /* Recency dot tiers — fresh (green) decays to cold (black). The "new"/never
+     state is its own accent so a never-visited lead reads as "go do this",
+     not "this is the most stale." See render.js for which class it picks. */
+  --crm-recency-new: var(--pe-gold);   /* never visited — gold accent ring */
+  --crm-recency-week: #1a9e4d;         /* <=1 week — bright green */
+  --crm-recency-2week: #8bbf2a;         /* <=2 weeks — lime */
+  --crm-recency-month: #f59e0b;         /* <=1 month — amber */
+  --crm-recency-stale: #d4541e;         /* a month+ — burnt orange/red */
+  --crm-recency-dead: #1c1c1c;          /* long gone — near black */
 
-  /* Time Badge Colors */
-  --badge-green: #22c55e;
-  --badge-yellow: #eab308;
-  --badge-orange: #f97316;
-  --badge-red: #ef4444;
-  --badge-purple: #a855f7;
-  --badge-black: #374151;
+  /* Reception sentiment (chips + last-reception emoji backing). */
+  --crm-warm: #d4541e;
+  --crm-lukewarm: #c79100;
+  --crm-cold: #2b7cb8;
 
-  /* Spacing */
-  --space-xs: 4px;
-  --space-sm: 8px;
-  --space-md: 16px;
-  --space-lg: 24px;
-  --space-xl: 32px;
-
-  /* Border Radius */
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-
-  /* Shadows */
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
-  --shadow-md: 0 4px 6px rgba(0,0,0,0.4);
-  --shadow-lg: 0 10px 25px rgba(0,0,0,0.5);
-
-  /* Typography */
-  --font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  --font-family-display: 'Impact', 'Haettenschweiler', 'Arial Narrow Bold', sans-serif;
+  /* Score badge tiers — out of 15 (three 1-5 scores). */
+  --crm-score-high: #006937;       /* >=12: green, the good leads */
+  --crm-score-med: #6b8e23;        /* 8-11: olive */
+  --crm-score-low: #8a8f8a;        /* <8: grey, deprioritize */
 }
 
-/* Reset */
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+/* ----------------------------------------------------------------------------
+   Page shell. The CRM <main> sits between the shared header and footer, on the
+   light site background. We add bottom padding so the fixed FAB never covers
+   the last lead card.
+   -------------------------------------------------------------------------- */
+.crm-page {
+  background: var(--crm-page-bg);
+  color: var(--crm-text);
+  min-height: 60vh;
+  padding-bottom: 96px;            /* clearance for the FAB */
+  font-family: var(--font-body);
 }
 
-html, body {
-  height: 100%;
-  overflow: hidden;
+/* A small reusable focus ring so keyboard users always see where they are.
+   We key off the site's gold so it matches every other page. */
+.crm-page :focus-visible {
+  outline: 2px solid var(--pe-green);
+  outline-offset: 2px;
+  border-radius: 4px;
 }
 
-body {
-  font-family: var(--font-family);
-  font-size: 14px;
-  background: var(--bg-dark);
-  color: var(--text-primary);
-  line-height: 1.5;
+/* ----------------------------------------------------------------------------
+   HERO — green band, Bangers headline. This is the "you are in the CRM" banner.
+   It reuses the site's green; the h1 is gold via the stepped-up --crm-gold-text
+   so the Bangers headline pops and stays legible.
+   -------------------------------------------------------------------------- */
+.crm-hero {
+  background: linear-gradient(135deg, var(--pe-green) 0%, var(--pe-green-dark) 100%);
+  color: var(--pe-white);
+  padding: var(--space-lg) 0;
+  text-align: center;
+  border-bottom: 4px solid var(--pe-gold);
 }
 
-/* App Layout */
-#app {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  overflow: hidden;
+.crm-hero h1 {
+  font-family: var(--font-heading);
+  color: var(--crm-gold-text);
+  font-size: 2.75rem;
+  letter-spacing: 1px;
+  margin-bottom: var(--space-xs);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
 }
 
-/* ============================================
-   HEADER
-   ============================================ */
-.app-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--space-md) var(--space-lg);
-  background: linear-gradient(135deg, var(--pe-green-dark) 0%, var(--pe-green) 100%);
-  border-bottom: 3px solid var(--pe-gold);
-  flex-shrink: 0;
-}
-
-.header-left {
-  display: flex;
-  align-items: baseline;
-  gap: var(--space-md);
-}
-
-.app-title {
-  font-family: var(--font-family-display);
-  font-size: 28px;
-  color: var(--pe-gold);
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-}
-
-.app-subtitle {
-  font-size: 13px;
-  color: var(--text-secondary);
+.crm-tagline {
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 1rem;
   font-style: italic;
+  margin-bottom: var(--space-md);
 }
 
-.header-right {
+/* The Drive bar holds the sync status + sign in/out. Wraps on small phones. */
+.crm-drive-bar {
   display: flex;
-  gap: var(--space-sm);
+  flex-wrap: wrap;
   align-items: center;
-}
-
-.demo-banner {
-  background: rgba(255, 199, 44, 0.1);
-  border-bottom: 1px solid rgba(255, 199, 44, 0.3);
-  padding: 10px var(--space-lg);
-  font-size: 13px;
-  color: var(--text-secondary);
-  display: flex;
-  align-items: center;
+  justify-content: center;
   gap: var(--space-sm);
 }
 
-.demo-banner strong {
-  color: var(--pe-gold);
-}
-
-.demo-banner-options {
-  margin-left: 6px;
-}
-
-.demo-banner-link {
-  background: none;
-  border: none;
-  padding: 0;
-  color: var(--pe-gold);
-  cursor: pointer;
-  font-size: inherit;
-  text-decoration: underline;
-  font-family: inherit;
-}
-
-.demo-banner-link:hover {
-  color: var(--pe-gold-light);
-}
-
-.drive-status-badge {
+/* ----------------------------------------------------------------------------
+   DRIVE STATUS PILL — its text/class is driven by sync.js onStatus(). Four
+   states; each gets a dot + tinted pill so the state reads at a glance without
+   relying on color alone (the words change too).
+   -------------------------------------------------------------------------- */
+.crm-status {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: var(--space-sm) var(--space-md);
-  background: rgba(0, 160, 70, 0.15);
-  color: #4caf50;
-  border: 1px solid rgba(0, 160, 70, 0.3);
-  border-radius: var(--radius-md);
-  font-size: 13px;
-  font-weight: 600;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--crm-radius-pill);
+  font-size: 0.85rem;
+  font-weight: 700;
   white-space: nowrap;
+  background: rgba(255, 255, 255, 0.15);
+  color: var(--pe-white);
   cursor: default;
 }
 
-/* ============================================
-   BUTTONS
-   ============================================ */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-xs);
-  padding: var(--space-sm) var(--space-md);
-  border: none;
-  border-radius: var(--radius-md);
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-}
-
-.btn:hover {
-  transform: translateY(-1px);
-}
-
-.btn:active {
-  transform: translateY(0);
-}
-
-.btn:focus-visible {
-  outline: 2px solid var(--pe-gold);
-  border-radius: 4px;
-  outline-offset: 2px;
-}
-
-.btn-primary {
-  background: var(--pe-gold);
-  color: var(--pe-green-dark);
-}
-
-.btn-primary:hover {
-  background: var(--pe-gold-light);
-  box-shadow: 0 4px 12px rgba(255, 199, 44, 0.3);
-}
-
-.btn-secondary {
-  background: var(--bg-card);
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
-}
-
-.btn-secondary:hover {
-  background: var(--bg-card-hover);
-  border-color: var(--pe-gold);
-}
-
-.btn-danger {
-  background: var(--danger);
-  color: white;
-}
-
-.btn-danger:hover {
-  background: #dc2626;
-}
-
-.btn-ai {
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-  color: white;
-  padding: var(--space-sm) var(--space-md);
-}
-
-.btn-ai:hover {
-  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
-}
-
-.btn-ai:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.btn-utility {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-  color: white;
-  padding: var(--space-sm) var(--space-md);
-}
-
-.btn-utility:hover {
-  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
-  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-}
-
-.btn-icon {
-  width: 36px;
-  height: 36px;
-  padding: 0;
-  background: transparent;
-  color: var(--text-secondary);
-  font-size: 18px;
-}
-
-.btn-icon:hover {
-  color: var(--pe-gold);
-  background: rgba(255, 199, 44, 0.1);
-}
-
-.btn-sm {
-  padding: var(--space-xs) var(--space-sm);
-  font-size: 12px;
-  height: auto;
-}
-
-.btn-icon.btn-sm {
-  width: 28px;
-  height: 28px;
-  padding: 0;
-}
-
-.btn-block {
-  width: 100%;
-}
-
-/* ============================================
-   MAIN CONTENT
-   ============================================ */
-.main-content {
-  display: flex;
-  flex: 1;
-  min-height: 0;
-  overflow: hidden;
-}
-
-/* ============================================
-   SIDEBAR
-   ============================================ */
-.sidebar {
-  width: 260px;
-  background: var(--bg-card);
-  border-right: 1px solid var(--border-color);
-  padding: var(--space-lg);
-  overflow-y: auto;
+/* The leading dot. ::before so we don't need extra markup. */
+.crm-status::before {
+  content: "";
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: currentColor;
   flex-shrink: 0;
 }
 
-.filter-section, .stats-section {
-  margin-bottom: var(--space-xl);
+.crm-status--local   { background: rgba(255, 255, 255, 0.18); color: #e6e6e6; }
+.crm-status--pending { background: rgba(255, 215, 0, 0.22);  color: var(--pe-gold); }
+.crm-status--synced  { background: rgba(255, 255, 255, 0.2); color: var(--pe-gold); }
+.crm-status--error   { background: rgba(139, 0, 0, 0.35);    color: #ffd0d0; }
+
+/* The pending state breathes so "not yet backed up" is noticeable but calm. */
+.crm-status--pending::before { animation: crm-pulse 1.6s ease-in-out infinite; }
+
+@keyframes crm-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.35; }
 }
 
-.filter-section h3, .stats-section h3 {
-  font-size: 14px;
-  color: var(--pe-gold);
-  margin-bottom: var(--space-md);
-  text-transform: uppercase;
-  letter-spacing: 1px;
+/* ----------------------------------------------------------------------------
+   DEMO BANNER — shown when you're on the seeded example data and signed out.
+   Gold-tinted so it reads as "heads up, this isn't your data yet."
+   -------------------------------------------------------------------------- */
+.crm-demo-banner {
+  margin: var(--space-md);
+  padding: var(--space-md);
+  background: #fff8e1;
+  border: 1px solid var(--pe-gold);
+  border-left: 4px solid var(--pe-gold);
+  border-radius: var(--crm-radius);
+  box-shadow: var(--crm-shadow);
 }
 
-.filter-group {
-  margin-bottom: var(--space-md);
-}
+.crm-demo-banner p { margin-bottom: var(--space-sm); }
+.crm-demo-banner strong { color: var(--pe-green-dark); }
 
-.filter-group label {
-  display: block;
-  font-size: 12px;
-  color: var(--text-secondary);
-  margin-bottom: var(--space-xs);
-}
-
-.filter-group select,
-.filter-group input[type="text"] {
-  width: 100%;
-  padding: var(--space-sm);
-  background: var(--bg-dark);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
-  color: var(--text-primary);
-  font-size: 13px;
-}
-
-.filter-group select:focus,
-.filter-group input:focus {
-  outline: none;
-  border-color: var(--pe-gold);
-}
-
-.filter-group input[type="range"] {
-  width: 100%;
-  accent-color: var(--pe-gold);
-}
-
-.stat-item {
+.crm-demo-actions {
   display: flex;
-  justify-content: space-between;
-  padding: var(--space-sm) 0;
-  border-bottom: 1px solid var(--border-color);
+  flex-wrap: wrap;
+  gap: var(--space-sm);
 }
 
-.stat-label {
-  color: var(--text-secondary);
-  font-size: 13px;
+/* ----------------------------------------------------------------------------
+   VIEWS — list view and route view swap via .hidden. Constrained to a readable
+   column and centered; on desktop it gets wider (see the 992 breakpoint).
+   -------------------------------------------------------------------------- */
+.crm-view {
+  width: 92%;
+  max-width: 640px;
+  margin: var(--space-md) auto 0;
 }
 
-.stat-value {
-  font-weight: 700;
-  color: var(--pe-gold);
-  font-size: 15px;
-}
-
-/* ============================================
-   LEAD LIST
-   ============================================ */
-.lead-list-section {
-  flex: 1;
+/* ----------------------------------------------------------------------------
+   TOOLBAR — search + filters toggle + sort. Search is the full-width primary;
+   the filter button and sort sit on a row below on phones.
+   -------------------------------------------------------------------------- */
+.crm-toolbar {
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  background: var(--bg-dark);
-}
-
-.list-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--space-md) var(--space-lg);
-  background: var(--bg-card);
-  border-bottom: 1px solid var(--border-color);
-}
-
-.list-controls {
-  display: flex;
   gap: var(--space-sm);
-  align-items: center;
+  margin-bottom: var(--space-md);
 }
 
-.search-input {
-  width: 250px;
-  padding: var(--space-sm) var(--space-md);
-  background: var(--bg-dark);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  color: var(--text-primary);
-  font-size: 13px;
-}
-
-.search-input:focus {
-  outline: none;
-  border-color: var(--pe-gold);
-}
-
-.sort-select {
-  padding: var(--space-sm) var(--space-md);
-  background: var(--bg-dark);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  color: var(--text-primary);
-  font-size: 13px;
-}
-
-.list-count {
-  color: var(--text-secondary);
-  font-size: 13px;
-}
-
-.lead-list {
-  flex: 1;
-  overflow-y: auto;
-  padding: var(--space-md);
-}
-
-/* Lead Card */
-.lead-card {
+/* Search is a label wrapping an icon + input so the whole pill is tappable. */
+.crm-search {
   display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 0 var(--space-md);
+  background: var(--crm-card-bg);
+  border: 1px solid var(--crm-border);
+  border-radius: var(--crm-radius);
+  box-shadow: var(--crm-shadow);
+}
+
+.crm-search i { color: var(--crm-text-faint); flex-shrink: 0; }
+
+.crm-search input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 12px 0;
+  font-size: 16px;               /* 16px: stops iOS from zooming on focus */
+  font-family: var(--font-body);
+  color: var(--crm-text);
+  min-height: 44px;              /* comfortable tap target */
+}
+
+.crm-search input:focus { outline: none; }
+
+.crm-search:focus-within {
+  border-color: var(--pe-green);
+  box-shadow: 0 0 0 3px rgba(var(--pe-green-rgb), 0.12);
+}
+
+.crm-toolbar-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+/* Sort is a label wrapping a select; let it grow to fill the row. */
+.crm-sort {
+  flex: 1;
+  display: flex;
+}
+
+.crm-sort select {
+  width: 100%;
+  min-height: 44px;
+  padding: var(--space-sm) var(--space-md);
+  font-size: 16px;
+  font-family: var(--font-body);
+  color: var(--crm-text);
+  background: var(--crm-card-bg);
+  border: 1px solid var(--crm-border);
+  border-radius: var(--crm-radius);
+  cursor: pointer;
+}
+
+.crm-sort select:focus {
+  outline: none;
+  border-color: var(--pe-green);
+}
+
+/* ----------------------------------------------------------------------------
+   FILTER DRAWER — collapsed by default on phones (toggled via [hidden] by JS),
+   a card of inputs when open. On desktop it sits inline, always visible.
+   -------------------------------------------------------------------------- */
+.crm-filter-drawer {
+  background: var(--crm-card-bg);
+  border: 1px solid var(--crm-border);
+  border-radius: var(--crm-radius);
+  box-shadow: var(--crm-shadow);
+  padding: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.crm-filter-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-md);
+}
+
+/* Each filter is a <label> wrapping its control. Stack label over control. */
+.crm-filter-grid > label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--pe-green);
+}
+
+.crm-filter-grid select,
+.crm-filter-grid input[type="text"] {
+  min-height: 44px;
+  padding: var(--space-sm) var(--space-md);
+  font-size: 16px;
+  font-family: var(--font-body);
+  color: var(--crm-text);
+  background: var(--crm-card-bg);
+  border: 1px solid var(--crm-border);
+  border-radius: var(--crm-radius-sm);
+}
+
+.crm-filter-grid select:focus,
+.crm-filter-grid input:focus {
+  outline: none;
+  border-color: var(--pe-green);
+}
+
+/* Range slider (min score) — gold thumb to match the brand accent. */
+.crm-filter-grid input[type="range"] {
+  width: 100%;
+  accent-color: var(--pe-green);
+  min-height: 44px;
+}
+
+/* The live <output> value next to "Min score". */
+.crm-filter-grid output {
+  font-weight: 700;
+  color: var(--pe-gold);
+  background: var(--pe-green);
+  padding: 1px 8px;
+  border-radius: var(--crm-radius-pill);
+  font-size: 0.8rem;
+}
+
+/* The reset button spans the grid on its own row. */
+#clear-filters-btn { justify-self: start; }
+
+/* ----------------------------------------------------------------------------
+   LIST HEAD — count on the left, the icon action cluster on the right
+   (route / activity / settings / export / import). Icons get equal 44px taps.
+   -------------------------------------------------------------------------- */
+.crm-list-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.crm-list-count {
+  font-weight: 700;
+  color: var(--crm-text-muted);
+  font-size: 0.95rem;
+}
+
+.crm-list-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  flex-wrap: wrap;
+}
+
+/* Icon-only action buttons in the list head: square, comfortable, the green
+   border-lift on hover like the rest of the site's cards. These are .btn
+   .btn-secondary (gold) from main.css; here we make the icon-only ones square
+   so they line up. The ones with text (Plan route) keep their natural width. */
+.crm-list-actions .btn {
+  min-height: 40px;
+}
+
+.crm-list-actions .btn[aria-label] {
+  /* aria-label-only buttons are the icon squares */
+  width: 40px;
+  padding: 0;
+}
+
+/* ----------------------------------------------------------------------------
+   LEAD LIST + CARD — the heart of the app. Each card: recency dot, name, meta
+   row (area • status badge • reception emoji), a sub line (last visit), and a
+   score chip. Whole card is a button (role="button", tabindex=0 in the
+   template) so it's tappable and keyboard-openable.
+   -------------------------------------------------------------------------- */
+.crm-lead-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.crm-lead-card {
+  display: grid;
+  /* dot | main (grows) | score */
+  grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: var(--space-md);
   padding: var(--space-md);
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  margin-bottom: var(--space-sm);
+  background: var(--crm-card-bg);
+  border: 1px solid var(--crm-border);
+  border-radius: var(--crm-radius);
+  box-shadow: var(--crm-shadow);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  min-height: 64px;
 }
 
-.lead-card:hover {
+/* The site's signature gold-border lift on hover/focus. */
+.crm-lead-card:hover,
+.crm-lead-card:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: var(--crm-shadow-lift);
   border-color: var(--pe-gold);
-  background: var(--bg-card-hover);
-  box-shadow: var(--shadow-md);
+  outline: none;
 }
 
-.lead-card.selected {
-  border-color: var(--pe-gold);
-  background: rgba(255, 199, 44, 0.05);
-}
+.crm-lead-card:active { transform: translateY(0); }
 
-.lead-badge {
-  width: 12px;
-  height: 12px;
+/* Recency dot — color set by tier class below. The "new" tier is a hollow
+   gold ring so it reads as an action, not a stale warning. */
+.crm-recency-dot {
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--crm-recency-dead);
+}
+
+.crm-recency--week  { background: var(--crm-recency-week); }
+.crm-recency--2week { background: var(--crm-recency-2week); }
+.crm-recency--month { background: var(--crm-recency-month); }
+.crm-recency--stale { background: var(--crm-recency-stale); }
+.crm-recency--new {
+  background: transparent;
+  border: 2px solid var(--crm-recency-new);
+  box-shadow: 0 0 0 2px rgba(255, 204, 0, 0.25);
+}
+
+.crm-lead-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;                   /* lets the name ellipsize instead of pushing */
+}
+
+.crm-lead-name {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--crm-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.crm-lead-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-xs) var(--space-sm);
+  font-size: 0.8rem;
+  color: var(--crm-text-muted);
+}
+
+.crm-lead-area { color: var(--pe-green); font-weight: 600; }
+
+.crm-reception { font-size: 0.95rem; line-height: 1; }
+
+.crm-lead-sub {
+  font-size: 0.8rem;
+  color: var(--crm-text-faint);
+}
+
+/* Status badge — small pill. Three states. */
+.crm-status-badge {
+  display: inline-block;
+  padding: 1px 8px;
+  border-radius: var(--crm-radius-pill);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  line-height: 1.6;
+}
+
+.crm-status-badge--active {
+  background: rgba(0, 105, 55, 0.12);
+  color: var(--pe-green);
+}
+
+.crm-status-badge--converted {
+  background: rgba(255, 204, 0, 0.22);
+  color: #8a6d00;
+}
+
+.crm-status-badge--archived {
+  background: rgba(112, 112, 112, 0.15);
+  color: var(--crm-text-muted);
+}
+
+/* Score chip — bold number, color by tier (high/med/low). */
+.crm-lead-score {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+  height: 40px;
+  padding: 0 var(--space-xs);
+  border-radius: var(--crm-radius-sm);
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--pe-white);
+  background: var(--crm-score-med);
   flex-shrink: 0;
 }
 
-.lead-badge.green { background: var(--badge-green); }
-.lead-badge.yellow { background: var(--badge-yellow); }
-.lead-badge.orange { background: var(--badge-orange); }
-.lead-badge.red { background: var(--badge-red); }
-.lead-badge.purple { background: var(--badge-purple); }
-.lead-badge.black { background: var(--badge-black); }
-.lead-badge.new {
-  background: transparent;
-  border: 2px dashed var(--text-muted);
+.crm-score--high { background: var(--crm-score-high); color: var(--pe-gold); }
+.crm-score--med  { background: var(--crm-score-med);  color: var(--pe-white); }
+.crm-score--low  { background: var(--crm-score-low);  color: var(--pe-white); }
+
+/* ----------------------------------------------------------------------------
+   EMPTY STATE — shown when there are no leads (or none match the filters).
+   -------------------------------------------------------------------------- */
+.crm-empty {
+  text-align: center;
+  padding: var(--space-xl) var(--space-md);
+  color: var(--crm-text-muted);
 }
 
-.lead-info {
-  flex: 1;
+.crm-empty p {
+  font-size: 1.1rem;
+  margin-bottom: var(--space-md);
+}
+
+/* ----------------------------------------------------------------------------
+   FAB — the floating capture button. Fixed bottom-right, thumb-reachable,
+   gold icon on green, big enough to hit one-handed. Sits above content (1500)
+   but below sheets (2000+).
+   -------------------------------------------------------------------------- */
+.crm-fab {
+  position: fixed;
+  right: max(var(--space-md), env(safe-area-inset-right));
+  bottom: max(var(--space-lg), env(safe-area-inset-bottom));
+  z-index: 1500;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  background: var(--pe-green);
+  color: var(--pe-gold);
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+}
+
+.crm-fab:hover {
+  background: var(--pe-green-light);
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+}
+
+.crm-fab:active { transform: translateY(0) scale(0.97); }
+
+/* ----------------------------------------------------------------------------
+   ROUTE VIEW — the trip planner. Controls in a card, then results as a numbered
+   list of stops. Mirrors the list view's column width.
+   -------------------------------------------------------------------------- */
+.crm-route-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.crm-route-head h2 {
+  font-family: var(--font-heading);
+  color: var(--pe-green);
+  font-size: 1.75rem;
+  margin: 0;
+}
+
+.crm-route-controls {
+  background: var(--crm-card-bg);
+  border: 1px solid var(--crm-border);
+  border-radius: var(--crm-radius);
+  box-shadow: var(--crm-shadow);
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.crm-route-controls > label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--pe-green);
+}
+
+.crm-route-controls input[type="text"],
+.crm-route-controls select {
+  min-height: 44px;
+  padding: var(--space-sm) var(--space-md);
+  font-size: 16px;
+  font-family: var(--font-body);
+  color: var(--crm-text);
+  background: var(--crm-card-bg);
+  border: 1px solid var(--crm-border);
+  border-radius: var(--crm-radius-sm);
+}
+
+.crm-route-controls input[type="text"]:focus,
+.crm-route-controls select:focus {
+  outline: none;
+  border-color: var(--pe-green);
+}
+
+.crm-route-controls input[type="range"] {
+  width: 100%;
+  accent-color: var(--pe-green);
+  min-height: 44px;
+}
+
+.crm-route-controls output {
+  font-weight: 700;
+  color: var(--pe-gold);
+  background: var(--pe-green);
+  padding: 1px 8px;
+  border-radius: var(--crm-radius-pill);
+  font-size: 0.8rem;
+}
+
+.crm-route-eligible {
+  margin: 0;
+  font-weight: 700;
+  color: var(--crm-text-muted);
+}
+
+.crm-route-eligible span { color: var(--pe-green); }
+
+.crm-route-buttons {
+  display: flex;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.crm-route-buttons .btn { flex: 1; }
+
+/* Progress + stats readouts during/after a route solve. */
+.crm-route-progress {
+  padding: var(--space-sm) var(--space-md);
+  background: var(--crm-card-bg-alt);
+  border-radius: var(--crm-radius-sm);
+  font-size: 0.9rem;
+  color: var(--crm-text-muted);
+  text-align: center;
+}
+
+.crm-route-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+  justify-content: center;
+  padding: var(--space-md);
+  margin-bottom: var(--space-md);
+  background: var(--crm-card-bg);
+  border: 1px solid var(--crm-border);
+  border-left: 4px solid var(--pe-gold);
+  border-radius: var(--crm-radius);
+  box-shadow: var(--crm-shadow);
+  font-weight: 700;
+  color: var(--pe-green);
+}
+
+/* The Maps link + export button + warning stack full-width and breathe. */
+#route-maps-link,
+#route-export-btn {
+  display: block;
+  width: 100%;
+  text-align: center;
+  margin-bottom: var(--space-sm);
+}
+
+/* Dropped-stops warning: amber so it's noticed but not an error. */
+.crm-route-warning {
+  padding: var(--space-sm) var(--space-md);
+  background: #fff8e1;
+  border: 1px solid var(--pe-gold);
+  border-left: 4px solid var(--pe-orange);
+  border-radius: var(--crm-radius-sm);
+  color: #7a5a00;
+  font-size: 0.9rem;
+  margin-bottom: var(--space-md);
+}
+
+/* Route results — a numbered ordered list of stops. */
+.crm-route-results {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.crm-route-stop {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: var(--crm-card-bg);
+  border: 1px solid var(--crm-border);
+  border-radius: var(--crm-radius);
+  box-shadow: var(--crm-shadow);
+}
+
+/* The stop number badge — green circle, gold numeral. */
+.crm-route-num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--pe-green);
+  color: var(--pe-gold);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.crm-route-stop-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
   min-width: 0;
 }
 
-.lead-name {
-  font-weight: 600;
-  font-size: 15px;
-  color: var(--text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.lead-meta {
-  display: flex;
-  gap: var(--space-md);
-  font-size: 12px;
-  color: var(--text-secondary);
-  margin-top: 2px;
-}
-
-.lead-neighborhood {
-  color: var(--pe-gold-light);
-}
-
-.lead-score {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  background: var(--pe-green);
-  border-radius: var(--radius-sm);
+.crm-route-stop-name {
   font-weight: 700;
-  font-size: 14px;
-  color: var(--pe-gold);
+  color: var(--crm-text);
 }
 
-.lead-score.high {
-  background: var(--pe-green-lighter);
+.crm-route-stop-addr {
+  font-size: 0.85rem;
+  color: var(--crm-text-muted);
 }
 
-.lead-score.medium {
-  background: var(--pe-green);
-}
-
-.lead-score.low {
-  background: var(--text-muted);
-}
-
-.lead-last-visit {
-  font-size: 12px;
-  color: var(--text-muted);
-  text-align: right;
-  min-width: 80px;
-}
-
-.reception-indicator {
-  font-size: 16px;
-}
-
-/* Status badges */
-.status-badge {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 10px;
-  font-size: 10px;
+.crm-route-stop-leg {
+  font-size: 0.8rem;
+  color: var(--pe-green);
   font-weight: 600;
-  text-transform: uppercase;
 }
 
-.status-badge.active {
-  background: rgba(34, 197, 94, 0.2);
-  color: var(--success);
-}
-
-.status-badge.converted {
-  background: rgba(255, 199, 44, 0.2);
-  color: var(--pe-gold);
-}
-
-.status-badge.archived {
-  background: rgba(112, 112, 112, 0.2);
-  color: var(--text-muted);
-}
-
-/* Empty State */
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-xl);
-  text-align: center;
-  color: var(--text-secondary);
-}
-
-.empty-state-icon {
-  font-size: 64px;
-  margin-bottom: var(--space-md);
-  opacity: 0.5;
-}
-
-.empty-state-text {
-  font-size: 16px;
-  margin-bottom: var(--space-lg);
-}
-
-/* ============================================
-   DETAIL PANEL
-   ============================================ */
-.detail-panel {
-  width: 400px;
-  background: var(--bg-card);
-  border-left: 1px solid var(--border-color);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-
-.detail-panel.hidden {
-  display: none;
-}
-
-.detail-header {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  padding: var(--space-md);
-  border-bottom: 1px solid var(--border-color);
-  background: var(--pe-green);
-}
-
-.detail-header h2 {
-  flex: 1;
-  font-size: 18px;
-  color: var(--pe-gold);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.detail-header .btn-icon {
-  color: var(--text-primary);
-}
-
-.detail-actions {
-  display: flex;
-  gap: var(--space-xs);
-}
-
-.detail-content {
-  flex: 1;
-  overflow-y: auto;
-  padding: var(--space-lg);
-}
-
-.detail-section {
-  margin-bottom: var(--space-lg);
-}
-
-.detail-section h3 {
-  font-size: 12px;
-  text-transform: uppercase;
-  color: var(--pe-gold);
-  letter-spacing: 1px;
-  margin-bottom: var(--space-sm);
-  padding-bottom: var(--space-xs);
-  border-bottom: 1px solid var(--border-color);
-}
-
-.detail-field {
-  margin-bottom: var(--space-sm);
-}
-
-.detail-label {
-  font-size: 11px;
-  color: var(--text-muted);
-  text-transform: uppercase;
-}
-
-.detail-value {
-  font-size: 14px;
-  color: var(--text-primary);
-}
-
-.detail-value.empty {
-  color: var(--text-muted);
-  font-style: italic;
-}
-
-.scores-display {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-sm);
-}
-
-.score-item {
-  text-align: center;
-  padding: var(--space-sm);
-  background: var(--bg-dark);
-  border-radius: var(--radius-sm);
-}
-
-.score-item-label {
-  font-size: 11px;
-  color: var(--text-secondary);
-}
-
-.score-item-value {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--pe-gold);
-}
-
-.total-score-display {
-  text-align: center;
-  padding: var(--space-md);
-  background: var(--pe-green);
-  border-radius: var(--radius-md);
-  margin-top: var(--space-sm);
-}
-
-.total-score-label {
-  font-size: 11px;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-}
-
-.total-score-value {
-  font-size: 32px;
-  font-weight: 700;
-  color: var(--pe-gold);
-}
-
-/* Visit History */
-.visit-item {
-  padding: var(--space-md);
-  background: var(--bg-dark);
-  border-radius: var(--radius-sm);
-  margin-bottom: var(--space-sm);
-  border-left: 3px solid var(--pe-gold);
-}
-
-.visit-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--space-xs);
-}
-
-.visit-date {
-  font-size: 12px;
-  color: var(--text-secondary);
-}
-
-.visit-reception {
-  font-size: 14px;
-}
-
-.visit-notes {
-  font-size: 13px;
-  color: var(--text-primary);
-  white-space: pre-wrap;
-}
-
-.visit-notes.empty {
-  color: var(--text-muted);
-  font-style: italic;
-}
-
-/* Visit Actions */
-.visit-actions {
-  display: flex;
-  align-items: center;
-  gap: var(--space-xs);
-}
-
-.btn-icon-sm {
-  background: transparent;
-  border: none;
-  padding: 4px 6px;
-  font-size: 14px;
-  cursor: pointer;
-  border-radius: var(--radius-sm);
-  opacity: 0.6;
-  transition: all 0.15s ease;
-}
-
-.btn-icon-sm:hover {
-  opacity: 1;
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.btn-icon-sm.btn-danger-subtle:hover {
-  background: rgba(239, 68, 68, 0.2);
-}
-
-.add-visit-btn {
-  width: 100%;
-  margin-top: var(--space-sm);
-}
-
-/* ============================================
-   CONSOLE PANEL
-   ============================================ */
-.console-panel {
-  height: 150px;
-  background: #111;
-  border-top: 2px solid var(--pe-green);
-  display: flex;
-  flex-direction: column;
-  flex-shrink: 0;
-}
-
-.console-panel.collapsed {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 32px;
-  z-index: 100;
-}
-
-.console-panel.collapsed .console-content {
-  display: none;
-}
-
-.console-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--space-xs) var(--space-md);
-  background: var(--pe-green-dark);
-  color: var(--pe-gold);
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  cursor: pointer;
-  flex-shrink: 0;
-  user-select: none;
-}
-
-.console-header:focus-visible {
-  outline: 2px solid var(--pe-gold);
-  outline-offset: -2px;
-}
-
-.console-toggle-arrow {
-  font-size: 14px;
-  transition: transform 0.2s ease;
-}
-
-.console-content {
-  flex: 1;
-  overflow-y: auto;
-  min-height: 0;
-  padding: var(--space-sm) var(--space-md);
-  font-family: 'Consolas', 'Monaco', monospace;
-  font-size: 12px;
-}
-
-.log-entry {
-  display: flex;
-  gap: var(--space-sm);
-  padding: 2px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-}
-
-.log-time {
-  color: var(--text-muted);
-  flex-shrink: 0;
-}
-
-.log-message {
-  color: var(--text-secondary);
-}
-
-.log-message.highlight {
-  color: var(--pe-gold);
-}
-
-/* ============================================
-   MODALS
-   ============================================ */
-.modal {
+/* ============================================================================
+   SHEETS — every dialog (lead detail, add/edit, visit, settings, activity,
+   confirm) is a .crm-sheet overlay. On phones it's a bottom sheet that slides
+   up; on desktop it becomes a centered modal (992 breakpoint). z-index 2000
+   to clear the sticky site header. [hidden] hides it; JS toggles that.
+   ============================================================================ */
+.crm-sheet {
   position: fixed;
   inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: flex-end;          /* bottom-sheet on phones */
+  justify-content: center;
+  /* The dim backdrop is baked into the overlay so we need no extra element. */
+  background: rgba(0, 0, 0, 0.55);
+  padding: 0;
+}
+
+.crm-sheet[hidden] { display: none; }
+
+.crm-sheet-panel {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-height: 92vh;
+  background: var(--crm-card-bg);
+  border-radius: var(--crm-radius) var(--crm-radius) 0 0;
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  /* Slide-up entrance; killed under reduced-motion at the bottom of the file. */
+  animation: crm-sheet-up 0.25s ease;
+}
+
+@keyframes crm-sheet-up {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+/* The small confirm dialog is centered even on phones — it's tiny. */
+.crm-sheet-panel--small {
+  width: 90%;
+  max-width: 380px;
+  margin: auto;
+  border-radius: var(--crm-radius);
+  align-self: center;
+}
+
+/* Sheet header. NOTE: the markup uses <header class="crm-sheet-head">. We style
+   by CLASS so we never inherit main.css's sticky element-selector header{}. */
+.crm-sheet-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: var(--pe-green);
+  border-bottom: 3px solid var(--pe-gold);
+  /* Defensive resets in case the element-selector header{} rules ever apply. */
+  position: static;
+  box-shadow: none;
+  flex-shrink: 0;
+}
+
+.crm-sheet-head h2 {
+  font-family: var(--font-heading);
+  color: var(--crm-gold-text);
+  font-size: 1.6rem;
+  margin: 0;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* The big tappable X. */
+.crm-sheet-close {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border: none;
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--pe-white);
+  font-size: 1.6rem;
+  line-height: 1;
+  border-radius: 50%;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.8);
-  z-index: 1000;
+  transition: background 0.18s ease, transform 0.18s ease;
 }
 
-.modal.hidden {
-  display: none;
+.crm-sheet-close:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: rotate(90deg);
 }
 
-.modal-content {
-  background: var(--bg-card);
-  border: 1px solid var(--pe-gold);
-  border-radius: var(--radius-lg);
-  width: 600px;
-  max-width: 95vw;
-  max-height: 90vh;
+/* Scrollable body — where forms and detail content live. */
+.crm-sheet-body {
+  padding: var(--space-md);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  flex: 1;
+}
+
+/* Sticky action bar at the bottom of a sheet (Cancel / Save). */
+.crm-sheet-actions {
   display: flex;
-  flex-direction: column;
-  box-shadow: var(--shadow-lg);
-  overflow: hidden;
+  gap: var(--space-sm);
+  justify-content: flex-end;
+  padding-top: var(--space-md);
+  margin-top: var(--space-md);
+  border-top: 1px solid var(--crm-border);
 }
 
-.modal-content.modal-sm {
-  width: 450px;
+.crm-sheet-actions .btn { min-height: 44px; }
+
+/* ----------------------------------------------------------------------------
+   FORMS inside sheets. These use .crm-field (a label wrapping its input) rather
+   than main.css's .form-group, so we control the mobile sizing fully. Inputs
+   are 16px to dodge the iOS zoom.
+   -------------------------------------------------------------------------- */
+.crm-field {
+  display: block;
+  margin-bottom: var(--space-md);
+  font-weight: 700;
+  color: var(--pe-green);
+  font-size: 0.9rem;
 }
 
-/* Danger Modal Styles */
-.modal-content.modal-danger {
-  border: 2px solid var(--danger);
+.crm-field input,
+.crm-field select,
+.crm-field textarea {
+  display: block;
+  width: 100%;
+  margin-top: var(--space-xs);
+  padding: 12px var(--space-md);
+  font-size: 16px;
+  font-family: var(--font-body);
+  font-weight: 400;
+  color: var(--crm-text);
+  background: var(--crm-card-bg);
+  border: 1px solid var(--crm-border-strong);
+  border-radius: var(--crm-radius-sm);
+  min-height: 44px;
 }
 
-.modal-danger .modal-header h2 {
-  color: var(--danger);
+.crm-field textarea {
+  resize: vertical;
+  min-height: 72px;
+  line-height: 1.5;
 }
 
-.delete-warning {
-  color: var(--danger);
-  font-weight: 600;
+.crm-field input:focus,
+.crm-field select:focus,
+.crm-field textarea:focus {
+  outline: none;
+  border-color: var(--pe-green);
+  box-shadow: 0 0 0 3px rgba(var(--pe-green-rgb), 0.12);
+}
+
+/* Two fields side by side (Type / Status). Stacks on the narrowest phones. */
+.crm-field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+}
+
+.crm-field-row .crm-field { margin-bottom: var(--space-md); }
+
+/* An auxiliary button tucked inside a field (e.g. "Use my location"). */
+.crm-field-aux {
+  margin-top: var(--space-xs);
+  min-height: 40px;
+}
+
+/* The required-marker asterisk. */
+.crm-req { color: var(--pe-red); font-weight: 700; }
+
+/* Inline help text (settings explainer). */
+.crm-help {
+  font-size: 0.85rem;
+  font-weight: 400;
+  color: var(--crm-text-muted);
+  margin-bottom: var(--space-sm);
+}
+
+/* A checkbox + label row ("Log a visit now"). */
+.crm-check {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-weight: 700;
+  color: var(--pe-green);
+  cursor: pointer;
+  min-height: 44px;
+}
+
+.crm-check input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--pe-green);
+  flex-shrink: 0;
+}
+
+/* Settings sheet: textarea + horizontal rules + section headings. */
+#settings-sheet textarea,
+.crm-sheet-body textarea#paste-email-text {
+  width: 100%;
+  margin-bottom: var(--space-sm);
+}
+
+.crm-sheet-body hr {
+  border: none;
+  border-top: 1px solid var(--crm-border);
+  margin: var(--space-md) 0;
+}
+
+.crm-sheet-body h3 {
+  font-family: var(--font-heading);
+  color: var(--pe-green);
+  font-size: 1.3rem;
+  margin-bottom: var(--space-sm);
+}
+
+/* ----------------------------------------------------------------------------
+   SEGMENTED SCORE CONTROL — the banned-sliders replacement. Each score (Space /
+   Traffic / Vibes) is a row: an emoji label + a connected 1-5 button group made
+   of real radio inputs. The radio is visually hidden (NOT display:none, so it
+   stays focusable and AT-readable); its <span> is the visible button. Checked =
+   filled green; the focus ring lands on the label so keyboard users see it.
+   -------------------------------------------------------------------------- */
+.crm-scores {
+  border: 1px solid var(--crm-border);
+  border-radius: var(--crm-radius);
+  padding: var(--space-md);
   margin-bottom: var(--space-md);
 }
 
-.delete-preview {
-  background: var(--bg-dark);
-  border-radius: var(--radius-md);
+.crm-scores legend {
+  font-family: var(--font-heading);
+  color: var(--pe-green);
+  font-size: 1.2rem;
+  padding: 0 var(--space-xs);
+}
+
+.crm-score-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-md);
+}
+
+.crm-score-row:last-child { margin-bottom: 0; }
+
+.crm-score-label {
+  font-weight: 700;
+  color: var(--crm-text);
+  font-size: 0.95rem;
+}
+
+/* The connected button group. Buttons butt up against each other; only the
+   group's outer corners are rounded. */
+.crm-segments {
+  display: flex;
+  width: 100%;
+}
+
+.crm-segments label {
+  flex: 1;
+  position: relative;
+  display: flex;
+}
+
+/* Visually hide the real radio but keep it in the layout/focus order. */
+.crm-segments input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  cursor: pointer;
+}
+
+/* The visible segment button. */
+.crm-segments label span {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: var(--space-sm);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--pe-green);
+  background: var(--crm-card-bg);
+  border: 1px solid var(--pe-green);
+  border-left-width: 0;            /* collapse the seam between segments */
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+/* Round only the group's two outer ends. */
+.crm-segments label:first-child span {
+  border-left-width: 1px;
+  border-radius: var(--crm-radius-sm) 0 0 var(--crm-radius-sm);
+}
+.crm-segments label:last-child span {
+  border-radius: 0 var(--crm-radius-sm) var(--crm-radius-sm) 0;
+}
+
+/* Checked segment fills green. */
+.crm-segments input[type="radio"]:checked + span {
+  background: var(--pe-green);
+  color: var(--pe-gold);
+}
+
+/* Focus ring on the label (since the input is invisible). */
+.crm-segments input[type="radio"]:focus-visible + span {
+  outline: 2px solid var(--pe-green);
+  outline-offset: 2px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ----------------------------------------------------------------------------
+   RECEPTION CHIPS — warm/lukewarm/cold pill buttons. Same hidden-radio trick as
+   the segments, but free-standing pills instead of a connected group.
+   -------------------------------------------------------------------------- */
+.crm-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.crm-chip {
+  position: relative;
+  display: inline-flex;
+}
+
+.crm-chip input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  cursor: pointer;
+}
+
+.crm-chip span {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  min-height: 44px;
+  padding: var(--space-sm) var(--space-md);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--crm-text);
+  background: var(--crm-card-bg);
+  border: 1px solid var(--crm-border-strong);
+  border-radius: var(--crm-radius-pill);
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.crm-chip input[type="radio"]:checked + span {
+  background: var(--pe-green);
+  border-color: var(--pe-green);
+  color: var(--pe-gold);
+}
+
+.crm-chip input[type="radio"]:focus-visible + span {
+  outline: 2px solid var(--pe-green);
+  outline-offset: 2px;
+}
+
+/* ----------------------------------------------------------------------------
+   CONTACTS — repeatable rows cloned from the template. Each row is a stack of
+   inputs on phones, a "Primary" radio, and a remove X.
+   -------------------------------------------------------------------------- */
+.crm-contacts {
+  border: 1px solid var(--crm-border);
+  border-radius: var(--crm-radius);
   padding: var(--space-md);
-  border-left: 3px solid var(--danger);
+  margin-bottom: var(--space-md);
 }
 
-.delete-preview-date {
-  font-size: 12px;
-  color: var(--text-secondary);
-  margin-bottom: var(--space-xs);
+.crm-contacts legend {
+  font-family: var(--font-heading);
+  color: var(--pe-green);
+  font-size: 1.2rem;
+  padding: 0 var(--space-xs);
 }
 
-.delete-preview-notes {
-  font-size: 13px;
-  color: var(--text-primary);
-  white-space: pre-wrap;
-  max-height: 100px;
-  overflow-y: auto;
+.crm-contact-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-sm);
+  align-items: center;
+  padding: var(--space-sm);
+  margin-bottom: var(--space-sm);
+  background: var(--crm-card-bg-alt);
+  border: 1px solid var(--crm-border);
+  border-radius: var(--crm-radius-sm);
+}
+
+/* The text/tel/email inputs span the full first column, stacked. */
+.crm-contact-row input[type="text"],
+.crm-contact-row input[type="tel"],
+.crm-contact-row input[type="email"] {
+  grid-column: 1 / -1;
+  width: 100%;
+  padding: 10px var(--space-md);
+  font-size: 16px;
+  font-family: var(--font-body);
+  color: var(--crm-text);
+  background: var(--crm-card-bg);
+  border: 1px solid var(--crm-border-strong);
+  border-radius: var(--crm-radius-sm);
+  min-height: 44px;
+}
+
+.crm-contact-row input:focus {
+  outline: none;
+  border-color: var(--pe-green);
+}
+
+/* "Primary" radio pick sits on the left of the last row. */
+.crm-primary-pick {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--crm-text-muted);
+  cursor: pointer;
+  min-height: 44px;
+}
+
+.crm-primary-pick input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--pe-green);
+}
+
+.crm-primary-pick:has(input:checked) { color: var(--pe-green); }
+
+/* The remove-contact X. */
+.crm-contact-remove {
+  justify-self: end;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: transparent;
+  color: var(--crm-text-faint);
+  font-size: 1.4rem;
+  line-height: 1;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.crm-contact-remove:hover {
+  background: rgba(139, 0, 0, 0.1);
+  color: var(--pe-red);
+}
+
+/* ----------------------------------------------------------------------------
+   QUICK VISIT — the default-on "log the visit you just made" block at the
+   bottom of the new-lead form.
+   -------------------------------------------------------------------------- */
+.crm-quickvisit {
+  background: var(--crm-card-bg-alt);
+  border: 1px dashed var(--crm-border-strong);
+  border-radius: var(--crm-radius);
+  padding: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+#quickvisit-fields { margin-top: var(--space-sm); }
+
+/* ----------------------------------------------------------------------------
+   ACTIVITY LIST — the running log of what happened, newest first.
+   -------------------------------------------------------------------------- */
+.crm-activity-list {
+  list-style: none;
+  padding: var(--space-md);
+  margin: 0;
+}
+
+.crm-activity-list li {
+  padding: var(--space-sm) 0;
+  border-bottom: 1px solid var(--crm-border);
+  font-size: 0.9rem;
+  color: var(--crm-text);
+}
+
+.crm-activity-list li:last-child { border-bottom: none; }
+
+/* ----------------------------------------------------------------------------
+   BUTTON VARIANTS the CRM needs that main.css doesn't ship. main.css defines
+   .btn / .btn-primary / .btn-secondary; the CRM additionally uses .btn-sm
+   (compact toolbar/action buttons — the whole list-head row would overflow a
+   phone otherwise) and .btn-danger (the delete-confirm button must READ as
+   destructive, not look like a normal green action). These are CRM-only — they
+   don't exist in main.css so there's no collision; we're filling a gap, not
+   redefining a token. Inherits .btn's base layout from main.css.
+   -------------------------------------------------------------------------- */
+.btn-sm {
+  padding: var(--space-xs) var(--space-sm);
+  font-size: 0.8rem;
+  letter-spacing: 0;
 }
 
 .btn-danger {
-  background: var(--danger);
-  color: white;
-  border: none;
+  background-color: var(--pe-red);
+  color: var(--pe-white);
 }
 
 .btn-danger:hover {
-  background: #dc2626;
+  background-color: #a31515;
+  color: var(--pe-white);
 }
 
-/* Shake animation for delete warning */
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-  20%, 40%, 60%, 80% { transform: translateX(5px); }
+/* ============================================================================
+   render.js runtime DOM — classes the JS generates at runtime (the lead detail
+   sheet, visit history, activity entries, toasts) and the recency/score color
+   MODIFIERS it applies. crm.css and render.js were authored in parallel; this
+   block reconciles the two against render.js as the source of truth (it emits
+   .crm-recency-dot--<tier>, .crm-lead-score--<bucket>, and the .crm-detail-* /
+   .crm-visit-* / .crm-toast-* DOM). Keep these names in sync with render.js.
+   ============================================================================ */
+
+/* Recency dot color tiers (base .crm-recency-dot is defined above). Fresh green
+   → cold black, with a hollow gold ring for never-visited ("go do this"). */
+.crm-recency-dot--new {
+  background: transparent;
+  border: 2px solid var(--crm-recency-new);
+}
+.crm-recency-dot--green  { background: var(--crm-recency-week); }
+.crm-recency-dot--yellow { background: var(--crm-recency-2week); }
+.crm-recency-dot--orange { background: var(--crm-recency-month); }
+.crm-recency-dot--red    { background: var(--crm-recency-stale); }
+.crm-recency-dot--purple { background: #7c5cbf; }
+.crm-recency-dot--black  { background: var(--crm-recency-dead); }
+
+/* Lead-card score color buckets (base .crm-lead-score defined above). */
+.crm-lead-score--high   { background: var(--crm-score-high); color: var(--crm-gold-text); }
+.crm-lead-score--medium { background: var(--crm-score-med);  color: #fff; }
+.crm-lead-score--low    { background: var(--crm-score-low);  color: #fff; }
+
+/* ── Lead detail sheet ──────────────────────────────────────────── */
+.crm-detail-section {
+  padding: var(--space-md) 0;
+  border-bottom: 1px solid var(--crm-border);
+}
+.crm-detail-section:last-of-type { border-bottom: none; }
+
+.crm-detail-heading {
+  font-family: var(--font-heading);
+  letter-spacing: 0.5px;
+  color: var(--pe-green);
+  font-size: 1.15rem;
+  margin: 0 0 var(--space-sm);
 }
 
-.shake {
-  animation: shake 0.5s ease-in-out;
+.crm-detail-field {
+  display: flex;
+  gap: var(--space-sm);
+  padding: 2px 0;
+  flex-wrap: wrap;
 }
+.crm-detail-label {
+  color: var(--crm-text-muted);
+  font-size: 0.85rem;
+  min-width: 72px;
+}
+.crm-detail-value { color: var(--crm-text); word-break: break-word; }
+.crm-detail-value--empty { color: var(--crm-text-faint); }
 
-.modal-header {
+.crm-detail-statusrow {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: var(--space-md) var(--space-lg);
-  border-bottom: 1px solid var(--border-color);
-  background: var(--pe-green);
-  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-}
-
-.modal-header h2 {
-  font-size: 18px;
-  color: var(--pe-gold);
-}
-
-.modal-header .btn-icon {
-  color: var(--text-primary);
-}
-
-.modal-body {
-  padding: var(--space-lg);
-  overflow-y: auto;
-  overflow-x: hidden;
-  flex: 1;
-}
-
-.modal-footer {
-  display: flex;
-  justify-content: flex-end;
   gap: var(--space-sm);
-  padding: var(--space-md) var(--space-lg);
-  border-top: 1px solid var(--border-color);
 }
+.crm-detail-recency { color: var(--crm-text-muted); font-size: 0.9rem; }
 
-/* Forms */
-.form-row {
-  display: flex;
-  gap: var(--space-md);
-  margin-bottom: var(--space-md);
-  align-items: flex-end;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xs);
-}
-
-.form-group.flex-grow {
-  flex: 1;
-}
-
-.form-group label {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea {
-  padding: var(--space-sm) var(--space-md);
-  background: var(--bg-dark);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
-  color: var(--text-primary);
-  font-size: 14px;
-  font-family: inherit;
-}
-
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-  outline: none;
-  border-color: var(--pe-gold);
-}
-
-.form-group small {
-  font-size: 11px;
-  color: var(--text-muted);
-}
-
-.form-group a {
-  color: var(--pe-gold);
-}
-
-.form-section {
-  margin-top: var(--space-lg);
-  padding-top: var(--space-lg);
-  border-top: 1px solid var(--border-color);
-}
-
-.form-section h3 {
-  font-size: 14px;
-  color: var(--pe-gold);
-  margin-bottom: var(--space-md);
-}
-
-/* Scores Grid */
-.scores-grid {
+.crm-detail-scores {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-md);
+  gap: var(--space-sm);
+  margin-bottom: var(--space-sm);
 }
-
-.score-group {
-  text-align: center;
-}
-
-.score-group label {
-  display: block;
-  margin-bottom: var(--space-xs);
-  font-size: 13px;
-  color: var(--text-primary);
-}
-
-.score-group input[type="range"] {
-  width: 100%;
-  accent-color: var(--pe-gold);
-}
-
-.score-group small {
-  display: block;
-  font-size: 10px;
-  color: var(--text-muted);
-  margin-top: var(--space-xs);
-}
-
-.total-score {
-  text-align: center;
-  margin-top: var(--space-md);
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--pe-gold);
-}
-
-/* AI Status */
-.ai-status {
-  padding: var(--space-sm) var(--space-md);
-  border-radius: var(--radius-sm);
-  font-size: 13px;
-  margin-bottom: var(--space-md);
-}
-
-.ai-status.loading {
-  background: rgba(99, 102, 241, 0.2);
-  color: #818cf8;
-}
-
-.ai-status.success {
-  background: rgba(34, 197, 94, 0.2);
-  color: var(--success);
-}
-
-.ai-status.warning {
-  background: rgba(245, 158, 11, 0.2);
-  color: var(--warning);
-}
-
-.ai-status.error {
-  background: rgba(239, 68, 68, 0.2);
-  color: var(--danger);
-}
-
-.ai-tag {
-  display: inline-block;
-  padding: 1px 6px;
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-  color: white;
-  font-size: 9px;
-  font-weight: 700;
-  border-radius: 3px;
-  margin-left: 4px;
-  vertical-align: middle;
-}
-
-/* Data Path Display */
-.data-path {
-  font-family: 'Consolas', 'Monaco', monospace;
-  font-size: 11px;
-  color: var(--text-muted);
-  background: var(--bg-dark);
+.crm-detail-score {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
   padding: var(--space-sm);
-  border-radius: var(--radius-sm);
-  word-break: break-all;
+  background: var(--crm-card-bg-alt);
+  border-radius: var(--crm-radius-sm);
 }
+.crm-detail-score-label { font-size: 0.8rem; color: var(--crm-text-muted); }
+.crm-detail-score-value { font-size: 1.3rem; font-weight: 700; color: var(--pe-green); }
 
-/* Utility Classes */
-.hidden {
-  display: none !important;
-}
-
-/* Scrollbar Styling */
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--bg-dark);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--border-color);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--pe-green);
-}
-
-/* Animation */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.lead-card {
-  animation: fadeIn 0.2s ease;
-}
-
-/* Checkbox styling */
-input[type="checkbox"] {
-  accent-color: var(--pe-gold);
-  width: 16px;
-  height: 16px;
-}
-
-/* ============================================
-   CONTACTS - Form & Detail Panel
-   ============================================ */
-
-/* Contacts section in form */
-.contacts-section {
-  margin-top: var(--space-md) !important;
-  padding-top: var(--space-md) !important;
-  overflow: visible;
-}
-
-.contacts-section.form-section {
-  border-top: 1px solid var(--border-color);
-}
-
-.contacts-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--space-md);
-  gap: var(--space-md);
-  flex-wrap: nowrap;
-}
-
-.contacts-header h3 {
-  margin-bottom: 0;
-  flex-shrink: 0;
-}
-
-.contacts-header .btn {
-  flex-shrink: 0;
-  white-space: nowrap;
-}
-
-.contacts-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-md);
-}
-
-.empty-contacts {
-  padding: var(--space-lg);
-  text-align: center;
-  color: var(--text-muted);
-  background: var(--bg-dark);
-  border-radius: var(--radius-md);
-  border: 1px dashed var(--border-color);
-}
-
-/* Contact card in form */
-.contact-card {
-  background: var(--bg-dark);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  padding: var(--space-md);
-}
-
-.contact-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--space-sm);
-  padding-bottom: var(--space-sm);
-  border-bottom: 1px solid var(--border-color);
-}
-
-.primary-checkbox {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  cursor: pointer;
-}
-
-.primary-checkbox input[type="radio"] {
-  accent-color: var(--pe-gold);
-}
-
-.primary-label {
-  font-size: 12px;
-  color: var(--text-secondary);
-}
-
-.primary-checkbox input:checked + .primary-label {
-  color: var(--pe-gold);
-  font-weight: 600;
-}
-
-.remove-contact-btn {
-  color: var(--text-muted) !important;
-}
-
-.remove-contact-btn:hover {
-  color: var(--danger) !important;
-  background: rgba(239, 68, 68, 0.1) !important;
-}
-
-.contact-card-fields .form-row {
-  margin-bottom: var(--space-sm);
-}
-
-.contact-card-fields .form-row:last-child {
-  margin-bottom: 0;
-}
-
-.contact-card-fields .form-group label {
-  font-size: 10px;
-}
-
-.contact-card-fields input {
-  padding: var(--space-xs) var(--space-sm);
-  font-size: 13px;
-}
-
-/* Detail panel contacts */
-.primary-contact-card {
-  background: var(--bg-dark);
-  border: 1px solid var(--pe-gold);
-  border-radius: var(--radius-md);
-  padding: var(--space-md);
-  margin-top: var(--space-sm);
-}
-
-.contact-badge {
+.crm-detail-total {
   display: inline-block;
-  padding: 2px 8px;
-  border-radius: 10px;
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  margin-bottom: var(--space-xs);
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--crm-radius-pill);
+  font-weight: 700;
+  color: #fff;
+  background: var(--crm-score-low);
 }
+.crm-detail-total--high   { background: var(--crm-score-high); color: var(--crm-gold-text); }
+.crm-detail-total--medium { background: var(--crm-score-med); }
+.crm-detail-total--low    { background: var(--crm-score-low); }
 
-.contact-badge.primary {
-  background: rgba(255, 199, 44, 0.2);
-  color: var(--pe-gold);
+.crm-detail-contact {
+  padding: var(--space-sm);
+  margin-bottom: var(--space-sm);
+  background: var(--crm-card-bg-alt);
+  border-radius: var(--crm-radius-sm);
 }
-
-.contact-name {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--text-primary);
+.crm-detail-contact-name { font-weight: 700; }
+.crm-detail-contact-primary { color: var(--crm-gold-text); font-weight: 700; font-size: 0.85rem; }
+.crm-detail-contact-role { color: var(--crm-text-muted); font-size: 0.9rem; }
+.crm-detail-contact-line {
+  display: flex;
+  gap: var(--space-sm);
+  align-items: baseline;
+  padding-top: 2px;
 }
+.crm-detail-link { color: var(--pe-green); font-weight: 600; word-break: break-all; }
+.crm-detail-link:hover { color: var(--pe-green-light); text-decoration: underline; }
+.crm-detail-notes { margin: 0; white-space: pre-wrap; color: var(--crm-text); }
+.crm-detail-empty { color: var(--crm-text-faint); font-style: italic; }
+.crm-detail-actions { margin-top: var(--space-md); }
 
-.contact-role {
-  font-size: 12px;
-  color: var(--text-secondary);
-  margin-top: 2px;
+/* ── Visit history items ────────────────────────────────────────── */
+.crm-visit-item {
+  padding: var(--space-sm) 0;
+  border-bottom: 1px solid var(--crm-border);
 }
-
-.contact-details {
-  margin-top: var(--space-sm);
-  padding-top: var(--space-sm);
-  border-top: 1px solid var(--border-color);
-}
-
-.contact-details .detail-field {
-  margin-bottom: var(--space-xs);
-}
-
-/* Other contacts expandable section */
-.other-contacts-section {
-  margin-top: var(--space-md);
-}
-
-.expand-contacts-btn {
+.crm-visit-head {
   display: flex;
   align-items: center;
   gap: var(--space-sm);
-  width: 100%;
-  padding: var(--space-sm) var(--space-md);
-  background: var(--bg-dark);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
-  color: var(--text-secondary);
-  font-size: 13px;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  flex-wrap: wrap;
 }
+.crm-visit-date { font-weight: 600; }
+.crm-visit-reception { color: var(--crm-text-muted); font-size: 0.9rem; text-transform: capitalize; }
+.crm-visit-actions { margin-left: auto; display: flex; gap: var(--space-xs); }
+.crm-visit-notes { margin: var(--space-xs) 0 0; color: var(--crm-text); white-space: pre-wrap; }
 
-.expand-contacts-btn:hover {
-  border-color: var(--pe-gold);
-  color: var(--pe-gold);
-}
+/* ── Activity entries (the <li> padding/border come from .crm-activity-list li) ── */
+.crm-activity-item { display: flex; flex-direction: column; gap: 2px; }
+.crm-activity-time { color: var(--crm-text-faint); font-size: 0.75rem; }
+.crm-activity-msg { color: var(--crm-text); }
 
-.expand-icon {
-  font-size: 10px;
-  transition: transform 0.2s ease;
-}
-
-.other-contacts-list {
-  margin-top: var(--space-sm);
+/* ── Toasts: brief non-blocking feedback (replaces alert()). Above sheets. ── */
+.crm-toast-container {
+  position: fixed;
+  left: 50%;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
+  transform: translateX(-50%);
+  z-index: 2500;
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
+  width: max-content;
+  max-width: 90vw;
+  pointer-events: none;
 }
-
-.other-contact-card {
-  background: var(--bg-dark);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
+.crm-toast {
   padding: var(--space-sm) var(--space-md);
-}
-
-.other-contact-card .contact-name {
-  font-size: 14px;
-}
-
-.other-contact-card .contact-role {
-  font-size: 11px;
-}
-
-.contact-mini-details {
-  display: flex;
-  gap: var(--space-md);
-  margin-top: var(--space-xs);
-  font-size: 11px;
-  color: var(--text-muted);
-}
-
-.contact-mini-details span {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-/* ============================================
-   ANIMATION INITIAL STATES
-   ============================================ */
-
-/* Stat cards start slightly smaller for entrance animation */
-body.page-loading .stat-card {
-  opacity: 0.5;
-  transform: scale(0.9);
-}
-
-/* Lead card animation states */
-.lead-card.anim-enter {
+  border-radius: var(--crm-radius-pill);
+  background: #2b2b2b;
+  color: #fff;
+  box-shadow: var(--crm-shadow-lift);
+  font-size: 0.9rem;
   opacity: 0;
-  transform: translateY(-20px);
+  transform: translateY(8px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.crm-toast--in { opacity: 1; transform: translateY(0); }
+.crm-toast--success { background: var(--pe-green); }
+.crm-toast--error { background: #8B0000; }
+.crm-toast--info { background: #2b2b2b; }
+
+@media (prefers-reduced-motion: reduce) {
+  .crm-toast { transition: none; }
 }
 
-/* Modal animation states */
-.modal .modal-content.anim-init {
-  opacity: 0;
-  transform: scale(0.9);
+/* ----------------------------------------------------------------------------
+   UTILITIES
+   -------------------------------------------------------------------------- */
+
+/* Screen-reader-only: present for AT, invisible on screen. */
+.crm-visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
-/* Hover lift effect for cards */
-.lead-card {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+/* The app's hard hide. !important so it always wins over display rules. JS
+   toggles this on views, buttons, banners, and route output. */
+.hidden { display: none !important; }
+
+/* ============================================================================
+   DESKTOP / WIDE LAYOUT (>=992px) — the enhancement layer. Roomier column,
+   the filter drawer goes inline, sheets become centered modals instead of
+   bottom sheets. Phone styles above are the source of truth; this only widens.
+   ============================================================================ */
+@media (min-width: 992px) {
+  .crm-view { max-width: 880px; }
+
+  .crm-hero h1 { font-size: 3.5rem; }
+
+  /* Toolbar goes horizontal: search grows, controls sit beside it. */
+  .crm-toolbar {
+    flex-direction: row;
+    align-items: center;
+  }
+  .crm-search { flex: 1; }
+  .crm-toolbar-controls { flex-shrink: 0; }
+  .crm-sort { flex: 0 0 auto; }
+  .crm-sort select { width: auto; }
+
+  /* Filter drawer sits inline as a multi-column grid (JS keeps it open). */
+  .crm-filter-grid {
+    grid-template-columns: repeat(3, 1fr);
+    align-items: end;
+  }
+
+  /* Sheets become centered modals: dim backdrop, panel floats in the middle. */
+  .crm-sheet { align-items: center; }
+
+  .crm-sheet-panel {
+    width: 90%;
+    max-width: 560px;
+    max-height: 88vh;
+    border-radius: var(--crm-radius);
+    animation: crm-sheet-pop 0.2s ease;
+  }
+
+  @keyframes crm-sheet-pop {
+    from { opacity: 0; transform: scale(0.96); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  /* Two-up route controls read better with the extra width. */
+  .crm-route-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: end;
+  }
+  .crm-route-controls .crm-route-eligible,
+  .crm-route-controls .crm-route-buttons,
+  .crm-route-controls .crm-route-progress {
+    grid-column: 1 / -1;
+  }
 }
 
-.lead-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+/* A mid breakpoint so tablets get a 2-col filter grid before the full desktop
+   layout kicks in. (Site uses 768 as its phone/tablet seam.) */
+@media (min-width: 768px) and (max-width: 991px) {
+  .crm-filter-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
-/* ============================================
-   MICRO-INTERACTIONS
-   ============================================ */
-
-/* Button hover and press feedback */
-.btn {
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+/* The narrowest phones (<=480, the site's smallest breakpoint): let the
+   Type/Status pair stack rather than cramming two selects side by side. */
+@media (max-width: 480px) {
+  .crm-field-row { grid-template-columns: 1fr; }
+  .crm-hero h1 { font-size: 2.25rem; }
+  .crm-route-buttons { flex-direction: column; }
+  .crm-route-buttons .btn { width: 100%; }
 }
 
-.btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
-}
-
-.btn:active {
-  transform: translateY(0) scale(0.98);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-}
-
-.btn-primary:hover {
-  background: var(--pe-green-light);
-}
-
-.btn-secondary:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-/* Icon buttons micro-feedback */
-.btn-icon {
-  transition: transform 0.15s ease, background 0.15s ease;
-}
-
-.btn-icon:hover {
-  transform: scale(1.1);
-  background: rgba(255, 255, 255, 0.1);
-}
-
-.btn-icon:active {
-  transform: scale(0.95);
-}
-
-.btn-icon:focus-visible,
-.btn-icon-sm:focus-visible {
-  outline: 2px solid var(--pe-gold);
-  border-radius: 4px;
-  outline-offset: 2px;
-}
-
-/* Status badge color transitions */
-.status-badge {
-  transition: background 0.3s ease, color 0.3s ease, transform 0.15s ease;
-}
-
-.status-badge:hover {
-  transform: scale(1.05);
-}
-
-/* Score slider value pop */
-.score-value {
-  transition: transform 0.2s ease, color 0.2s ease;
-}
-
-.score-value.pop {
-  transform: scale(1.3);
-  color: var(--pe-gold);
-}
-
-/* Slider thumb animation */
-input[type="range"]::-webkit-slider-thumb {
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-input[type="range"]:active::-webkit-slider-thumb {
-  transform: scale(1.2);
-  box-shadow: 0 0 8px rgba(255, 199, 44, 0.5);
-}
-
-/* Toast notification slide */
-.toast {
-  transform: translateX(100%);
-  transition: transform 0.3s ease;
-}
-
-.toast.show {
-  transform: translateX(0);
-}
-
-/* Checkbox check mark animation */
-input[type="checkbox"]:checked + label::before {
-  animation: checkPop 0.2s ease;
-}
-
-@keyframes checkPop {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.2); }
-}
-
-/* Input focus glow */
-input:focus, textarea:focus, select:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(255, 199, 44, 0.3);
-  transition: box-shadow 0.2s ease;
-}
-
-/* Keyboard-only focus ring for a11y */
-input:focus-visible, textarea:focus-visible, select:focus-visible,
-a:focus-visible, button:focus-visible {
-  outline: 2px solid var(--pe-gold);
-  outline-offset: 2px;
-  border-radius: 4px;
-}
-
-/* Inline loading spinner for async buttons */
-.loading-spinner {
-  display: none;
-  width: 14px;
-  height: 14px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: #fff;
-  border-radius: 50%;
-  animation: spin 0.6s linear infinite;
-  vertical-align: middle;
-  margin-left: 6px;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
+/* ============================================================================
+   REDUCED MOTION — honor the OS setting. Kill the sheet slide-up, the FAB
+   lift, the status pulse, the card transitions. The app is fully usable static.
+   ============================================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .crm-sheet-panel,
+  .crm-lead-card,
+  .crm-fab,
+  .crm-sheet-close,
+  .crm-status--pending::before,
+  .crm-segments label span,
+  .crm-chip span,
+  .crm-contact-remove {
+    animation: none !important;
+    transition: none !important;
+  }
 }

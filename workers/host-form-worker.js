@@ -5,8 +5,12 @@
  * No data is stored server-side -- submissions go straight to email.
  */
 
-// Import statements for Workers functionality
-import { EmailMessage } from 'cloudflare:email';
+// The `cloudflare:email` module only exists inside the Workers runtime. We load
+// it lazily (a dynamic import inside sendEmail) instead of at the top of the
+// file so this module can also be imported by plain Node -- e.g. the unit tests
+// that exercise the pure formatHostEmail() helper without a Cloudflare runtime.
+// Behavior in production is unchanged: EmailMessage is still pulled from
+// cloudflare:email, just at first send instead of at module load.
 
 /**
  * Main handler for all incoming requests
@@ -99,6 +103,65 @@ async function processFormSubmission({ env, subject, emailContent, successMessag
 }
 
 /**
+ * Build the host-request email body.
+ *
+ * This is a PURE function (no network, no bindings) so it can be unit-tested
+ * directly and so the CRM's email-lead-parser has a single source of truth for
+ * the exact text shape it parses. The body has two parts:
+ *
+ *   1. A human-readable section -- what shows up in the inbox for a person to read.
+ *   2. A machine-readable fenced block (--- LEAD JSON v1 ---) so the CRM can
+ *      ingest the lead without anyone re-typing it. The JSON is produced with
+ *      JSON.stringify so ALL user input is properly escaped -- never hand-glue
+ *      user strings into JSON, that's how you get broken parses or injection.
+ *
+ * @param {Object} fields
+ * @param {string} fields.venueName
+ * @param {string} fields.contactName
+ * @param {string} fields.contactEmail
+ * @param {string} fields.venueType  - the enum slug from the form (card-shop, etc.)
+ * @param {string} fields.message
+ * @param {string} [fields.sourceDate] - ISO timestamp; defaults to now (param exists
+ *                                        so tests can pin a deterministic value)
+ * @returns {string} the full plaintext email body
+ */
+function formatHostEmail({ venueName, contactName, contactEmail, venueType, message, sourceDate }) {
+  const isoDate = sourceDate || new Date().toISOString();
+
+  // The machine-readable payload. JSON.stringify escapes quotes, backslashes,
+  // newlines, and HTML-ish characters inside the string values for us.
+  const leadJson = JSON.stringify({
+    schema: 'lead-v1',
+    name: venueName,
+    venueType: venueType,
+    contacts: [
+      { name: contactName, email: contactEmail, isPrimary: true }
+    ],
+    message: message,
+    source: 'website',
+    sourceDate: isoDate
+  });
+
+  // Human section first, then the fence. The fence is just plain text living
+  // inside the same plaintext body -- no MIME changes, no separate part.
+  return `
+    New Host Connection Request
+
+    Venue Name: ${venueName}
+    Contact Name: ${contactName}
+    Contact Email: ${contactEmail}
+    Venue Type: ${venueType}
+
+    Message:
+    ${message}
+
+--- LEAD JSON v1 ---
+${leadJson}
+--- END LEAD JSON ---
+  `;
+}
+
+/**
  * Handle host connection form submissions
  * @param {FormData} formData
  * @param {Env} env - Environment containing MAIL binding
@@ -110,25 +173,21 @@ async function handleHostForm(formData, env) {
   const contactEmail = formData.get('contact-email')
   const venueType = formData.get('venue-type')
   const message = formData.get('message') || 'No message provided'
-  
+
   // Validate required fields
   if (!venueName || !contactName || !contactEmail || !venueType) {
     return errorResponse('Please fill in all required fields', 400);
   }
-  
-  // Format the email content
-  const emailContent = `
-    New Host Connection Request
 
-    Venue Name: ${venueName}
-    Contact Name: ${contactName}
-    Contact Email: ${contactEmail}
-    Venue Type: ${venueType}
-    
-    Message:
-    ${message}
-  `
-  
+  // Format the email content (human section + machine-readable LEAD JSON fence)
+  const emailContent = formatHostEmail({
+    venueName,
+    contactName,
+    contactEmail,
+    venueType,
+    message
+  });
+
   return processFormSubmission({
     env,
     subject: `New Host Request: ${venueName}`,
@@ -191,6 +250,9 @@ async function sendEmail(to, subject, body, env) {
     }
     
     try {
+      // Pull EmailMessage from the Workers-only module at send time.
+      const { EmailMessage } = await import('cloudflare:email');
+
       // Create a properly formatted raw email with headers
       const fromEmail = 'forms@peoples-elbow.com';
       const date = new Date().toUTCString();
@@ -260,3 +322,8 @@ function errorResponse(message, status = 500) {
     status: status
   });
 }
+
+// Named export of the pure body-builder so it can be unit-tested without
+// Cloudflare bindings, and so the CRM parser tests can reproduce the exact
+// body shape. The Worker still ships via the `default` export above.
+export { formatHostEmail };

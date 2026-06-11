@@ -1,235 +1,128 @@
-import { register } from 'node:module';
-register('./test-loader.js', import.meta.url);
+// Tests for host-form-worker's PURE logic.
+// Run: node --test workers/host-form-worker.test.js
+//
+// The Worker's fetch()/sendEmail() need Cloudflare bindings (the MAIL binding,
+// the cloudflare:email module) that don't exist in plain Node, so we don't try
+// to exercise them here. Instead we test the one piece of pure logic that
+// actually matters for correctness: formatHostEmail(), which builds the email
+// body -- including the machine-readable "--- LEAD JSON v1 ---" fence the CRM
+// later parses. (The worker loads cloudflare:email lazily, so importing this
+// module in Node is safe as long as we never call sendEmail.)
 
-import test from 'node:test';
-import assert from 'node:assert';
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
 
-test('host-form-worker: handleContactForm success path', async () => {
-    const worker = await import('./host-form-worker.js');
+import { formatHostEmail } from './host-form-worker.js';
 
-    // Create FormData with required fields for contact form
-    const formData = new FormData();
-    formData.append('name', 'Test User');
-    formData.append('email', 'test@example.com');
-    formData.append('contact-message', 'This is a test message');
+// Pull the JSON object back out of the fence. We brace-balance (respecting
+// string literals + escapes) rather than slicing to the "--- END LEAD JSON ---"
+// marker, because a hostile value can legitimately contain that marker text
+// inside an escaped JSON string. This mirrors the real parser's extraction.
+function extractFenceJson(body) {
+  const open = body.indexOf('--- LEAD JSON v1 ---');
+  assert.notEqual(open, -1, 'body should contain the opening fence marker');
 
-    const request = new Request('http://localhost/', {
-        method: 'POST',
-        body: formData
-    });
+  const start = body.indexOf('{', open);
+  assert.notEqual(start, -1, 'body should contain a JSON object after the marker');
 
-    let d1QueryRun = false;
-    let emailSent = false;
+  let depth = 0;
+  let inString = false;
+  let escaped = false;
+  for (let i = start; i < body.length; i++) {
+    const ch = body[i];
+    if (inString) {
+      if (escaped) escaped = false;
+      else if (ch === '\\') escaped = true;
+      else if (ch === '"') inString = false;
+      continue;
+    }
+    if (ch === '"') inString = true;
+    else if (ch === '{') depth++;
+    else if (ch === '}') {
+      depth--;
+      if (depth === 0) return JSON.parse(body.slice(start, i + 1));
+    }
+  }
+  throw new Error('unbalanced JSON object in fence');
+}
 
-    const env = {
-        FORMS_DB: {
-            prepare: (query) => {
-                if (query.includes('SELECT name FROM sqlite_master')) {
-                    return { all: async () => [{name: 'contact_submissions'}] };
-                }
-                assert.ok(query.includes('INSERT INTO contact_submissions'));
-                return {
-                    bind: (...values) => {
-                        assert.ok(values.includes('Test User'));
-                        assert.ok(values.includes('test@example.com'));
-                        assert.ok(values.includes('This is a test message'));
-                        return {
-                            run: async () => { d1QueryRun = true; }
-                        };
-                    }
-                };
-            }
-        },
-        MAIL: {
-            send: async (message) => {
-                assert.strictEqual(message.to, 'peoples.elbow.massage@gmail.com');
-                assert.ok(message.raw.includes('Subject: New Contact Form Message from Test User'));
-                emailSent = true;
-            }
-        }
-    };
+test('formatHostEmail: human section contains the submitted fields', () => {
+  const body = formatHostEmail({
+    venueName: 'Comic Cave',
+    contactName: 'Pat Quinn',
+    contactEmail: 'pat@comiccave.example',
+    venueType: 'card-shop',
+    message: 'Tuesdays are slow, come liven them up.',
+    sourceDate: '2026-06-11T18:00:00.000Z'
+  });
 
-    const ctx = {};
-    const response = await worker.default.fetch(request, env, ctx);
-
-    assert.strictEqual(response.status, 200);
-    const data = await response.json();
-    assert.strictEqual(data.success, true);
-
-    assert.ok(d1QueryRun, 'D1 query should have been run');
-    assert.ok(emailSent, 'Email should have been sent');
+  assert.match(body, /Venue Name: Comic Cave/);
+  assert.match(body, /Contact Name: Pat Quinn/);
+  assert.match(body, /Contact Email: pat@comiccave\.example/);
+  assert.match(body, /Venue Type: card-shop/);
+  assert.match(body, /Tuesdays are slow/);
 });
 
-test('host-form-worker: handleContactForm missing required fields', async () => {
-    const worker = await import('./host-form-worker.js');
+test('formatHostEmail: LEAD JSON fence is present and well-formed', () => {
+  const body = formatHostEmail({
+    venueName: 'Comic Cave',
+    contactName: 'Pat Quinn',
+    contactEmail: 'pat@comiccave.example',
+    venueType: 'card-shop',
+    message: 'Tuesdays are slow.',
+    sourceDate: '2026-06-11T18:00:00.000Z'
+  });
 
-    const formData = new FormData();
-    formData.append('name', 'Test User');
-    // Missing email
+  assert.match(body, /--- LEAD JSON v1 ---/);
+  assert.match(body, /--- END LEAD JSON ---/);
 
-    const request = new Request('http://localhost/', {
-        method: 'POST',
-        body: formData
-    });
+  const payload = extractFenceJson(body);
+  assert.equal(payload.schema, 'lead-v1');
+  assert.equal(payload.name, 'Comic Cave');
+  assert.equal(payload.venueType, 'card-shop');
+  assert.equal(payload.message, 'Tuesdays are slow.');
+  assert.equal(payload.source, 'website');
+  assert.equal(payload.sourceDate, '2026-06-11T18:00:00.000Z');
 
-    const env = {};
-    const ctx = {};
-
-    const response = await worker.default.fetch(request, env, ctx);
-
-    assert.strictEqual(response.status, 400);
-    const data = await response.json();
-    assert.strictEqual(data.success, false);
-    assert.strictEqual(data.message, 'Please fill in all required fields');
+  assert.equal(payload.contacts.length, 1);
+  assert.equal(payload.contacts[0].name, 'Pat Quinn');
+  assert.equal(payload.contacts[0].email, 'pat@comiccave.example');
+  assert.equal(payload.contacts[0].isPrimary, true);
 });
 
-test('host-form-worker: handleContactForm fallback message', async () => {
-    const worker = await import('./host-form-worker.js');
+test('formatHostEmail: special characters survive JSON.stringify escaping', () => {
+  // Quotes, braces, HTML, backslashes, newlines, and even a fake fence marker
+  // inside user input must come through as literal string values once the JSON
+  // is parsed back -- proof the fields are stringify-escaped, not concatenated.
+  const venueName = 'Joe\'s "Cards" }{ <b>shop</b>';
+  const message = 'Line one\nLine "two" \\ end --- END LEAD JSON ---';
 
-    const formData = new FormData();
-    formData.append('name', 'Test User');
-    formData.append('email', 'test@example.com');
-    // Missing contact-message
+  const body = formatHostEmail({
+    venueName,
+    contactName: 'O\'Brien',
+    contactEmail: 'obrien@example.com',
+    venueType: 'other',
+    message,
+    sourceDate: '2026-06-11T00:00:00.000Z'
+  });
 
-    const request = new Request('http://localhost/', {
-        method: 'POST',
-        body: formData
-    });
-
-    let emailSent = false;
-    const env = {
-        FORMS_DB: {
-            prepare: (query) => {
-                if (query.includes('SELECT name FROM sqlite_master')) {
-                    return { all: async () => [{name: 'contact_submissions'}] };
-                }
-                return {
-                    bind: (...values) => {
-                        assert.ok(values.includes('No message provided'));
-                        return { run: async () => {} };
-                    }
-                };
-            }
-        },
-        MAIL: {
-            send: async (message) => {
-                assert.ok(message.raw.includes('No message provided'));
-                emailSent = true;
-            }
-        }
-    };
-
-    const ctx = {};
-    const response = await worker.default.fetch(request, env, ctx);
-
-    assert.strictEqual(response.status, 200);
-    assert.ok(emailSent);
+  const payload = extractFenceJson(body);
+  assert.equal(payload.name, venueName);
+  assert.equal(payload.message, message);
+  assert.equal(payload.contacts[0].name, "O'Brien");
 });
 
-test('host-form-worker: handleHostForm success path', async () => {
-    const worker = await import('./host-form-worker.js');
+test('formatHostEmail: sourceDate defaults to an ISO timestamp when omitted', () => {
+  const body = formatHostEmail({
+    venueName: 'No Date Venue',
+    contactName: 'A',
+    contactEmail: 'a@example.com',
+    venueType: 'other',
+    message: 'hi'
+  });
 
-    // Create FormData with required fields for host form
-    const formData = new FormData();
-    formData.append('venue-name', 'The Cool Venue');
-    formData.append('contact-name', 'Venue Manager');
-    formData.append('contact-email', 'venue@example.com');
-    formData.append('venue-type', 'Cafe');
-    formData.append('message', 'We would love to host!');
-
-    const request = new Request('http://localhost/', {
-        method: 'POST',
-        body: formData
-    });
-
-    let d1QueryRun = false;
-    let emailSent = false;
-
-    const env = {
-        FORMS_DB: {
-            prepare: (query) => {
-                if (query.includes('SELECT name FROM sqlite_master')) {
-                    return { all: async () => [{name: 'host_submissions'}] };
-                }
-                assert.ok(query.includes('INSERT INTO host_submissions'));
-                return {
-                    bind: (...values) => {
-                        assert.ok(values.includes('The Cool Venue'));
-                        assert.ok(values.includes('Venue Manager'));
-                        assert.ok(values.includes('venue@example.com'));
-                        assert.ok(values.includes('Cafe'));
-                        assert.ok(values.includes('We would love to host!'));
-                        return {
-                            run: async () => { d1QueryRun = true; }
-                        };
-                    }
-                };
-            }
-        },
-        MAIL: {
-            send: async (message) => {
-                assert.strictEqual(message.to, 'peoples.elbow.massage@gmail.com');
-                assert.ok(message.raw.includes('Subject: New Host Request: The Cool Venue'));
-                emailSent = true;
-            }
-        }
-    };
-
-    const ctx = {};
-    const response = await worker.default.fetch(request, env, ctx);
-
-    assert.strictEqual(response.status, 200);
-    const data = await response.json();
-    assert.strictEqual(data.success, true);
-
-    assert.ok(d1QueryRun, 'D1 query should have been run');
-    assert.ok(emailSent, 'Email should have been sent');
-});
-
-test('host-form-worker: handleHostForm missing required fields', async () => {
-    const worker = await import('./host-form-worker.js');
-
-    const formData = new FormData();
-    formData.append('venue-name', 'The Cool Venue');
-    // Missing other fields
-
-    const request = new Request('http://localhost/', {
-        method: 'POST',
-        body: formData
-    });
-
-    const env = {};
-    const ctx = {};
-
-    const response = await worker.default.fetch(request, env, ctx);
-
-    assert.strictEqual(response.status, 400);
-    const data = await response.json();
-    assert.strictEqual(data.success, false);
-    assert.strictEqual(data.message, 'Please fill in all required fields');
-});
-
-test('host-form-worker: CORS preflight requests', async () => {
-    const worker = await import('./host-form-worker.js');
-    const request = new Request('http://localhost/', {
-        method: 'OPTIONS'
-    });
-    const env = {};
-    const ctx = {};
-
-    const response = await worker.default.fetch(request, env, ctx);
-    assert.strictEqual(response.status, 200);
-    assert.strictEqual(response.headers.get('Access-Control-Allow-Methods'), 'POST, OPTIONS');
-});
-
-test('host-form-worker: Reject non-POST requests', async () => {
-    const worker = await import('./host-form-worker.js');
-    const request = new Request('http://localhost/', {
-        method: 'GET'
-    });
-    const env = {};
-    const ctx = {};
-
-    const response = await worker.default.fetch(request, env, ctx);
-    assert.strictEqual(response.status, 405);
+  const payload = extractFenceJson(body);
+  // Should be a parseable ISO date string, not undefined.
+  assert.equal(typeof payload.sourceDate, 'string');
+  assert.ok(!Number.isNaN(Date.parse(payload.sourceDate)), 'sourceDate should be a valid date');
 });

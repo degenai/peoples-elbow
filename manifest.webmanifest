@@ -1,0 +1,23 @@
+{
+  "name": "Lead-o-Tron",
+  "short_name": "Lead-o-Tron",
+  "description": "Field CRM for The People's Elbow — your leads, your Drive, no backend",
+  "start_url": "crm.html",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#f4f4f4",
+  "theme_color": "#006937",
+  "icons": [
+    {
+      "src": "images/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "images/favicon-32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    }
+  ]
+}
