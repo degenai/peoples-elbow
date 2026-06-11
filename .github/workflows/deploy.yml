@@ -40,7 +40,9 @@ jobs:
           CHANGELOG_WRITE_TOKEN: ${{ secrets.CHANGELOG_WRITE_TOKEN }}
         run: |
           echo "🔄 Updating D1 changelog with new meaningful commits..."
-          node update-d1-changelog.js
+          # .cjs because package.json declares "type":"module" (for the CRM's ESM
+          # tests) — this script is CommonJS and Node needs the explicit extension.
+          node update-d1-changelog.cjs
           echo "✅ D1 changelog update complete"
       
 #      - name: Generate fresh version data
