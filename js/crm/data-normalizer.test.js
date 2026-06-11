@@ -259,17 +259,25 @@ test('coords missing lon is nulled', () => {
 
 // --- enum defaults ---
 
-test('invalid status / source / venueType fall back to defaults', () => {
+test('invalid status / source fall back to defaults; venueType is free text', () => {
   const lead = cleanLead({
     status: 'bogus',
     source: 'spy-satellite',
-    venueType: 'nightclub'
+    venueType: 'Comic Shop'
   });
   const { lead: normalized, changed } = normalizeLead(lead);
   assert.strictEqual(normalized.status, 'active');
   assert.strictEqual(normalized.source, 'field');
-  assert.strictEqual(normalized.venueType, '');
+  // venueType is a free-text combobox now (like the area field) — kept, not enum-gated.
+  assert.strictEqual(normalized.venueType, 'Comic Shop');
   assert.strictEqual(changed, true);
+});
+
+test('venueType is whitespace-collapsed, trimmed, and length-capped', () => {
+  const { lead: a } = normalizeLead(cleanLead({ venueType: '  Comic   Shop  ' }));
+  assert.strictEqual(a.venueType, 'Comic Shop');
+  const { lead: b } = normalizeLead(cleanLead({ venueType: 'x'.repeat(200) }));
+  assert.strictEqual(b.venueType.length, 60);
 });
 
 test('empty-string venueType is valid and preserved', () => {

@@ -186,10 +186,10 @@
                 <span id="lead-count" class="crm-list-count">0 leads</span>
                 <div class="crm-list-actions">
                     <button id="route-btn" class="btn btn-secondary btn-sm" type="button"><i class="fas fa-route" aria-hidden="true"></i> Plan route</button>
-                    <button id="activity-btn" class="btn btn-secondary btn-sm" type="button" aria-label="Activity log"><i class="fas fa-clock-rotate-left" aria-hidden="true"></i></button>
-                    <button id="settings-btn" class="btn btn-secondary btn-sm" type="button" aria-label="Settings"><i class="fas fa-gear" aria-hidden="true"></i></button>
-                    <button id="export-btn" class="btn btn-secondary btn-sm" type="button" aria-label="Export JSON"><i class="fas fa-download" aria-hidden="true"></i></button>
-                    <button id="import-btn" class="btn btn-secondary btn-sm" type="button" aria-label="Import JSON"><i class="fas fa-upload" aria-hidden="true"></i></button>
+                    <button id="activity-btn" class="btn btn-secondary btn-sm" type="button" title="Activity log" aria-label="Activity log"><i class="fas fa-clock-rotate-left" aria-hidden="true"></i></button>
+                    <button id="settings-btn" class="btn btn-secondary btn-sm" type="button" title="Settings &amp; add-from-email" aria-label="Settings"><i class="fas fa-gear" aria-hidden="true"></i></button>
+                    <button id="export-btn" class="btn btn-secondary btn-sm" type="button" title="Download a backup (JSON)" aria-label="Export JSON"><i class="fas fa-download" aria-hidden="true"></i></button>
+                    <button id="import-btn" class="btn btn-secondary btn-sm" type="button" title="Restore from a JSON file" aria-label="Import JSON"><i class="fas fa-upload" aria-hidden="true"></i></button>
                     <input id="import-file" type="file" accept="application/json,.json" hidden>
                 </div>
             </div>
@@ -246,8 +246,9 @@
         </section>
 
         <!-- Floating capture button — the primary action, thumb-reachable. -->
-        <button id="new-lead-fab" class="crm-fab" type="button" aria-label="Add a new venue">
+        <button id="new-lead-fab" class="crm-fab" type="button" title="Add a new venue" aria-label="Add a new venue">
             <i class="fas fa-plus" aria-hidden="true"></i>
+            <span class="crm-fab-label">New venue</span>
         </button>
     </main>
 
@@ -294,13 +295,8 @@
 
                 <div class="crm-field-row">
                     <label class="crm-field">Type
-                        <select id="field-venuetype">
-                            <option value="">—</option>
-                            <option value="card-shop">Card shop</option>
-                            <option value="farmers-market">Farmers market</option>
-                            <option value="community-space">Community space</option>
-                            <option value="other">Other</option>
-                        </select>
+                        <input id="field-venuetype" type="text" list="venuetype-options"
+                               autocapitalize="words" enterkeyhint="next" placeholder="Type or pick — e.g. Card shop">
                     </label>
                     <label class="crm-field">Status
                         <select id="field-status">
@@ -510,6 +506,21 @@
         <option value="Holly Springs"></option>
         <option value="Ball Ground"></option>
         <option value="Atlanta"></option>
+    </datalist>
+
+    <!-- Starter venue types for the Type combobox; JS merges in any others you type. -->
+    <datalist id="venuetype-options">
+        <option value="Card shop"></option>
+        <option value="Comic shop"></option>
+        <option value="Farmers market"></option>
+        <option value="Community space"></option>
+        <option value="Brewery"></option>
+        <option value="Taproom"></option>
+        <option value="Coffee shop"></option>
+        <option value="Bar"></option>
+        <option value="Bookstore"></option>
+        <option value="Gym"></option>
+        <option value="Other"></option>
     </datalist>
 
     <div id="footer-placeholder"></div>

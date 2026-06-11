@@ -29,6 +29,7 @@ import {
   addContactRow,
   renderActivity,
   mergeNeighborhoods,
+  mergeVenueTypes,
   setSyncStatus,
 } from './render.js';
 import { createRoute } from './route.js';
@@ -196,8 +197,10 @@ function lastReception(lead) {
 // hold an array of our own.
 function refresh() {
   const visible = getVisibleLeads();
+  const allLeads = store.getLeads();
   renderList(visible);
-  mergeNeighborhoods(store.getLeads());
+  mergeNeighborhoods(allLeads);
+  mergeVenueTypes(allLeads);
 
   // Demo banner: only when the store is showing untouched demo data.
   const demo = store.isDemo();
@@ -245,9 +248,17 @@ const sheetStack = [];
 function openSheet(id, opener) {
   const sheet = byId(id);
   if (!sheet) return;
-  // Already open? Do nothing. A double-trigger must never push a duplicate stack
-  // entry — that desyncs Escape/backdrop/focus-trap against a phantom sheet.
-  if (sheetStack.some((s) => s.id === id)) return;
+  // Guard against a double-trigger pushing a duplicate stack entry — but ONLY if the
+  // sheet is genuinely visible. If a stale entry lingers for a sheet that's actually
+  // hidden (some close path missed it), drop it and open fresh instead of refusing to
+  // EVER open again. (A blocking-forever guard here once "yeeted" the New-venue button
+  // after the first save.)
+  const existingIdx = sheetStack.findIndex((s) => s.id === id);
+  if (existingIdx !== -1) {
+    if (!sheet.hidden) return;             // truly already open — ignore the re-trigger
+    sheetStack.splice(existingIdx, 1);     // stale entry for a closed sheet — clean it
+    if (sheetStack.length === 0) document.body.classList.remove('crm-modal-open');
+  }
 
   const wasEmpty = sheetStack.length === 0;
   sheet.hidden = false;
@@ -430,25 +441,33 @@ byId('lead-form').addEventListener('submit', (e) => {
   };
   if (pendingCoords) input.coords = pendingCoords;
 
-  let lead;
-  if (editingId) {
-    lead = store.updateLead(editingId, input);
-    if (lead) store.logActivity(`Updated venue: ${lead.name}`);
-  } else {
-    lead = store.createLead(input);
-    if (lead) store.logActivity(`Added venue: ${lead.name}`);
-    // Quick visit: log the visit you just made, if the toggle is on.
-    if (lead && data.quickVisit.enabled) {
-      store.addVisit(lead.id, {
-        reception: data.quickVisit.reception,
-        notes: data.quickVisit.notes,
-      });
-      store.logActivity(`Logged a ${data.quickVisit.reception} visit to ${lead.name}`);
+  try {
+    let lead;
+    if (editingId) {
+      lead = store.updateLead(editingId, input);
+      if (lead) store.logActivity(`Updated venue: ${lead.name}`);
+    } else {
+      lead = store.createLead(input);
+      if (lead) store.logActivity(`Added venue: ${lead.name}`);
+      // Quick visit: log the visit you just made, if the toggle is on.
+      if (lead && data.quickVisit.enabled) {
+        store.addVisit(lead.id, {
+          reception: data.quickVisit.reception,
+          notes: data.quickVisit.notes,
+        });
+        store.logActivity(`Logged a ${data.quickVisit.reception} visit to ${lead.name}`);
+      }
     }
+  } catch (err) {
+    console.error('Saving the venue failed:', err);
+    toast('Something went wrong saving that venue.', 'error');
+  } finally {
+    // ALWAYS close + clear, even if something above threw — a save error must never
+    // strand the form open and leave it stuck in the sheet stack (which would block
+    // the next "New venue").
+    pendingCoords = null;
+    closeSheet('form-sheet');
   }
-
-  pendingCoords = null;
-  closeSheet('form-sheet');
 });
 
 // "Add contact" button inside the form.

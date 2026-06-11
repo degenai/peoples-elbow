@@ -12,7 +12,6 @@
 import {
   STATUS_VALUES,
   RECEPTION_VALUES,
-  VENUE_TYPE_VALUES,
   SOURCE_VALUES,
   DEFAULTS
 } from './constants.js';
@@ -147,13 +146,17 @@ function normalizeLead(lead) {
     changed = true;
   }
 
-  // --- venueType enum (v2) ---
-  // Empty string is a valid value here (means "not categorized yet"), so we accept
-  // '' OR a member of VENUE_TYPE_VALUES; anything else falls back to ''.
-  if (rawLead.venueType !== '' && !VENUE_TYPE_VALUES.includes(rawLead.venueType)) {
-    rawLead.venueType = DEFAULT_VENUE_TYPE;
-    changed = true;
-  }
+  // --- venueType (v2) — free text, with remembered suggestions ---
+  // The form field is a combobox (type your own OR pick a remembered one), exactly
+  // like the area field, so we accept ANY string here — just normalized: trimmed,
+  // control chars stripped, length-capped. '' means "not categorized yet". It only
+  // ever renders via textContent, so an odd value can't inject anything.
+  const venueType = (typeof rawLead.venueType === 'string' ? rawLead.venueType : '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 60);
+  if (rawLead.venueType !== venueType) changed = true;
+  rawLead.venueType = venueType;
 
   // --- created timestamp ---
   if (!rawLead.created || typeof rawLead.created !== 'string') {

@@ -218,7 +218,8 @@ export function renderDetail(lead) {
   const placeSec = section('Place');
   placeSec.appendChild(fieldRow('Area', lead.neighborhood));
   placeSec.appendChild(fieldRow('Address', lead.address));
-  placeSec.appendChild(fieldRow('Type', VENUE_TYPE_LABELS[lead.venueType] || ''));
+  // Known types get a friendly label; a custom typed-in type shows as-is.
+  placeSec.appendChild(fieldRow('Type', VENUE_TYPE_LABELS[lead.venueType] || lead.venueType || ''));
   body.appendChild(placeSec);
 
   // ── Score breakdown ──
@@ -530,6 +531,29 @@ export function mergeNeighborhoods(leads) {
       opt.value = n; // .value is a safe sink (no HTML parsing)
       datalist.appendChild(opt);
       existing.add(n.toLowerCase());
+    }
+  }
+}
+
+// ── mergeVenueTypes ─────────────────────────────────────────────
+// Same idea as mergeNeighborhoods, for the venue-type combobox: remember any
+// type the user has actually typed (on top of the starter list in crm.html), so
+// it autocompletes next time. Free text + suggestions, exactly like the area field.
+export function mergeVenueTypes(leads) {
+  const datalist = document.getElementById('venuetype-options');
+  if (!datalist) return;
+
+  const existing = new Set(
+    Array.from(datalist.options).map((o) => o.value.toLowerCase())
+  );
+
+  for (const lead of leads) {
+    const t = (lead.venueType || '').trim();
+    if (t && !existing.has(t.toLowerCase())) {
+      const opt = document.createElement('option');
+      opt.value = t; // .value is a safe sink (no HTML parsing)
+      datalist.appendChild(opt);
+      existing.add(t.toLowerCase());
     }
   }
 }

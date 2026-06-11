@@ -548,25 +548,32 @@
    gold icon on green, big enough to hit one-handed. Sits above content (1500)
    but below sheets (2000+).
    -------------------------------------------------------------------------- */
+/* Labeled pill, not a bare "+" circle — the add-a-venue action has to be obvious
+   on a phone (no hover tooltips there) and on desktop. Icon + "New venue" text. */
 .crm-fab {
   position: fixed;
   right: max(var(--space-md), env(safe-area-inset-right));
   bottom: max(var(--space-lg), env(safe-area-inset-bottom));
   z-index: 1500;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
+  min-height: 52px;
+  padding: 0 var(--space-lg) 0 var(--space-md);
+  border-radius: var(--crm-radius-pill);
   border: none;
   background: var(--pe-green);
-  color: var(--pe-gold);
-  font-size: 1.4rem;
+  color: var(--crm-gold-text);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 700;
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: var(--space-sm);
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
   cursor: pointer;
   transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
 }
+
+.crm-fab i { font-size: 1.2rem; }
+.crm-fab-label { white-space: nowrap; }
 
 .crm-fab:hover {
   background: var(--pe-green-light);
