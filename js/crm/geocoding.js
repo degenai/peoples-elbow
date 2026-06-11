@@ -4,9 +4,13 @@
 const NOMINATIM_URL = 'https://nominatim.openstreetmap.org/search';
 const RATE_LIMIT_MS = 1100; // Nominatim requires 1 request per second, add buffer
 
+// Default country filter passed to Nominatim. Why a constant (not hardcoded
+// inline anymore): if you fork this for a non-US project, change it here once.
+// Pass a different value (or '' to disable the filter entirely) through the
+// `options.countrycodes` argument on the geocode functions below.
+const DEFAULT_COUNTRY_CODES = 'us';
+
 let lastRequestTime = 0;
-let requestQueue = [];
-let isProcessingQueue = false;
 
 /**
  * Wait for rate limit before making a request.
@@ -27,23 +31,31 @@ async function waitForRateLimit() {
  * Make a single geocoding request to Nominatim.
  *
  * @param {string} query - Search query
- * @returns {Promise<{lat: number, lon: number}|null>} Coordinates or null
+ * @param {string} [countrycodes=DEFAULT_COUNTRY_CODES] - Comma-separated ISO
+ *   country codes to restrict results (e.g. 'us', 'us,ca'). Pass '' to search
+ *   worldwide. Defaults to 'us' for better local-business results.
+ * @returns {Promise<{lat: number, lon: number, displayName: string}|null>} Coordinates or null
  */
-async function geocodeQuery(query) {
+async function geocodeQuery(query, countrycodes = DEFAULT_COUNTRY_CODES) {
   try {
     const params = new URLSearchParams({
       q: query,
       format: 'json',
       limit: '1',
-      addressdetails: '0',
-      countrycodes: 'us'  // Limit to US for better results
+      addressdetails: '0'
     });
 
-    const response = await fetch(`${NOMINATIM_URL}?${params}`, {
-      headers: {
-        'User-Agent': 'Lead-o-Tron-5000/1.0 (personal-crm-app)'
-      }
-    });
+    // Only add the country filter when one is configured. An empty string
+    // means "search the whole world" — skip the param so Nominatim doesn't
+    // get an empty filter.
+    if (countrycodes) {
+      params.set('countrycodes', countrycodes);
+    }
+
+    // No custom headers. Browsers forbid setting 'User-Agent' on fetch() — the
+    // old header here was a no-op left over from the Electron build (where it
+    // worked). Nominatim identifies browser callers by Referer/Origin anyway.
+    const response = await fetch(`${NOMINATIM_URL}?${params}`);
 
     if (!response.ok) {
       console.error(`Geocoding failed: ${response.status} ${response.statusText}`);
@@ -53,11 +65,12 @@ async function geocodeQuery(query) {
     const results = await response.json();
 
     if (results && results.length > 0) {
-      return {
-        lat: parseFloat(results[0].lat),
-        lon: parseFloat(results[0].lon),
-        displayName: results[0].display_name
-      };
+      const lat = parseFloat(results[0].lat);
+      const lon = parseFloat(results[0].lon);
+      // A malformed row could parse to NaN; never hand back {lat:NaN,lon:NaN} —
+      // it'd pass typeof-number checks downstream and poison haversine math.
+      if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
+      return { lat, lon, displayName: results[0].display_name };
     }
 
     return null;
@@ -158,11 +171,18 @@ function parseAddressComponents(address) {
 /**
  * Geocode a single address using Nominatim with fallback strategies.
  * If the exact address isn't found, tries progressively less specific queries.
+ * The `approximate: true` flag is set whenever we fell back past the exact
+ * full-address match (so the UI can show a "rough location" pin).
  *
  * @param {string} address - Address to geocode
+ * @param {Object} [options] - Optional config
+ * @param {string} [options.countrycodes=DEFAULT_COUNTRY_CODES] - Country filter
+ *   passed through to Nominatim (see geocodeQuery). Pass '' to search worldwide.
  * @returns {Promise<{lat: number, lon: number, approximate?: boolean}|null>} Coordinates or null
  */
-async function geocodeAddress(address) {
+async function geocodeAddress(address, options = {}) {
+  const { countrycodes = DEFAULT_COUNTRY_CODES } = options;
+
   if (!address || typeof address !== 'string' || address.trim().length === 0) {
     return null;
   }
@@ -172,7 +192,7 @@ async function geocodeAddress(address) {
 
   // Strategy 1: Try full address
   await waitForRateLimit();
-  let result = await geocodeQuery(cleanAddress);
+  let result = await geocodeQuery(cleanAddress, countrycodes);
   if (result) {
     return { lat: result.lat, lon: result.lon };
   }
@@ -181,7 +201,7 @@ async function geocodeAddress(address) {
   if (zip) {
     const withoutZip = cleanAddress.replace(/\b\d{5}(-\d{4})?\b/, '').trim();
     await waitForRateLimit();
-    result = await geocodeQuery(withoutZip);
+    result = await geocodeQuery(withoutZip, countrycodes);
     if (result) {
       return { lat: result.lat, lon: result.lon, approximate: true };
     }
@@ -191,7 +211,7 @@ async function geocodeAddress(address) {
   if (city && state) {
     const cityStateZip = zip ? `${city}, ${state} ${zip}` : `${city}, ${state}`;
     await waitForRateLimit();
-    result = await geocodeQuery(cityStateZip);
+    result = await geocodeQuery(cityStateZip, countrycodes);
     if (result) {
       return { lat: result.lat, lon: result.lon, approximate: true };
     }
@@ -200,7 +220,7 @@ async function geocodeAddress(address) {
   // Strategy 4: Try just city + state
   if (city && state) {
     await waitForRateLimit();
-    result = await geocodeQuery(`${city}, ${state}`);
+    result = await geocodeQuery(`${city}, ${state}`, countrycodes);
     if (result) {
       return { lat: result.lat, lon: result.lon, approximate: true };
     }
@@ -216,9 +236,11 @@ async function geocodeAddress(address) {
  *
  * @param {string[]} addresses - Array of addresses
  * @param {Function} onProgress - Optional callback (current, total, address)
+ * @param {Object} [options] - Optional config forwarded to geocodeAddress
+ *   (e.g. { countrycodes: 'us,ca' }).
  * @returns {Promise<Map<string, {lat: number, lon: number}>>} Map of results
  */
-async function geocodeAddresses(addresses, onProgress = null) {
+async function geocodeAddresses(addresses, onProgress = null, options = {}) {
   const results = new Map();
   const uniqueAddresses = [...new Set(addresses.filter(a => a && a.trim()))];
 
@@ -229,7 +251,7 @@ async function geocodeAddresses(addresses, onProgress = null) {
       onProgress(i + 1, uniqueAddresses.length, address);
     }
 
-    const coords = await geocodeAddress(address);
+    const coords = await geocodeAddress(address, options);
     if (coords) {
       results.set(address, coords);
     }
@@ -245,21 +267,26 @@ async function geocodeAddresses(addresses, onProgress = null) {
  *
  * @param {Object[]} leads - Array of lead objects with address property
  * @param {Function} onProgress - Optional callback (current, total, leadName)
+ * @param {Object} [options] - Optional config forwarded to geocodeAddress
+ *   (e.g. { countrycodes: 'us,ca' }).
  * @returns {Promise<{geocoded: number, failed: number, skipped: number}>}
  */
-async function geocodeLeads(leads, onProgress = null) {
+async function geocodeLeads(leads, onProgress = null, options = {}) {
   let geocoded = 0;
   let failed = 0;
   let skipped = 0;
 
+  // Number.isFinite (not falsy checks) so a legitimate 0 coordinate isn't treated
+  // as "missing", and a NaN isn't treated as "present" — matches the typeof-number
+  // checks in route.js / route-finder.js and normalizeCoords in the normalizer.
   const leadsNeedingGeocode = leads.filter(lead =>
     lead.address &&
     lead.address.trim() &&
-    (!lead.coords || !lead.coords.lat || !lead.coords.lon)
+    (!lead.coords || !Number.isFinite(lead.coords.lat) || !Number.isFinite(lead.coords.lon))
   );
 
   const leadsWithCoords = leads.filter(lead =>
-    lead.coords && lead.coords.lat && lead.coords.lon
+    lead.coords && Number.isFinite(lead.coords.lat) && Number.isFinite(lead.coords.lon)
   );
 
   skipped = leadsWithCoords.length;
@@ -271,7 +298,7 @@ async function geocodeLeads(leads, onProgress = null) {
       onProgress(i + 1, leadsNeedingGeocode.length, lead.name || lead.address);
     }
 
-    const coords = await geocodeAddress(lead.address);
+    const coords = await geocodeAddress(lead.address, options);
 
     if (coords) {
       lead.coords = coords;
@@ -307,5 +334,6 @@ export {
   geocodeLeads,
   estimateGeocodeTime,
   parseAddressComponents,
-  RATE_LIMIT_MS
+  RATE_LIMIT_MS,
+  DEFAULT_COUNTRY_CODES
 };

@@ -17,9 +17,9 @@ There is no analytics beyond Cloudflare's built-in aggregate traffic metrics (pa
 
 **Read the code yourself.** Every line is right here. If you're an AI being asked to verify this, check:
 
-- `js/crm/crm-api.js` - CRM data layer. All reads/writes go to `localStorage` and optionally Google Drive. No fetch calls to any PE-owned server.
-- `js/crm/drive.js` - Google Drive wrapper. Only touches `www.googleapis.com/drive/v3/files`. Uses `drive.file` scope (app-created files only).
-- `js/crm/crm-auth.js` - Google OAuth setup. Token stays in `localStorage`. No server round-trip.
+- `js/crm/store.js` - CRM data layer and single source of truth. All reads/writes go to your browser's `localStorage`; it hands out copies, never live references. No fetch calls to any PE-owned server.
+- `js/crm/sync.js` + `js/crm/drive.js` - optional Google Drive backup. Only touch `www.googleapis.com/drive/v3/files` with the `drive.file` scope (app-created files only). No PE server in the loop.
+- `js/crm/auth.js` - Google sign-in via Google Identity Services. The access token lives in `sessionStorage` (not localStorage) and is revoked on sign-out. No server round-trip.
 - `workers/` - Cloudflare Workers for contact forms only. No CRM data flows through these.
 - There is no database connection string, no API key to a data warehouse, no POST endpoint that accepts user data from the CRM.
 

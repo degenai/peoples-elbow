@@ -1,372 +1,522 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdnjs.cloudflare.com https://static.cloudflareinsights.com https://accounts.google.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; connect-src 'self' https://www.googleapis.com https://oauth2.googleapis.com https://accounts.google.com https://nominatim.openstreetmap.org https://cloudflareinsights.com; frame-src https://accounts.google.com">
-  <title>Lead-o-Tron 5000 CRM</title>
-  <link rel="shortcut icon" href="images/favicon-32.png" type="image/png">
-  <link rel="stylesheet" href="css/crm.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <!--
+      Content-Security-Policy: the v1 port shipped 'unsafe-inline' + 'unsafe-eval'
+      (which defeats the point) and cdnjs in script-src (for the old anime CDN).
+      v2 drops all of that: no inline scripts (the service worker is registered
+      from app.js, not an inline tag), anime is the vendored ESM, and the only
+      script origins are our own + Google Identity Services. connect-src lists
+      Drive, OAuth, Nominatim (route geocoding), and the changelog-reader worker
+      that the shared header's version badge calls.
+    -->
+    <meta http-equiv="Content-Security-Policy" content="
+      default-src 'self';
+      script-src 'self' https://accounts.google.com https://apis.google.com https://www.gstatic.com;
+      connect-src 'self' https://www.googleapis.com https://oauth2.googleapis.com https://accounts.google.com https://www.gstatic.com https://nominatim.openstreetmap.org https://changelog-reader.alex-adamczyk.workers.dev;
+      frame-src https://accounts.google.com;
+      img-src 'self' data: https:;
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;
+      font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;
+      manifest-src 'self';
+      worker-src 'self';
+      base-uri 'self';
+      object-src 'none';
+    ">
 
-  <!-- Google Identity Services — OAuth for Drive sync -->
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <title>Lead-o-Tron | The People's Elbow</title>
+    <meta name="description" content="The People's Elbow field CRM — capture and score venue leads from your phone while tabling. Your data lives in your own Google Drive, with no backend.">
+    <link rel="canonical" href="https://peoples-elbow.com/crm.html">
+    <meta name="robots" content="noindex">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://peoples-elbow.com/crm.html">
+    <meta property="og:title" content="Lead-o-Tron | The People's Elbow">
+    <meta property="og:description" content="Field CRM for venue outreach. Your leads, your Drive, no backend.">
+    <meta property="og:image" content="https://peoples-elbow.com/images/logo.png">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <!-- PWA: installable so it opens with no signal and survives iOS storage eviction. -->
+    <link rel="manifest" href="manifest.webmanifest">
+    <meta name="theme-color" content="#006937">
+    <link rel="shortcut icon" href="images/favicon-32.png" type="image/png">
+    <link rel="apple-touch-icon" href="images/logo.png">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Open+Sans:wght@400;700&display=swap">
+    <link rel="stylesheet" href="css/main.css">
+    <!-- crm.css is loaded AFTER main.css and uses only namespaced .crm-* / --crm-* -->
+    <link rel="stylesheet" href="css/crm.css">
+
+    <!-- Google Identity Services (token client for Drive sign-in). -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
-<body class="page-loading">
-  <div id="app">
-    <!-- Header -->
-    <header class="app-header">
-      <div class="header-left">
-        <h1 class="app-title">LEAD-O-TRON 5000</h1>
-        <span class="app-subtitle">The People's Elbow Outreach Tracker</span>
-      </div>
-      <div class="header-right">
-        <button id="utilityBeltBtn" class="btn btn-utility" title="Utility Belt - Route Finder & Tools" aria-label="Utility Belt - Route Finder & Tools">🛠️ Utility Belt</button>
-        <button id="settingsBtn" class="btn btn-icon" title="Settings" aria-label="Settings">⚙️</button>
-        <button id="exportBtn" class="btn btn-secondary">Export JSON</button>
-        <button id="importBtn" class="btn btn-secondary">Import JSON</button>
-        <!-- Drive auth UI — toggled by crm-auth.js -->
-        <button id="driveSignInBtn" class="btn btn-secondary" title="Sign in with Google to sync CRM to Drive">☁ Sign in</button>
-        <span id="driveStatusBadge" class="drive-status-badge hidden" title="CRM data is syncing to your Google Drive">☁ Synced</span>
-        <button id="driveSignOutBtn" class="btn btn-secondary hidden" title="Disconnect Google Drive sync">Sign out</button>
-        <button id="addLeadBtn" class="btn btn-primary">+ New Lead</button>
-        <a href="index.html" class="btn btn-secondary">← Back to Site</a>
-      </div>
-    </header>
+<body>
+<!--
+  ════════════════════════════════════════════════════════════════════════════
+  LEAD-O-TRON v2 — DOM CONTRACT
+  This file is the single source of structure. The JS modules bind to the ids
+  and classes below; the CSS styles them; do not rename without updating both.
 
-    <!-- Demo data banner — hidden once Drive connects or data is cleared -->
-    <div id="demo-banner" class="demo-banner hidden">
-      <div class="demo-banner-text">
-        <strong>Demo mode</strong>: you're viewing fictional sample data.
-        <span class="demo-banner-options">
-          Sign in with Google to load your real leads and sync to Drive.
-          Or <button id="importBtnBanner" class="demo-banner-link">import a JSON file</button> to use the CRM locally without Google.
-          <button id="clearDemoBtn" class="demo-banner-link">Clear demo data</button> to start with an empty CRM.
-        </span>
-      </div>
-    </div>
+  Module wiring (all under js/crm/, ESM, no build step):
+    app.js     entry — createStore() + createAuth({clientId}) + createSync();
+               wires every control below; routes list <-> route views; registers
+               sw.js; foreground token check; visibilitychange -> sync.flushNow().
+    store.js   single source of truth (createStore). app calls it; render reads
+               store.getState()/getLeads()/getLead(); never hold its arrays.
+    sync.js    Drive engine (createSync). app calls connect() on token, flushNow()
+               on pagehide; onStatus -> #drive-status text/class.
+    auth.js    GIS (createAuth). app wires #sign-in-btn -> auth.signIn() INSIDE the
+               click handler (iOS popup rule); onError/onExpired -> UI.
+    render.js  builds DOM from <template>s with textContent only (XSS-immune):
+               renderList(leads), renderDetail(lead), fillForm(lead|null),
+               renderActivity(log), updateStatus(state). Event DELEGATION on
+               #lead-list and the sheets — no per-card listeners.
+    route.js   the #route-view: eligible filter -> geocodeMissing -> solveRoute
+               (route-finder.js) -> Maps link (generateGoogleMapsUrl returns
+               {url, droppedStops} — surface droppedStops as a warning) + Notes export.
+    motion.js  anime v4 from ../vendor/anime.esm.min.js; house idioms — bail on
+               prefers-reduced-motion, page is fully usable if it never runs, seed
+               hidden state with utils.set() in the same frame you animate.
 
-    <!-- Main Content -->
-    <main class="main-content">
-      <!-- Sidebar Filters -->
-      <aside class="sidebar">
-        <div class="filter-section">
-          <h3>🔍 Filters</h3>
+  Capture-first invariant: name is the ONLY required field. Address, contacts,
+  scores, notes are all deferrable. Sliders are banned for scoring — scores are
+  segmented 1-5 button rows; reception is chips; both are real radio inputs so
+  they work with no JS and are keyboard/AT accessible.
+  ════════════════════════════════════════════════════════════════════════════
+-->
+    <div id="header-placeholder"></div>
 
-          <div class="filter-group">
-            <label for="filterStatus">Status</label>
-            <select id="filterStatus">
-              <option value="all">All Status</option>
-              <option value="active" selected>Active</option>
-              <option value="converted">Converted</option>
-              <option value="archived">Archived</option>
-            </select>
-          </div>
+    <main class="crm-page">
+        <!-- ── Hero + Drive status ─────────────────────────────── -->
+        <section class="crm-hero">
+            <div class="container">
+                <h1>Lead-o-Tron</h1>
+                <p class="crm-tagline">Field CRM — your leads, your Drive, no backend.</p>
+                <div class="crm-drive-bar">
+                    <span id="drive-status" class="crm-status crm-status--local" title="How your data is backed up">Saved on this phone</span>
+                    <button id="sign-in-btn" class="btn btn-secondary btn-sm" type="button">
+                        <i class="fab fa-google" aria-hidden="true"></i> Sign in to back up
+                    </button>
+                    <button id="sign-out-btn" class="btn btn-secondary btn-sm hidden" type="button">Sign out</button>
+                </div>
+            </div>
+        </section>
 
-          <div class="filter-group">
-            <label for="filterTime">Time Since Visit</label>
-            <select id="filterTime">
-              <option value="all">All Time</option>
-              <option value="week">This Week</option>
-              <option value="due-1">Due (1+ weeks)</option>
-              <option value="due-2">Due (2+ weeks)</option>
-              <option value="due-3">Due (3+ weeks)</option>
-              <option value="due-month">Due (1+ month)</option>
-              <option value="never">Never Visited</option>
-            </select>
-          </div>
-
-          <div class="filter-group">
-            <label for="filterNeighborhood">Neighborhood</label>
-            <select id="filterNeighborhood">
-              <option value="all">All Areas</option>
-            </select>
-          </div>
-
-          <div class="filter-group">
-            <label for="filterMinScore">Min Score</label>
-            <input type="range" id="filterMinScore" min="3" max="15" value="3">
-            <span id="filterMinScoreValue">3+</span>
-          </div>
-
-          <div class="filter-group">
-            <label for="filterReception">Last Reception</label>
-            <select id="filterReception">
-              <option value="all">All</option>
-              <option value="warm">🔥 Warm</option>
-              <option value="lukewarm">🌤️ Lukewarm</option>
-              <option value="cold">❄️ Cold</option>
-            </select>
-          </div>
-
-          <button id="clearFiltersBtn" class="btn btn-secondary btn-block">Clear Filters</button>
+        <!-- ── Demo banner (signed out + untouched demo data) ──── -->
+        <div id="demo-banner" class="crm-demo-banner hidden" role="status">
+            <p><strong>You're looking at example data.</strong> These ten venues are fictional — they show how the CRM works. Make it yours:</p>
+            <div class="crm-demo-actions">
+                <button id="demo-signin-btn" class="btn btn-primary btn-sm" type="button">Sign in with Google</button>
+                <button id="demo-import-btn" class="btn btn-secondary btn-sm" type="button">Import a JSON file</button>
+                <button id="demo-clear-btn" class="btn btn-secondary btn-sm" type="button">Start empty</button>
+            </div>
         </div>
 
-        <div class="stats-section">
-          <h3>📊 Stats</h3>
-          <div class="stat-item">
-            <span class="stat-label">Total Leads</span>
-            <span id="statTotal" class="stat-value">0</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-label">Active</span>
-            <span id="statActive" class="stat-value">0</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-label">Converted</span>
-            <span id="statConverted" class="stat-value">0</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-label">Due This Week</span>
-            <span id="statDue" class="stat-value">0</span>
-          </div>
-        </div>
-      </aside>
+        <!-- ── List view (the primary screen) ──────────────────── -->
+        <section id="list-view" class="crm-view">
+            <div class="crm-toolbar">
+                <label class="crm-search" for="search-input">
+                    <i class="fas fa-search" aria-hidden="true"></i>
+                    <input id="search-input" type="search" placeholder="Search venues, areas, contacts…"
+                           enterkeyhint="search" autocomplete="off" aria-label="Search leads">
+                </label>
+                <div class="crm-toolbar-controls">
+                    <button id="filter-toggle" class="btn btn-secondary btn-sm" type="button" aria-expanded="false" aria-controls="filter-drawer">
+                        <i class="fas fa-filter" aria-hidden="true"></i> Filters
+                    </button>
+                    <label class="crm-sort" for="sort-select">
+                        <span class="crm-visually-hidden">Sort by</span>
+                        <select id="sort-select">
+                            <option value="recent">Last visit (newest)</option>
+                            <option value="stale">Last visit (oldest)</option>
+                            <option value="name">Name (A–Z)</option>
+                            <option value="score">Score (high–low)</option>
+                            <option value="neighborhood">Area (A–Z)</option>
+                            <option value="created">Date added</option>
+                        </select>
+                    </label>
+                </div>
+            </div>
 
-      <!-- Lead List -->
-      <section class="lead-list-section">
-        <div class="list-header">
-          <div class="list-controls">
-            <input type="text" id="searchInput" placeholder="Search leads..." class="search-input">
-            <select id="sortBy" class="sort-select">
-              <option value="lastVisit">Sort: Last Visit</option>
-              <option value="name">Sort: Name</option>
-              <option value="totalScore">Sort: Score</option>
-              <option value="neighborhood">Sort: Neighborhood</option>
-              <option value="created">Sort: Date Added</option>
-            </select>
-            <button id="sortOrderBtn" class="btn btn-icon" title="Toggle sort order" aria-label="Toggle sort order">↓</button>
-          </div>
-          <div class="list-count">
-            <span id="leadCount">0 leads</span>
-          </div>
-        </div>
+            <!-- Filter drawer: collapsed on phones, inline on desktop -->
+            <div id="filter-drawer" class="crm-filter-drawer" hidden>
+                <div class="crm-filter-grid">
+                    <label>Status
+                        <select id="filter-status">
+                            <option value="all">All</option>
+                            <option value="active" selected>Active</option>
+                            <option value="converted">Converted</option>
+                            <option value="archived">Archived</option>
+                        </select>
+                    </label>
+                    <label>Last visit
+                        <select id="filter-time">
+                            <option value="all">Any time</option>
+                            <option value="week">Within a week</option>
+                            <option value="due1">Due (1+ week)</option>
+                            <option value="due2">Due (2+ weeks)</option>
+                            <option value="due3">Due (3+ weeks)</option>
+                            <option value="due4">Due (1+ month)</option>
+                            <option value="never">Never visited</option>
+                        </select>
+                    </label>
+                    <label>Area
+                        <input id="filter-neighborhood" type="text" list="neighborhood-options"
+                               placeholder="Any area" autocomplete="off">
+                    </label>
+                    <label>Min score <output id="filter-minscore-out">3</output>
+                        <input id="filter-minscore" type="range" min="3" max="15" value="3">
+                    </label>
+                    <label>Last reception
+                        <select id="filter-reception">
+                            <option value="all">Any</option>
+                            <option value="warm">Warm</option>
+                            <option value="lukewarm">Lukewarm</option>
+                            <option value="cold">Cold</option>
+                        </select>
+                    </label>
+                    <button id="clear-filters-btn" class="btn btn-secondary btn-sm" type="button">Reset filters</button>
+                </div>
+            </div>
 
-        <div id="leadList" class="lead-list">
-          <!-- Leads will be rendered here -->
-        </div>
-      </section>
+            <div class="crm-list-head">
+                <span id="lead-count" class="crm-list-count">0 leads</span>
+                <div class="crm-list-actions">
+                    <button id="route-btn" class="btn btn-secondary btn-sm" type="button"><i class="fas fa-route" aria-hidden="true"></i> Plan route</button>
+                    <button id="activity-btn" class="btn btn-secondary btn-sm" type="button" aria-label="Activity log"><i class="fas fa-clock-rotate-left" aria-hidden="true"></i></button>
+                    <button id="settings-btn" class="btn btn-secondary btn-sm" type="button" aria-label="Settings"><i class="fas fa-gear" aria-hidden="true"></i></button>
+                    <button id="export-btn" class="btn btn-secondary btn-sm" type="button" aria-label="Export JSON"><i class="fas fa-download" aria-hidden="true"></i></button>
+                    <button id="import-btn" class="btn btn-secondary btn-sm" type="button" aria-label="Import JSON"><i class="fas fa-upload" aria-hidden="true"></i></button>
+                    <input id="import-file" type="file" accept="application/json,.json" hidden>
+                </div>
+            </div>
 
-      <!-- Lead Detail Panel -->
-      <aside id="detailPanel" class="detail-panel hidden">
-        <div class="detail-header">
-          <button id="closeDetailBtn" class="btn btn-icon" aria-label="Close lead details">✕</button>
-          <h2 id="detailTitle">Lead Details</h2>
-          <div class="detail-actions">
-            <button id="editLeadBtn" class="btn btn-secondary">Edit</button>
-            <button id="deleteLeadBtn" class="btn btn-danger">Delete</button>
-          </div>
-        </div>
+            <ul id="lead-list" class="crm-lead-list" aria-label="Leads"></ul>
 
-        <div id="detailContent" class="detail-content">
-          <!-- Detail content will be rendered here -->
-        </div>
-      </aside>
+            <div id="empty-state" class="crm-empty hidden">
+                <p>No venues yet.</p>
+                <button class="btn btn-primary" type="button" data-action="new-lead">+ Add your first venue</button>
+            </div>
+        </section>
+
+        <!-- ── Route view (shown at #route) ────────────────────── -->
+        <section id="route-view" class="crm-view hidden" aria-label="Route planner">
+            <div class="crm-route-head">
+                <button id="route-back-btn" class="btn btn-secondary btn-sm" type="button"><i class="fas fa-arrow-left" aria-hidden="true"></i> Back to leads</button>
+                <h2>Plan an outreach route</h2>
+            </div>
+            <div class="crm-route-controls">
+                <label>Start address
+                    <input id="route-start" type="text" autocomplete="street-address" placeholder="Where you're starting from">
+                </label>
+                <button id="use-location-route" class="btn btn-secondary btn-sm" type="button"><i class="fas fa-location-crosshairs" aria-hidden="true"></i> Use my location</button>
+                <label>Include leads due
+                    <select id="route-filter-time">
+                        <option value="all">Any</option>
+                        <option value="due1">1+ week</option>
+                        <option value="due2" selected>2+ weeks</option>
+                        <option value="due3">3+ weeks</option>
+                        <option value="due4">1+ month</option>
+                    </select>
+                </label>
+                <label>Status
+                    <select id="route-filter-status">
+                        <option value="active" selected>Active only</option>
+                        <option value="all">All</option>
+                    </select>
+                </label>
+                <label>Max stops <output id="route-maxstops-out">9</output>
+                    <input id="route-maxstops" type="range" min="1" max="15" value="9">
+                </label>
+                <p class="crm-route-eligible"><span id="route-eligible-count">0</span> eligible leads</p>
+                <div class="crm-route-buttons">
+                    <button id="geocode-btn" class="btn btn-secondary btn-sm" type="button">Geocode addresses</button>
+                    <button id="calc-route-btn" class="btn btn-primary btn-sm" type="button">Calculate route</button>
+                </div>
+                <div id="route-progress" class="crm-route-progress" hidden></div>
+            </div>
+            <div id="route-stats" class="crm-route-stats hidden"></div>
+            <a id="route-maps-link" class="btn btn-primary hidden" target="_blank" rel="noopener noreferrer">Open in Google Maps</a>
+            <button id="route-export-btn" class="btn btn-secondary hidden" type="button">Download route notes</button>
+            <p id="route-dropped-warning" class="crm-route-warning hidden"></p>
+            <ol id="route-results" class="crm-route-results"></ol>
+        </section>
+
+        <!-- Floating capture button — the primary action, thumb-reachable. -->
+        <button id="new-lead-fab" class="crm-fab" type="button" aria-label="Add a new venue">
+            <i class="fas fa-plus" aria-hidden="true"></i>
+        </button>
     </main>
 
-    <!-- Console/Activity Log -->
-    <footer class="console-panel">
-      <div class="console-header" role="button" tabindex="0" aria-label="Toggle activity log">
-        <span>📋 Activity Log</span>
-        <span class="console-toggle-arrow">▼</span>
-      </div>
-      <div id="consoleContent" class="console-content">
-        <!-- Log entries will appear here -->
-      </div>
-    </footer>
+    <!-- ════ Overlays / sheets (z-index >= 2000 in crm.css) ════ -->
 
-    <!-- Add/Edit Lead Modal -->
-    <div id="leadModal" class="modal hidden">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2 id="modalTitle">Add New Lead</h2>
-          <button id="closeModalBtn" class="btn btn-icon" aria-label="Close modal">✕</button>
+    <!-- Lead detail -->
+    <div id="lead-sheet" class="crm-sheet" hidden role="dialog" aria-modal="true" aria-labelledby="lead-sheet-title">
+        <div class="crm-sheet-panel">
+            <header class="crm-sheet-head">
+                <h2 id="lead-sheet-title">Venue</h2>
+                <button class="crm-sheet-close" type="button" data-close aria-label="Close">&times;</button>
+            </header>
+            <div id="lead-sheet-body" class="crm-sheet-body"></div>
         </div>
-        <form id="leadForm" class="modal-body">
-          <div class="form-row">
-            <div class="form-group flex-grow">
-              <label for="leadName">Business Name *</label>
-              <input type="text" id="leadName" required placeholder="Enter business name">
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group flex-grow">
-              <label for="leadAddress">Address</label>
-              <input type="text" id="leadAddress" placeholder="Full address">
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="leadNeighborhood">Neighborhood</label>
-              <select id="leadNeighborhood"></select>
-            </div>
-            <div class="form-group">
-              <label for="leadStatus">Status</label>
-              <select id="leadStatus">
-                <option value="active">Active</option>
-                <option value="converted">Converted</option>
-                <option value="archived">Archived</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="form-section contacts-section">
-            <div class="contacts-header">
-              <h3>Contacts</h3>
-              <button type="button" id="addContactBtn" class="btn btn-secondary btn-sm">+ Add Contact</button>
-            </div>
-            <div id="contactsList" class="contacts-list">
-              <!-- Contacts will be rendered dynamically -->
-            </div>
-          </div>
-
-          <div class="form-section">
-            <h3>Scores</h3>
-            <div class="scores-grid">
-              <div class="score-group">
-                <label for="scoreSpace">🪑 Space <span id="spaceValue">3</span>/5</label>
-                <input type="range" id="scoreSpace" min="1" max="5" value="3">
-                <small>Room for chair massage setup</small>
-              </div>
-              <div class="score-group">
-                <label for="scoreTraffic">👥 Traffic <span id="trafficValue">3</span>/5</label>
-                <input type="range" id="scoreTraffic" min="1" max="5" value="3">
-                <small>Customer foot traffic</small>
-              </div>
-              <div class="score-group">
-                <label for="scoreVibes">✨ Vibes <span id="vibesValue">3</span>/5</label>
-                <input type="range" id="scoreVibes" min="1" max="5" value="3">
-                <small>Cultural fit / mutual aid alignment</small>
-              </div>
-            </div>
-            <div class="total-score">
-              Total Score: <span id="totalScoreValue">9</span>/15
-            </div>
-          </div>
-
-          <div id="quickVisitSection" class="form-section">
-            <h3>Quick Add Visit</h3>
-            <div class="form-group">
-              <label for="addQuickVisit">
-                <input type="checkbox" id="addQuickVisit"> Log a visit now
-              </label>
-            </div>
-            <div id="quickVisitFields" class="hidden">
-              <div class="form-group">
-                <label for="quickVisitNotes">Notes</label>
-                <textarea id="quickVisitNotes" rows="2" placeholder="Notes from this visit..."></textarea>
-              </div>
-              <div class="form-group">
-                <label for="quickVisitReception">Reception</label>
-                <select id="quickVisitReception">
-                  <option value="lukewarm">🌤️ Lukewarm</option>
-                  <option value="warm">🔥 Warm</option>
-                  <option value="cold">❄️ Cold</option>
-                </select>
-              </div>
-            </div>
-          </div>
-
-          <input type="hidden" id="leadId">
-        </form>
-        <div class="modal-footer">
-          <button type="button" id="cancelModalBtn" class="btn btn-secondary">Cancel</button>
-          <button type="submit" form="leadForm" class="btn btn-primary" id="saveLeadBtn"><span>Save Lead</span> <span class="loading-spinner"></span></button>
-        </div>
-      </div>
     </div>
 
-    <!-- Add/Edit Visit Modal -->
-    <div id="visitModal" class="modal hidden">
-      <div class="modal-content modal-sm">
-        <div class="modal-header">
-          <h2 id="visitModalTitle">Log Visit</h2>
-          <button id="closeVisitModalBtn" class="btn btn-icon" aria-label="Close visit modal">✕</button>
+    <!-- Add / edit lead -->
+    <div id="form-sheet" class="crm-sheet" hidden role="dialog" aria-modal="true" aria-labelledby="form-title">
+        <div class="crm-sheet-panel">
+            <header class="crm-sheet-head">
+                <h2 id="form-title">New venue</h2>
+                <button class="crm-sheet-close" type="button" data-close aria-label="Close">&times;</button>
+            </header>
+            <form id="lead-form" class="crm-sheet-body">
+                <input type="hidden" id="form-lead-id">
+
+                <label class="crm-field">Venue name <span class="crm-req">*</span>
+                    <input id="field-name" type="text" required autocomplete="organization"
+                           autocapitalize="words" enterkeyhint="next" placeholder="e.g. Ironwood Taproom">
+                </label>
+
+                <label class="crm-field">Area
+                    <input id="field-neighborhood" type="text" list="neighborhood-options"
+                           autocapitalize="words" enterkeyhint="next" placeholder="Type or pick — e.g. Woodstock">
+                </label>
+
+                <label class="crm-field">Address
+                    <input id="field-address" type="text" autocomplete="street-address"
+                           autocapitalize="words" enterkeyhint="next" placeholder="Street, city, ZIP">
+                    <button id="use-location-btn" class="btn btn-secondary btn-sm crm-field-aux" type="button">
+                        <i class="fas fa-location-crosshairs" aria-hidden="true"></i> Use my location
+                    </button>
+                </label>
+
+                <div class="crm-field-row">
+                    <label class="crm-field">Type
+                        <select id="field-venuetype">
+                            <option value="">—</option>
+                            <option value="card-shop">Card shop</option>
+                            <option value="farmers-market">Farmers market</option>
+                            <option value="community-space">Community space</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </label>
+                    <label class="crm-field">Status
+                        <select id="field-status">
+                            <option value="active" selected>Active</option>
+                            <option value="converted">Converted</option>
+                            <option value="archived">Archived</option>
+                        </select>
+                    </label>
+                </div>
+
+                <!-- Scores: segmented 1-5 button rows (radios), NOT sliders. -->
+                <fieldset class="crm-scores">
+                    <legend>Score it (1–5)</legend>
+                    <div class="crm-score-row" data-score="space">
+                        <span class="crm-score-label">🪑 Space</span>
+                        <span class="crm-segments" role="radiogroup" aria-label="Space score">
+                            <label><input type="radio" name="score-space" value="1"><span>1</span></label>
+                            <label><input type="radio" name="score-space" value="2"><span>2</span></label>
+                            <label><input type="radio" name="score-space" value="3" checked><span>3</span></label>
+                            <label><input type="radio" name="score-space" value="4"><span>4</span></label>
+                            <label><input type="radio" name="score-space" value="5"><span>5</span></label>
+                        </span>
+                    </div>
+                    <div class="crm-score-row" data-score="traffic">
+                        <span class="crm-score-label">👥 Traffic</span>
+                        <span class="crm-segments" role="radiogroup" aria-label="Traffic score">
+                            <label><input type="radio" name="score-traffic" value="1"><span>1</span></label>
+                            <label><input type="radio" name="score-traffic" value="2"><span>2</span></label>
+                            <label><input type="radio" name="score-traffic" value="3" checked><span>3</span></label>
+                            <label><input type="radio" name="score-traffic" value="4"><span>4</span></label>
+                            <label><input type="radio" name="score-traffic" value="5"><span>5</span></label>
+                        </span>
+                    </div>
+                    <div class="crm-score-row" data-score="vibes">
+                        <span class="crm-score-label">✨ Vibes</span>
+                        <span class="crm-segments" role="radiogroup" aria-label="Vibes score">
+                            <label><input type="radio" name="score-vibes" value="1"><span>1</span></label>
+                            <label><input type="radio" name="score-vibes" value="2"><span>2</span></label>
+                            <label><input type="radio" name="score-vibes" value="3" checked><span>3</span></label>
+                            <label><input type="radio" name="score-vibes" value="4"><span>4</span></label>
+                            <label><input type="radio" name="score-vibes" value="5"><span>5</span></label>
+                        </span>
+                    </div>
+                </fieldset>
+
+                <!-- Contacts: rows cloned from the template below -->
+                <fieldset class="crm-contacts">
+                    <legend>Contacts</legend>
+                    <div id="contacts-list"></div>
+                    <button id="add-contact-btn" class="btn btn-secondary btn-sm" type="button">+ Add contact</button>
+                </fieldset>
+
+                <label class="crm-field">Notes
+                    <textarea id="field-notes" rows="3" autocapitalize="sentences" placeholder="Anything worth remembering"></textarea>
+                </label>
+
+                <!-- Quick visit: default-on in the field — log the visit you just made -->
+                <div class="crm-quickvisit">
+                    <label class="crm-check"><input id="quickvisit-toggle" type="checkbox"> Log a visit now</label>
+                    <div id="quickvisit-fields" hidden>
+                        <span class="crm-chips" role="radiogroup" aria-label="How did it go?">
+                            <label class="crm-chip"><input type="radio" name="qv-reception" value="warm"><span>🔥 Warm</span></label>
+                            <label class="crm-chip"><input type="radio" name="qv-reception" value="lukewarm" checked><span>🌤️ Lukewarm</span></label>
+                            <label class="crm-chip"><input type="radio" name="qv-reception" value="cold"><span>❄️ Cold</span></label>
+                        </span>
+                        <textarea id="qv-notes" rows="2" autocapitalize="sentences" placeholder="How did it go?"></textarea>
+                    </div>
+                </div>
+
+                <div class="crm-sheet-actions">
+                    <button type="button" class="btn btn-secondary" data-close>Cancel</button>
+                    <button id="form-save-btn" type="submit" class="btn btn-primary">Save venue</button>
+                </div>
+            </form>
         </div>
-        <form id="visitForm" class="modal-body">
-          <div class="form-group">
-            <label for="visitDate">Date</label>
-            <input type="datetime-local" id="visitDate">
-          </div>
-          <div class="form-group">
-            <label for="visitNotes">Notes</label>
-            <textarea id="visitNotes" rows="4" placeholder="Notes from this visit..."></textarea>
-          </div>
-          <div class="form-group">
-            <label for="visitReception">Reception</label>
-            <select id="visitReception">
-              <option value="lukewarm">🌤️ Lukewarm</option>
-              <option value="warm">🔥 Warm</option>
-              <option value="cold">❄️ Cold</option>
-            </select>
-          </div>
-          <input type="hidden" id="visitLeadId">
-          <input type="hidden" id="visitIndex" value="">
-        </form>
-        <div class="modal-footer">
-          <button type="button" id="cancelVisitModalBtn" class="btn btn-secondary">Cancel</button>
-          <button type="submit" form="visitForm" id="visitSubmitBtn" class="btn btn-primary"><span>Log Visit</span> <span class="loading-spinner"></span></button>
-        </div>
-      </div>
     </div>
 
-    <!-- Delete Visit Confirmation Modal -->
-    <div id="deleteVisitModal" class="modal hidden">
-      <div class="modal-content modal-sm modal-danger">
-        <div class="modal-header">
-          <h2>⚠️ Delete Visit?</h2>
-          <button id="closeDeleteVisitBtn" class="btn btn-icon" aria-label="Close delete visit confirmation">✕</button>
+    <!-- Log / edit a visit -->
+    <div id="visit-sheet" class="crm-sheet" hidden role="dialog" aria-modal="true" aria-labelledby="visit-title">
+        <div class="crm-sheet-panel">
+            <header class="crm-sheet-head">
+                <h2 id="visit-title">Log a visit</h2>
+                <button class="crm-sheet-close" type="button" data-close aria-label="Close">&times;</button>
+            </header>
+            <form id="visit-form" class="crm-sheet-body">
+                <input type="hidden" id="visit-lead-id">
+                <input type="hidden" id="visit-id">
+                <label class="crm-field">When
+                    <input id="visit-date" type="datetime-local">
+                </label>
+                <span class="crm-chips" role="radiogroup" aria-label="Reception">
+                    <label class="crm-chip"><input type="radio" name="visit-reception" value="warm"><span>🔥 Warm</span></label>
+                    <label class="crm-chip"><input type="radio" name="visit-reception" value="lukewarm" checked><span>🌤️ Lukewarm</span></label>
+                    <label class="crm-chip"><input type="radio" name="visit-reception" value="cold"><span>❄️ Cold</span></label>
+                </span>
+                <label class="crm-field">Notes
+                    <textarea id="visit-notes" rows="3" autocapitalize="sentences"></textarea>
+                </label>
+                <div class="crm-sheet-actions">
+                    <button type="button" class="btn btn-secondary" data-close>Cancel</button>
+                    <button id="visit-save-btn" type="submit" class="btn btn-primary">Save visit</button>
+                </div>
+            </form>
         </div>
-        <div class="modal-body">
-          <p class="delete-warning">This action cannot be undone.</p>
-          <div class="delete-preview">
-            <div class="delete-preview-date" id="deleteVisitDate"></div>
-            <div class="delete-preview-notes" id="deleteVisitNotes"></div>
-          </div>
-          <input type="hidden" id="deleteVisitLeadId">
-          <input type="hidden" id="deleteVisitIndex">
-        </div>
-        <div class="modal-footer">
-          <button type="button" id="cancelDeleteVisitBtn" class="btn btn-secondary">Cancel</button>
-          <button type="button" id="confirmDeleteVisitBtn" class="btn btn-danger">Delete Visit</button>
-        </div>
-      </div>
     </div>
 
-    <!-- Settings Modal -->
-    <div id="settingsModal" class="modal hidden">
-      <div class="modal-content modal-sm">
-        <div class="modal-header">
-          <h2>⚙️ Settings</h2>
-          <button id="closeSettingsModalBtn" class="btn btn-icon" aria-label="Close settings modal">✕</button>
+    <!-- Settings -->
+    <div id="settings-sheet" class="crm-sheet" hidden role="dialog" aria-modal="true" aria-labelledby="settings-title">
+        <div class="crm-sheet-panel">
+            <header class="crm-sheet-head">
+                <h2 id="settings-title">Settings</h2>
+                <button class="crm-sheet-close" type="button" data-close aria-label="Close">&times;</button>
+            </header>
+            <div class="crm-sheet-body">
+                <label class="crm-field">Default route start address
+                    <input id="setting-start-address" type="text" autocomplete="street-address">
+                </label>
+                <label class="crm-field">Geocoding country code
+                    <input id="setting-country" type="text" maxlength="2" placeholder="us" inputmode="latin">
+                </label>
+                <hr>
+                <h3>Add a lead from a website email</h3>
+                <p class="crm-help">When a venue contacts you through peoples-elbow.com, the email contains a hidden lead block. Paste the whole email here to add them.</p>
+                <textarea id="paste-email-text" rows="4" placeholder="Paste the email text…"></textarea>
+                <button id="paste-email-btn" class="btn btn-secondary btn-sm" type="button">Add lead from email</button>
+                <hr>
+                <div class="crm-sheet-actions">
+                    <button id="export-btn-2" class="btn btn-secondary" type="button">Export all data (JSON)</button>
+                </div>
+            </div>
         </div>
-        <div class="modal-body">
-          <div class="form-group">
-            <label for="defaultLocation">Default Location (City, State)</label>
-            <input type="text" id="defaultLocation" placeholder="e.g., Woodstock, GA">
-            <small>Used for geocoding in the route finder</small>
-          </div>
-          <div class="form-group">
-            <label for="defaultZipcode">Default Zipcode</label>
-            <input type="text" id="defaultZipcode" placeholder="e.g., 30188" maxlength="10">
-            <small>Optional - adds precision to geocoding</small>
-          </div>
-          <div class="form-group" style="display: none;">
-            <label>Data Location</label>
-            <p id="dataPathDisplay" class="data-path">Cloudflare KV</p>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" id="saveSettingsBtn" class="btn btn-primary">Save Settings</button>
-        </div>
-      </div>
     </div>
-  </div>
 
-  <!-- anime.js v3 UMD build (v4 is a full rewrite — migration TBD) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
-  <script type="module" src="js/crm/crm-auth.js"></script>
-  <script type="module" src="js/crm/renderer.js"></script>
+    <!-- Activity log -->
+    <div id="activity-sheet" class="crm-sheet" hidden role="dialog" aria-modal="true" aria-labelledby="activity-title">
+        <div class="crm-sheet-panel">
+            <header class="crm-sheet-head">
+                <h2 id="activity-title">Activity</h2>
+                <button class="crm-sheet-close" type="button" data-close aria-label="Close">&times;</button>
+            </header>
+            <ul id="activity-list" class="crm-activity-list crm-sheet-body"></ul>
+        </div>
+    </div>
+
+    <!-- Generic confirm (used for deletes — no native confirm()/alert() on mobile) -->
+    <div id="confirm-sheet" class="crm-sheet" hidden role="dialog" aria-modal="true" aria-labelledby="confirm-message">
+        <div class="crm-sheet-panel crm-sheet-panel--small">
+            <div class="crm-sheet-body">
+                <p id="confirm-message">Are you sure?</p>
+                <div class="crm-sheet-actions">
+                    <button id="confirm-cancel" type="button" class="btn btn-secondary" data-close>Cancel</button>
+                    <button id="confirm-ok" type="button" class="btn btn-danger">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ════ Templates: cloned by render.js, filled with textContent (no innerHTML of data) ════ -->
+    <template id="lead-card-template">
+        <li class="crm-lead-card" tabindex="0" role="button">
+            <span class="crm-recency-dot" data-recency aria-hidden="true"></span>
+            <span class="crm-lead-main">
+                <span class="crm-lead-name" data-field="name"></span>
+                <span class="crm-lead-meta">
+                    <span class="crm-lead-area" data-field="neighborhood"></span>
+                    <span class="crm-status-badge" data-field="status"></span>
+                    <span class="crm-reception" data-field="reception" aria-hidden="true"></span>
+                </span>
+                <span class="crm-lead-sub" data-field="lastvisit"></span>
+            </span>
+            <span class="crm-lead-score" data-field="score"></span>
+        </li>
+    </template>
+
+    <template id="contact-row-template">
+        <div class="crm-contact-row">
+            <input type="hidden" data-field="id">
+            <input type="text" data-field="name" placeholder="Name" autocapitalize="words" autocomplete="name">
+            <input type="text" data-field="role" placeholder="Role">
+            <input type="tel" data-field="phone" placeholder="Phone" autocomplete="tel" inputmode="tel">
+            <input type="email" data-field="email" placeholder="Email" autocomplete="email" autocapitalize="none" spellcheck="false">
+            <label class="crm-primary-pick"><input type="radio" name="contact-primary" data-field="isPrimary"> Primary</label>
+            <button type="button" class="crm-contact-remove" data-action="remove-contact" aria-label="Remove contact">&times;</button>
+        </div>
+    </template>
+
+    <template id="route-stop-template">
+        <li class="crm-route-stop">
+            <span class="crm-route-num" data-field="num"></span>
+            <span class="crm-route-stop-main">
+                <span class="crm-route-stop-name" data-field="name"></span>
+                <span class="crm-route-stop-addr" data-field="address"></span>
+                <span class="crm-route-stop-leg" data-field="leg"></span>
+            </span>
+        </li>
+    </template>
+
+    <!-- Canonical areas for the metro; render.js merges in any others found in data. -->
+    <datalist id="neighborhood-options">
+        <option value="Woodstock"></option>
+        <option value="Marietta"></option>
+        <option value="Roswell"></option>
+        <option value="Canton"></option>
+        <option value="Kennesaw"></option>
+        <option value="Acworth"></option>
+        <option value="Alpharetta"></option>
+        <option value="Holly Springs"></option>
+        <option value="Ball Ground"></option>
+        <option value="Atlanta"></option>
+    </datalist>
+
+    <div id="footer-placeholder"></div>
+
+    <!-- Shared site scripts first (header/footer injection, global form/nav helpers), then the CRM module. -->
+    <script src="js/components.js"></script>
+    <script src="js/main.js"></script>
+    <script type="module" src="js/crm/app.js"></script>
 </body>
 </html>

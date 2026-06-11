@@ -56,6 +56,14 @@ function buildDistanceMatrix(locations) {
  * Select the K nearest leads to the starting point using greedy selection.
  * This creates a cluster of nearby leads rather than far-flung ones.
  *
+ * HEURISTIC LIMITATION (read before trusting the output): this ranks leads by
+ * straight-line distance from the START point only — not by how they cluster
+ * with each other. So a tight pocket of leads that's a bit farther out can get
+ * passed over in favor of closer-but-scattered ones, and the resulting route
+ * may not be the globally shortest K-stop tour. It's "good enough for a day of
+ * door-knocking," not an exact solver. If you need better, replace this with a
+ * proper clustering step (k-means / DBSCAN on coords) before solveRoute.
+ *
  * @param {Object} startCoords - {lat, lon} of starting location
  * @param {Array<Object>} leads - Array of lead objects with coords property
  * @param {number} maxLeads - Maximum number of leads to select
@@ -271,17 +279,40 @@ function solveRoute(startCoords, leads, maxLeads) {
   };
 }
 
+// Google Maps /maps/dir/ URLs silently truncate beyond ~10 total points
+// (origin + 9 waypoints). Past that, Google just drops the extra stops with no
+// error, so a 12-stop route would quietly become a 10-stop one. We cap it
+// ourselves so the UI can warn the user instead of being silently lied to.
+const MAX_GOOGLE_MAPS_STOPS = 9; // stops BEYOND the origin
+
 /**
  * Generate a Google Maps multi-stop directions URL.
  *
- * @param {string} startAddress - Starting address
+ * Caps the route at the origin plus MAX_GOOGLE_MAPS_STOPS (9) waypoints,
+ * because the /maps/dir/ URL format silently truncates anything past ~10 total
+ * points. We return the counts so the caller can tell the user "we mapped the
+ * first 9, X stops didn't fit" rather than having Google quietly drop them.
+ *
+ * @param {string} startAddress - Starting address (the origin, always kept)
  * @param {Array<Object>} orderedLeads - Leads in visit order with address property
- * @returns {string} Google Maps directions URL
+ * @returns {{url: string, includedStops: number, droppedStops: number}}
+ *   url: the directions URL. includedStops: how many leads made it into the URL
+ *   (0..9). droppedStops: how many leads were left off because of the cap.
  */
 function generateGoogleMapsUrl(startAddress, orderedLeads) {
-  const stops = [startAddress, ...orderedLeads.map(lead => lead.address)];
+  const leads = Array.isArray(orderedLeads) ? orderedLeads : [];
+
+  const includedLeads = leads.slice(0, MAX_GOOGLE_MAPS_STOPS);
+  const droppedStops = leads.length - includedLeads.length;
+
+  const stops = [startAddress, ...includedLeads.map(lead => lead.address)];
   const encodedStops = stops.map(addr => encodeURIComponent(addr));
-  return `https://www.google.com/maps/dir/${encodedStops.join('/')}`;
+
+  return {
+    url: `https://www.google.com/maps/dir/${encodedStops.join('/')}`,
+    includedStops: includedLeads.length,
+    droppedStops
+  };
 }
 
 export {

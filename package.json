@@ -1,0 +1,9 @@
+{
+  "name": "peoples-elbow",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test js/crm/*.test.js",
+    "test:workers": "node --test workers/"
+  }
+}

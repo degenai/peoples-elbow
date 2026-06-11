@@ -33,4 +33,4 @@ Only propose a loop replacement if it **reduces total line count** AND **improve
 ## Sentinel
 
 ### Scope of innerHTML escaping
-When fixing unescaped `innerHTML` interpolation, check the CRM renderer (`js/crm/renderer.js`) and related modules. The demo page (`crm-demo.html`) has been deprecated -- `crm.html` now serves as both demo and production CRM via Google OAuth.
+The v2 CRM renderer (`js/crm/render.js`) builds DOM via `<template>` clone + `textContent` only — there is no `innerHTML`-of-data path to escape. The one HTML-string path is the downloadable route-notes file in `js/crm/route.js` (`generateNotesHTML`), where every lead value goes through `escapeHtml()`. `crm.html` serves as both demo and production CRM (signed-out shows demo data; Google sign-in loads your Drive).
