@@ -133,11 +133,17 @@ function getNewCommits(sinceHash) {
  */
 async function addCommitToD1(commit) {
     try {
+        // Authenticate to the changelog-writer worker when a token is configured.
+        // Absent (e.g. before the secret is set) = no header; the pre-auth worker
+        // still accepts it, so this stays backward-compatible during rollout.
+        const headers = { 'Content-Type': 'application/json' };
+        if (process.env.CHANGELOG_WRITE_TOKEN) {
+            headers['Authorization'] = `Bearer ${process.env.CHANGELOG_WRITE_TOKEN}`;
+        }
+
         const response = await fetch(WRITER_WORKER_URL, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers,
             body: JSON.stringify({
                 commit_hash: commit.hash,
                 commit_message: commit.message,

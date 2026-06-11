@@ -4,6 +4,19 @@ export default {
       return new Response('Expected POST request', { status: 405 });
     }
 
+    // Require a shared-secret Bearer token. Fail closed: if CHANGELOG_WRITE_TOKEN
+    // isn't configured on the worker, reject everything — no anonymous DB writes.
+    // Set it with:  wrangler secret put CHANGELOG_WRITE_TOKEN
+    // CI sends it as  Authorization: Bearer <token>  (see update-d1-changelog.js).
+    const expectedToken = env.CHANGELOG_WRITE_TOKEN;
+    const providedToken = (request.headers.get('Authorization') || '').replace(/^Bearer\s+/i, '');
+    if (!expectedToken || !timingSafeEqual(providedToken, expectedToken)) {
+      return new Response(JSON.stringify({ success: false, message: 'Unauthorized' }), {
+        status: 401,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
     try {
       const commitData = await request.json();
 
@@ -37,10 +50,20 @@ export default {
           headers: { 'Content-Type': 'application/json' },
         });
       }
-      return new Response(JSON.stringify({ success: false, message: 'Failed to add changelog entry.', error: e.message }), {
+      // Don't leak internal error details (SQL/stack) to the caller.
+      return new Response(JSON.stringify({ success: false, message: 'Failed to add changelog entry.' }), {
         status: 500,
         headers: { 'Content-Type': 'application/json' },
       });
     }
   },
 };
+
+// Constant-time comparison so token checks don't leak length/content via timing.
+function timingSafeEqual(a, b) {
+  if (typeof a !== 'string' || typeof b !== 'string') return false;
+  if (a.length !== b.length) return false;
+  let mismatch = 0;
+  for (let i = 0; i < a.length; i++) mismatch |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return mismatch === 0;
+}

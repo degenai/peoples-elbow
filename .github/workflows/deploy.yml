@@ -32,6 +32,12 @@ jobs:
           node-version: '20'
       
       - name: Update D1 Changelog
+        env:
+          # Shared secret for the authenticated changelog-writer worker.
+          # Add it under repo Settings → Secrets → Actions. Absent = no auth header
+          # sent (the pre-auth worker still accepts the write); set it once the
+          # authenticated worker is deployed. See leadotron-rebuild/SECURITY.md.
+          CHANGELOG_WRITE_TOKEN: ${{ secrets.CHANGELOG_WRITE_TOKEN }}
         run: |
           echo "🔄 Updating D1 changelog with new meaningful commits..."
           node update-d1-changelog.js
@@ -79,13 +85,47 @@ jobs:
           echo "Git log:"
           git log --oneline -3
       
+      - name: Assemble publish directory (deny-list — never publish the whole checkout)
+        run: |
+          # The repo is public and read-friendly ("Steal This Site"), but the working
+          # checkout also carries credentials/PII and private notes that must NOT be
+          # served. Copy the site into _site/ excluding everything server-side or private,
+          # then publish ONLY that dir. CNAME, images, css, js, components, sw.js, the
+          # manifest, and every *.html are kept automatically by being un-excluded.
+          mkdir -p _site
+          rsync -a --delete \
+            --exclude='/_site/' \
+            --exclude='/.git/' \
+            --exclude='/.github/' \
+            --exclude='node_modules/' \
+            --exclude='.wrangler/' \
+            --exclude='.mf/' \
+            --exclude='/.jules/' \
+            --exclude='/.Jules/' \
+            --exclude='/_deprecated/' \
+            --exclude='/handoffs/' \
+            --exclude='/docs/' \
+            --exclude='/workers/' \
+            --exclude='/migrations/' \
+            --exclude='*.sqlite' --exclude='*.sqlite-shm' --exclude='*.sqlite-wal' \
+            --exclude='/schema.sql' \
+            --exclude='/woodstock-plan.html' \
+            --exclude='/TODO.md' \
+            --exclude='*.test.js' \
+            --exclude='/.gitignore' \
+            --exclude='/.dev.vars' \
+            --exclude='*.toml' \
+            --exclude='/package.json' --exclude='/package-lock.json' \
+            ./ _site/
+          echo "Published files:"; find _site -maxdepth 2 -type f | sort
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
-      
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: '.'
+          path: '_site'
       
       - name: Deploy to GitHub Pages
         id: deployment

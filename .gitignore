@@ -34,5 +34,19 @@ out/
 devring_overhaul.md
 node_modules
 
+# Wrangler / Miniflare local state — leaks CF account id, home geolocation, dev DBs.
+# These were committed before this rule existed; untracked via `git rm --cached`.
+.wrangler/
+**/.wrangler/
+.mf/
+**/.mf/
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+.dev.vars
+
+# Private business planning — must never reach the public deploy.
+woodstock-plan.html
+
 # Claude Code session state
 .claude/
