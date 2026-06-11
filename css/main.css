@@ -2515,3 +2515,204 @@ nav ul li a.active {
         font-size: 1.8rem;
     }
 }
+
+/* ============================================================
+   People's Elbow at Hustle House - homepage residency section
+   ============================================================ */
+.hustle-house {
+    padding: var(--space-xl) 0;
+    background: var(--pe-white);
+}
+
+.hh-inner {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: var(--space-xl);
+    align-items: center;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.hh-kicker {
+    display: inline-block;
+    background: var(--pe-green-dark);
+    color: var(--pe-gold);
+    padding: 0.4rem 1rem;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin-bottom: var(--space-md);
+}
+
+.hh-lede p {
+    line-height: 1.7;
+    color: var(--pe-text-dark);
+    margin-bottom: var(--space-md);
+}
+
+.hh-offer {
+    background: var(--pe-light-gray);
+    border-left: 4px solid var(--pe-gold);
+    padding: var(--space-md);
+    border-radius: 6px;
+}
+
+.hh-lede .btn {
+    margin-top: var(--space-sm);
+}
+
+.hh-menu {
+    background: var(--pe-green);
+    color: var(--pe-white);
+    border-radius: 12px;
+    padding: var(--space-lg);
+    box-shadow: 0 6px 20px rgba(var(--pe-green-rgb), 0.25);
+}
+
+.hh-menu-title {
+    font-family: var(--font-heading);
+    color: var(--pe-gold);
+    font-size: 1.8rem;
+    text-align: center;
+    letter-spacing: 1px;
+    margin-bottom: var(--space-md);
+}
+
+.hh-menu-list {
+    list-style: none;
+    margin: 0 0 var(--space-md);
+    padding: 0;
+}
+
+.hh-menu-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 0.6rem 0;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.25);
+    font-size: 1.1rem;
+}
+
+.hh-menu-list li:last-child {
+    border-bottom: none;
+}
+
+.hh-dur {
+    font-weight: 700;
+}
+
+.hh-price {
+    font-family: var(--font-heading);
+    color: var(--pe-gold);
+    font-size: 1.4rem;
+    letter-spacing: 0.5px;
+}
+
+.hh-menu-note {
+    font-size: 0.9rem;
+    line-height: 1.55;
+    opacity: 0.95;
+}
+
+@media (max-width: 768px) {
+    .hh-inner {
+        grid-template-columns: 1fr;
+        gap: var(--space-lg);
+    }
+}
+
+/* ============================================================
+   book.html - the menu / offerings block
+   ============================================================ */
+.book-menu-section {
+    padding: var(--space-xl) 0 0;
+    background: var(--pe-white);
+}
+
+.book-menu-section .section-title {
+    font-family: var(--font-heading);
+    font-size: 2.2rem;
+    color: var(--pe-green-dark);
+    text-align: center;
+    margin-bottom: var(--space-md);
+}
+
+.book-menu-intro {
+    max-width: 760px;
+    margin: 0 auto var(--space-lg);
+    text-align: center;
+    line-height: 1.7;
+    color: var(--pe-text-dark);
+}
+
+.book-menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--space-lg);
+    max-width: 1000px;
+    margin: 0 auto var(--space-lg);
+}
+
+.book-menu-card {
+    background: var(--pe-light-gray);
+    border-radius: 10px;
+    padding: var(--space-lg);
+    text-align: center;
+    border-top: 4px solid var(--pe-green);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.book-menu-card.featured {
+    border-top-color: var(--pe-gold);
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+}
+
+.book-menu-dur {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    color: var(--pe-green-dark);
+    letter-spacing: 0.5px;
+}
+
+.book-menu-price {
+    font-family: var(--font-heading);
+    font-size: 2.4rem;
+    color: var(--pe-green);
+}
+
+.book-menu-card.featured .book-menu-price {
+    color: var(--pe-orange);
+}
+
+.book-menu-desc {
+    font-size: 0.92rem;
+    line-height: 1.5;
+    color: var(--pe-text-dark);
+}
+
+.book-addons {
+    max-width: 760px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.book-addons p {
+    line-height: 1.6;
+    margin-bottom: var(--space-sm);
+    color: var(--pe-text-dark);
+}
+
+.book-addons i {
+    color: var(--pe-green);
+    margin-right: 0.35rem;
+}
+
+.book-firstvisit {
+    background: var(--pe-light-gray);
+    border-left: 4px solid var(--pe-gold);
+    padding: var(--space-md);
+    border-radius: 6px;
+    display: inline-block;
+}
