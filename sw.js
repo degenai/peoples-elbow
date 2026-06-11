@@ -16,16 +16,18 @@
  *   fetch    -> decide, per request, whether to answer from cache or network
  */
 
-// Bump this string whenever you ship new assets. The browser notices the
-// byte change in this file, installs the new worker, and `activate` below
-// deletes every cache that doesn't match — that's how users get updates.
+// Asset updates normally land on their own: same-origin JS/CSS use
+// stale-while-revalidate below, so a changed file is refreshed on the load after
+// it ships (users are at most one load behind), and navigations are network-first
+// so crm.html is never stale online. Bump this VERSION to FORCE an immediate full
+// purge of the old cache on activate (e.g. for a breaking app-shell change).
 const VERSION = 'lot-v2.0.0';
 const CACHE_NAME = VERSION; // one cache per version keeps cleanup trivial.
 
-// The app shell: everything the CRM needs to boot offline. Some of the
-// js/crm/* files are still being written by other agents as of this commit,
-// so they may 404 today. That's fine — see the install handler: we add each
-// file individually and tolerate misses instead of failing the whole batch.
+// The app shell: everything the CRM needs to boot offline. We add each file
+// individually and tolerate a miss (see the install handler) rather than failing
+// the whole batch if a path is ever renamed. The js/crm/* list must match app.js's
+// static import graph, or a cold offline first-load will fail to resolve a module.
 const PRECACHE_URLS = [
   'crm.html',
   'css/main.css',
@@ -38,8 +40,7 @@ const PRECACHE_URLS = [
   'components/footer.html',
   'images/favicon-32.png',
   'images/logo.png',
-  // The CRM engine, split into plain ES modules. A few of these don't exist
-  // on disk yet — install won't brick because of that (Promise.allSettled).
+  // The CRM engine, plain ES modules. Keep in sync with app.js's imports.
   'js/crm/app.js',
   'js/crm/store.js',
   'js/crm/sync.js',
@@ -54,6 +55,7 @@ const PRECACHE_URLS = [
   'js/crm/constants.js',
   'js/crm/utils.js',
   'js/crm/data-normalizer.js',
+  'js/crm/email-lead-parser.js',
 ];
 
 // --- INSTALL: precache the app shell ---------------------------------------
@@ -65,11 +67,10 @@ self.addEventListener('install', (event) => {
 
   event.waitUntil((async () => {
     const cache = await caches.open(CACHE_NAME);
-    // We deliberately do NOT use cache.addAll(): addAll is all-or-nothing, so
-    // a single missing file (one of the not-yet-written js/crm modules) would
-    // reject the whole install and the app would never go offline-capable.
-    // Instead we add each URL on its own and use allSettled, which never
-    // rejects — present files get cached, absent ones are simply skipped.
+    // We deliberately do NOT use cache.addAll(): addAll is all-or-nothing, so a
+    // single missing/renamed file would reject the whole install and the app
+    // would never go offline-capable. Instead we add each URL on its own and use
+    // allSettled, which never rejects — present files get cached, misses skipped.
     const results = await Promise.allSettled(
       PRECACHE_URLS.map((url) => cache.add(url))
     );
@@ -145,9 +146,16 @@ async function networkFirst(request) {
   } catch (err) {
     const cached = await cache.match(request);
     if (cached) return cached;
-    // The request may have been for crm.html with query params we didn't
-    // cache verbatim; fall back to the bare precached shell.
-    return (await cache.match('crm.html')) || Response.error();
+    // This worker is root-scoped (it governs the whole site), so only fall back
+    // to the CRM shell for the CRM itself — never serve crm.html in place of the
+    // homepage or another page when offline. Other pages get the browser's own
+    // offline page (Response.error()). The query-param case for crm.html (which
+    // we didn't cache verbatim) still lands on the bare precached shell.
+    const path = new URL(request.url).pathname;
+    if (path === '/crm.html' || path.endsWith('/crm.html')) {
+      return (await cache.match('crm.html')) || Response.error();
+    }
+    return Response.error();
   }
 }
 

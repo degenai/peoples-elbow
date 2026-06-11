@@ -87,10 +87,11 @@ jobs:
       
       - name: Run CRM test suite (a red suite blocks deploy)
         run: |
-          # Gate the deploy on the CRM tests. `npm test` runs `node --test js/crm/`
-          # (see package.json) — no dependencies to install, just Node's built-in
-          # test runner. If any CRM test fails this step exits non-zero and the
-          # job stops here, so a broken CRM never reaches the live site.
+          # Gate the deploy on the CRM tests. `npm test` runs
+          # `node --test js/crm/*.test.js` (see package.json) — no dependencies to
+          # install, just Node's built-in test runner. The CI shell expands the
+          # glob to the test files. If any CRM test fails this step exits non-zero
+          # and the job stops here, so a broken CRM never reaches the live site.
           npm test
 
       - name: Assemble publish directory (deny-list — never publish the whole checkout)
