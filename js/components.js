@@ -59,8 +59,7 @@ class ComponentLoader {
             'calendar.html': 'calendar',
             'chat.html': 'chat',
             'changelog.html': 'changelog',
-            'steal-this-site.html': 'steal-this-site',
-            'dashboard.html': 'dashboard'
+            'steal-this-site.html': 'steal-this-site'
         };
         
         return pageMap[filename] || filename.replace('.html', '');
@@ -241,14 +240,6 @@ class ComponentLoader {
         try {
             const version = await this.getVersion();
             headerVersionElement.textContent = version;
-            
-            // Special styling for version 100 milestone
-            if (version === 100) {
-                const versionBadge = headerVersionElement.closest('.version-badge');
-                if (versionBadge) {
-                    versionBadge.classList.add('milestone-100');
-                }
-            }
 
             // Header version updated from D1 database
         } catch (error) {

@@ -28,7 +28,7 @@ Compare that to $200 and up per year for Squarespace, Wix, and the rest of the w
 - Plain **static HTML/CSS/JS**. No framework, no build step, nothing to compile.
 - Shared **header/footer components** injected client-side by `js/components.js`, so every page stays in sync without server-side templating.
 - **Contact forms** POST to a Cloudflare Worker that emails the submission. No database required for forms. See `workers/`.
-- A **live changelog**: a GitHub Action writes each commit into a D1 database on push (`update-d1-changelog.js`), and a Worker reads it back for the site. The version badge counts commits.
+- A **live changelog**: a GitHub Action writes each commit into a D1 database on push (`update-d1-changelog.cjs`), and a Worker reads it back for the site. The version badge counts commits.
 - **Motion** is optional anime.js, added as progressive enhancement that degrades to a static page: `js/hero.js`, `js/countdown.js`, `js/reveal.js`, `js/gallery.js`.
 - An optional **browser-based CRM** with Google Drive storage and no backend of its own: `js/crm/`.
 

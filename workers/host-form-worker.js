@@ -240,9 +240,6 @@ async function handleContactForm(formData, env) {
  */
 async function sendEmail(to, subject, body, env) {
   try {
-    // Log email details for debugging
-    console.log('Sending email:', { to, subject });
-    
     // Check if the MAIL binding exists
     if (!env || !env.MAIL) {
       console.error('Email binding not available');
@@ -285,7 +282,6 @@ async function sendEmail(to, subject, body, env) {
       
       // Send the email using the binding
       await env.MAIL.send(message);
-      console.log('Email sent successfully!');
       return true;
     } catch (emailError) {
       console.error('Error details from email send:', emailError);

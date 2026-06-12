@@ -246,46 +246,6 @@ document.addEventListener('DOMContentLoaded', function() {
         updateParallax(); // Initial call
     }
 
-    // Simple animation for stats in the impact section
-    function animateStats() {
-        const stats = document.querySelectorAll('.stat-number');
-        if (stats.length === 0) return;
-        
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const target = entry.target;
-                    // Skip animation if the content is "TBD"
-                    if (target.textContent.trim() === 'TBD') {
-                        observer.unobserve(target);
-                        return;
-                    }
-                    
-                    const finalValue = parseInt(target.textContent);
-                    let currentValue = 0;
-                    
-                    // Simple animation
-                    const interval = setInterval(() => {
-                        currentValue++;
-                        target.textContent = currentValue;
-                        
-                        if (currentValue >= finalValue) {
-                            clearInterval(interval);
-                        }
-                    }, 20);
-                    
-                    observer.unobserve(target);
-                }
-            });
-        }, { threshold: 0.5 });
-        
-        stats.forEach(stat => {
-            observer.observe(stat);
-        });
-    }
-    
-    // Call animation function
-    animateStats();
     initParticles();
     initParallax();
     

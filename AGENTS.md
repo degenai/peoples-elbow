@@ -24,8 +24,8 @@ input:focus-visible, a:focus-visible, button:focus-visible {
 
 ### STOP replacing functional array methods with imperative loops
 This has been proposed and rejected TWICE. Do not do it again. `.filter()`, `.map()`, `.reduce()` are preferred in this codebase. The CRM manages ~200 leads. There is no hot path. Specifically banned:
-- `.filter()` → `for`/`continue`/`push` in `getFilteredLeads()`
-- `.map().join('')` → `for` loop string concat in `renderLeadList()`, `renderActivityLog()`, `renderDetailPanel()`
+- `.filter()` → `for`/`continue`/`push` loops in `js/crm/store.js` / `js/crm/route.js`
+- `.map().join('')` → `for` loop string concat in `renderList()` / `renderDetail()` in `js/crm/render.js`
 - IIFE wrappers inside template literals to avoid `.map()`
 
 Only propose a loop replacement if it **reduces total line count** AND **improves readability**. If the diff adds lines, it will be rejected.

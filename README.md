@@ -8,7 +8,7 @@ Mutual aid chair massage. Woodstock, Georgia. [peoples-elbow.com](https://people
 
 This project has no backend database, no user accounts, no analytics, no tracking pixels, no cookies, and no server-side data collection of any kind.
 
-The site is static HTML/CSS/JS hosted on Cloudflare Pages. The only server-side components are:
+The site is static HTML/CSS/JS hosted on GitHub Pages (see `.github/workflows/deploy.yml`), with Cloudflare providing DNS for the domain. The only server-side components run on Cloudflare Workers:
 
 - **Contact forms** route through a Cloudflare Worker that emails submissions directly to us. Nothing is stored in a database. Your message goes to our inbox and that's it.
 - **The Lead-o-Tron CRM** stores all data in **your browser's localStorage** or **your own Google Drive** (if you choose to sign in). The CRM uses Google's `drive.file` scope, which means it can only access files it created in your Drive. We cannot see, read, or access your data. It never touches our infrastructure.
@@ -20,7 +20,7 @@ There is no analytics beyond Cloudflare's built-in aggregate traffic metrics (pa
 - `js/crm/store.js` - CRM data layer and single source of truth. All reads/writes go to your browser's `localStorage`; it hands out copies, never live references. No fetch calls to any PE-owned server.
 - `js/crm/sync.js` + `js/crm/drive.js` - optional Google Drive backup. Only touch `www.googleapis.com/drive/v3/files` with the `drive.file` scope (app-created files only). No PE server in the loop.
 - `js/crm/auth.js` - Google sign-in via Google Identity Services. The access token lives in `sessionStorage` (not localStorage) and is revoked on sign-out. No server round-trip.
-- `workers/` - Cloudflare Workers for contact forms only. No CRM data flows through these.
+- `workers/` - Cloudflare Workers for the contact forms (email-only, nothing stored) and the public commit changelog (D1, commit metadata only). No CRM or user data flows through any of them.
 - There is no database connection string, no API key to a data warehouse, no POST endpoint that accepts user data from the CRM.
 
 The full privacy policy is at [peoples-elbow.com/privacy.html](https://peoples-elbow.com/privacy.html).
@@ -31,8 +31,8 @@ A mutual aid massage operation that proves community care infrastructure can be 
 
 - **50/50 split** with hosting venues, no hidden fees
 - **Chair massage** at breweries, markets, nonprofits, and community spaces
-- **No upselling**, no data harvesting, no mission creep
-- Entire tech stack runs for ~$10/year on Cloudflare
+- **No membership traps**, no data harvesting, no mission creep
+- Entire tech stack runs for ~$10/year (the domain) on GitHub Pages + Cloudflare free tiers
 
 ## The Lead-o-Tron CRM
 

@@ -51,11 +51,9 @@
 ## 📋 Backlog (Post-V2)
 
 ### Form System (Working - Low Priority)
-- [x] Create D1 database and tables
-- [x] Store form submissions in D1 database
+- [x] ~~Store form submissions in D1~~ (retired April 2026 — forms are email-only, nothing stored; see workers/host-form-worker.js. D1 is changelog-only.)
 - [x] Add proper form validation and error handling
 - [x] Set up Email Routing
-- [ ] Create simple admin view for database submissions
 - [ ] Add CSRF protection to forms
 
 ### Website Features
@@ -73,7 +71,7 @@
 ### Technical Debt
 - [ ] Add proper test suite for worker functions
 - [ ] Implement rate limiting on form submissions
-- [ ] Create backup system for D1 database
+- [ ] Backup/rebuild script for the changelog D1 (reconstructable from git log)
 - [ ] Add monitoring for Worker errors
 - [ ] Eventually gitignore `_deprecated/` folder
 

@@ -69,17 +69,12 @@ class D1Changelog {
 
     displayVersionNumber() {
         const versionElement = document.getElementById('version-number');
-        const footerVersionElement = document.getElementById('footer-version-number');
         const headerVersionElement = document.getElementById('header-version-number'); // Add header badge
-        
+
         if (this.totalCount > 0) {
-            // Use total count from database (87 meaningful commits) as version
-            // This represents the complete curated development history
-            const version = this.totalCount; 
+            // Use the total commit count from the database as the version number
+            const version = this.totalCount;
             versionElement.textContent = `v${version}`;
-            if (footerVersionElement) {
-                footerVersionElement.textContent = `v${version}`;
-            }
             // Update header badge — no "v" prefix, the HTML span already has it
             if (headerVersionElement) {
                 headerVersionElement.textContent = version;
@@ -88,9 +83,6 @@ class D1Changelog {
             try { sessionStorage.setItem('site_version', version); } catch (e) {}
         } else {
             versionElement.textContent = 'v0';
-            if (footerVersionElement) {
-                footerVersionElement.textContent = 'v0';
-            }
             if (headerVersionElement) {
                 headerVersionElement.textContent = '0';
             }

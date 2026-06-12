@@ -22,18 +22,11 @@ export default {
     }
 
     try {
-      // Parse query parameters
+      // Parse query parameters, clamped to sane bounds (max 100 for performance;
+      // negative values would otherwise mean "no limit" in SQLite)
       const url = new URL(request.url);
-      const limit = parseInt(url.searchParams.get('limit')) || 50;
-      const offset = parseInt(url.searchParams.get('offset')) || 0;
-
-      // Validate limit (max 100 for performance)
-      if (limit > 100) {
-        return new Response(
-          JSON.stringify({ error: 'Limit cannot exceed 100' }), 
-          { status: 400, headers: corsHeaders }
-        );
-      }
+      const limit = Math.min(Math.max(parseInt(url.searchParams.get('limit'), 10) || 50, 1), 100);
+      const offset = Math.max(parseInt(url.searchParams.get('offset'), 10) || 0, 0);
 
       // Query changelog entries from D1, ordered by insertion id (newest first)
       // id reflects git log --reverse insertion order, which is immune to
