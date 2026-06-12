@@ -12,14 +12,14 @@ The People's Elbow is a mutual aid massage therapy service operating under the p
 
 1. **Local Symbiosis** - Always partner directly with hosts who receive direct benefit
 2. **No Mission Creep** - Amplify host causes rather than impose external agendas  
-3. **Mutual Aid over Branding** - Serve communities without data collection or upselling
+3. **Mutual Aid over Branding** - Serve communities without data collection or membership traps
 4. **Accessible Care** - Superhero persona makes wellness services approachable and non-intimidating
 
 ## Technical Architecture
 
-**Infrastructure Cost**: ~$10/year running entirely on Cloudflare
+**Infrastructure Cost**: ~$10/year (domain) on GitHub Pages + Cloudflare free tiers
 - **Static Hosting**: GitHub Pages with Cloudflare proxy
-- **Database**: Cloudflare D1 for form submissions and version tracking
+- **Database**: Cloudflare D1 for the public changelog / version tracking only — form submissions are emailed via a Worker, never stored
 - **Forms**: Cloudflare Workers for processing
 - **Version System**: Git-based automated build numbering
 
@@ -53,7 +53,7 @@ Primary focus on suburban metro Atlanta, but designed for replication:
 
 The entire codebase is designed for community adaptation:
 - Fork repository and adapt messaging for local context
-- Deploy on Cloudflare infrastructure for minimal cost
+- Deploy on GitHub Pages + Cloudflare free tiers for minimal cost
 - Customize forms and branding while maintaining core mutual aid principles
 - Document local adaptations to share with other communities
 

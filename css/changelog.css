@@ -85,20 +85,6 @@
     padding: 2rem;
 }
 
-/* Code tag styling */
-.code-tag {
-    font-family: monospace;
-    background-color: rgba(0, 0, 0, 0.1);
-    color: #CE9C00;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-weight: bold;
-    font-size: 0.9em;
-    border: 1px solid rgba(206, 156, 0, 0.3);
-    box-shadow: 1px 1px 0 rgba(0, 0, 0, 0.1);
-    white-space: nowrap;
-}
-
 .timeline-intro {
     text-align: center;
     margin-bottom: 3rem;
@@ -139,11 +125,11 @@
     margin-left: 60px;
 }
 
-.timeline-item:nth-child(odd) .timeline-dot {
+.timeline-item:nth-child(odd) .timeline-marker {
     right: -42px;
 }
 
-.timeline-item:nth-child(even) .timeline-dot {
+.timeline-item:nth-child(even) .timeline-marker {
     left: -42px;
 }
 
@@ -164,32 +150,7 @@
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
 }
 
-/* Color-coding based on commit type */
-.timeline-content.feat {
-    border-left-color: #4CAF50; /* Green for features */
-}
-
-.timeline-content.fix {
-    border-left-color: #F44336; /* Red for fixes */
-}
-
-.timeline-content.docs {
-    border-left-color: #2196F3; /* Blue for documentation */
-}
-
-.timeline-content.refactor {
-    border-left-color: #FF9800; /* Orange for refactoring */
-}
-
-.timeline-content.style {
-    border-left-color: #9C27B0; /* Purple for style changes */
-}
-
-.timeline-content.chore {
-    border-left-color: #607D8B; /* Blue-grey for chores */
-}
-
-.timeline-dot {
+.timeline-marker {
     width: 24px;
     height: 24px;
     background-color: #CE9C00;
@@ -198,120 +159,6 @@
     top: 1.5rem;
     z-index: 1;
     box-shadow: 0 0 0 4px rgba(206, 156, 0, 0.3);
-}
-
-/* Adjustments for odd/even alignment with new message structure */
-.timeline-item:nth-child(odd) .timeline-message,
-.timeline-item:nth-child(odd) .timeline-full-message {
-    text-align: left; /* Keep details left-aligned even if overall content block is right */
-}
-
-.timeline-item:nth-child(even) .timeline-message,
-.timeline-item:nth-child(even) .timeline-full-message {
-    text-align: left;
-}
-
-.timeline-date {
-    font-size: 0.9rem;
-    color: #888;
-    margin-bottom: 0.5rem;
-}
-
-.timeline-version {
-    font-family: 'Bangers', cursive;
-    font-size: 1.5rem;
-    color: #333;
-    margin-bottom: 0.5rem;
-}
-
-.timeline-tag {
-    display: inline-block;
-    background-color: #CE9C00;
-    color: #fff;
-    font-weight: bold;
-    font-size: 0.75rem;
-    padding: 0.2rem 0.5rem;
-    border-radius: 50px;
-    margin-bottom: 0.75rem;
-    text-transform: uppercase;
-}
-
-.timeline-message {
-    margin-bottom: 0.5rem;
-    line-height: 1.5;
-    cursor: pointer;
-    position: relative;
-    transition: color 0.3s ease, background-color 0.3s ease;
-    font-weight: bold;
-    padding: 4px 8px;
-    margin-left: -8px;
-    border-radius: 4px;
-}
-
-.timeline-message:hover {
-    background-color: rgba(206, 156, 0, 0.1);
-    color: #CE9C00;
-}
-
-.message-toggle {
-    display: inline-block;
-    margin-left: 6px;
-    color: #CE9C00;
-    transition: transform 0.3s ease;
-}
-
-.message-toggle i {
-    font-size: 14px;
-}
-
-.timeline-full-message {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.8s ease, opacity 0.5s ease, padding 0.5s ease;
-    opacity: 0;
-    padding: 0;
-    margin-bottom: 0;
-    font-size: 0.95rem;
-    line-height: 1.6; /* Increased line-height for better readability */
-    color: #333; /* Darker text for better contrast */
-    border-left: 4px solid rgba(206, 156, 0, 0.5); /* More visible border */
-    background-color: rgba(206, 156, 0, 0.08);
-    border-radius: 0 4px 4px 0;
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-.timeline-full-message.show {
-    max-height: 2000px; /* Further increased for extremely long messages */
-    opacity: 1;
-    padding: 16px 20px;
-    margin: 10px 0;
-    white-space: pre-line; /* Preserve line breaks better */
-    text-align: left; /* Ensure text alignment is always left */
-    width: calc(100% + 20px); /* Make it slightly wider than the container */
-    margin-left: -10px; /* Offset the extra width */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); /* Add subtle shadow for depth */
-}
-
-/* Error message */
-.timeline-error {
-    text-align: center;
-    background-color: rgba(0, 0, 0, 0.05);
-    padding: 2rem;
-    border-radius: 8px;
-    margin: 2rem auto;
-    max-width: 600px;
-}
-
-.timeline-error i {
-    font-size: 3rem;
-    color: #CE9C00;
-    margin-bottom: 1rem;
-    display: block;
-}
-
-.timeline-error p {
-    font-size: 1.2rem;
-    color: #666;
 }
 
 /* Loading animation */
@@ -387,8 +234,8 @@
         width: calc(100% - 75px);
     }
     
-    .timeline-item:nth-child(odd) .timeline-dot,
-    .timeline-item:nth-child(even) .timeline-dot {
+    .timeline-item:nth-child(odd) .timeline-marker,
+    .timeline-item:nth-child(even) .timeline-marker {
         left: 18px;
         right: auto;
     }

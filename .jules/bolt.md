@@ -15,7 +15,8 @@
 **Action:** Replace `new Date()` comparisons with simple string comparison for ISO-8601 strings (which sort perfectly lexicographically). Replace `localeCompare` with case-insensitive relational operators (`<` and `>`) to eliminate CPU bottlenecks during sorting operations in hot loops.
 
 ## REJECTED PATTERNS - DO NOT REPEAT
-The following changes have been proposed and rejected TWICE (2026-04-11, 2026-04-12). Do not propose them again:
+The following changes have been proposed and rejected TWICE (2026-04-11, 2026-04-12). Do not propose them again
+(function names below are v1-era; the rule applies equally to their v2 equivalents in `js/crm/render.js` and `js/crm/store.js`):
 - Replacing `.filter()` with `for`/`continue`/`push` in `getFilteredLeads()` — the functional version is shorter, more readable, and this CRM has ~200 leads
 - Replacing `.map().join('')` with `for` loop string concatenation in `renderLeadList()` or `renderActivityLog()` — no measurable performance difference at this scale
 - Wrapping template literal sections in IIFEs to avoid `.map().join('')` — makes code harder to read for zero gain

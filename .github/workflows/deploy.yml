@@ -33,10 +33,9 @@ jobs:
       
       - name: Update D1 Changelog
         env:
-          # Shared secret for the authenticated changelog-writer worker.
-          # Add it under repo Settings → Secrets → Actions. Absent = no auth header
-          # sent (the pre-auth worker still accepts the write); set it once the
-          # authenticated worker is deployed. See leadotron-rebuild/SECURITY.md.
+          # Shared secret for the authenticated changelog-writer worker
+          # (Bearer auth check lives in workers/changelog-writer-worker.js).
+          # Add it under repo Settings → Secrets → Actions.
           CHANGELOG_WRITE_TOKEN: ${{ secrets.CHANGELOG_WRITE_TOKEN }}
         run: |
           echo "🔄 Updating D1 changelog with new meaningful commits..."

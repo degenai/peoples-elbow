@@ -7,7 +7,7 @@ export default {
     // Require a shared-secret Bearer token. Fail closed: if CHANGELOG_WRITE_TOKEN
     // isn't configured on the worker, reject everything — no anonymous DB writes.
     // Set it with:  wrangler secret put CHANGELOG_WRITE_TOKEN
-    // CI sends it as  Authorization: Bearer <token>  (see update-d1-changelog.js).
+    // CI sends it as  Authorization: Bearer <token>  (see update-d1-changelog.cjs).
     const expectedToken = env.CHANGELOG_WRITE_TOKEN;
     const providedToken = (request.headers.get('Authorization') || '').replace(/^Bearer\s+/i, '');
     if (!expectedToken || !timingSafeEqual(providedToken, expectedToken)) {

@@ -9,13 +9,12 @@ This system allows you to maintain a single header and footer that can be used a
 - `components/header.html` - Universal header component
 - `components/footer.html` - Universal footer component  
 - `js/components.js` - JavaScript component loader
-- `template-page.html` - Template for creating new pages
 
 ## How to Use
 
 ### For New Pages
 
-1. Copy `template-page.html` and rename it
+1. Copy an existing simple page (e.g. `book.html`) and rename it
 2. Update the title, meta description, and page content
 3. The header and footer will automatically load
 
@@ -49,14 +48,7 @@ Make sure to include the component loader script:
 
 ## Navigation Data Attributes
 
-The system uses `data-nav` attributes to identify pages for highlighting:
-
-- `home` - index.html
-- `calendar` - calendar.html
-- `map` - map.html
-- `chat` - chat.html
-- `changelog` - changelog.html
-- `steal-this-site` - steal-this-site.html
+The system uses `data-nav` attributes to identify pages for highlighting. The current header nav carries `data-nav` items for the index sections (`mission`, `services`, `host`, `impact`, `locations`, `contact`) plus `past-events`, `book`, and `steal-this-site`. The page map in `js/components.js` also recognizes `calendar.html`, `chat.html`, and `changelog.html`, but those pages are not currently in the header nav, so no highlighting applies to them.
 
 ## Making Changes
 
@@ -83,13 +75,17 @@ The system uses `data-nav` attributes to identify pages for highlighting:
 
 All site pages now use the universal component system:
 - ✅ `index.html` - Homepage
-- ✅ `calendar.html` - Calendar page  
-- ✅ `map.html` - Map page
-- ✅ `chat.html` - Chat page
+- ✅ `book.html` - Booking page
+- ✅ `calendar.html` - Calendar page (not currently in the nav)
+- ✅ `chat.html` - Chat page (not currently in the nav)
+- ✅ `past-events.html` - Past appearances
 - ✅ `steal-this-site.html` - Documentation page
 - ✅ `changelog.html` - Development log
+- ✅ `crm.html` - Lead-o-Tron CRM
+- ✅ `privacy.html` - Privacy policy
+- ✅ `brand-kit.html` - Brand kit
 - ✅ `404.html` - Error page
-- ⚠️ `dashboard.html` - Left unchanged (admin only)
+- 🗑️ `dashboard.html` - retired to `_deprecated/` (replaced by `crm.html`, the Lead-o-Tron v2)
 
 ## Troubleshooting
 
