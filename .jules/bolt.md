@@ -21,3 +21,10 @@ The following changes have been proposed and rejected TWICE (2026-04-11, 2026-04
 - Replacing `.map().join('')` with `for` loop string concatenation in `renderLeadList()` or `renderActivityLog()` — no measurable performance difference at this scale
 - Wrapping template literal sections in IIFEs to avoid `.map().join('')` — makes code harder to read for zero gain
 - Any change that increases line count without improving readability or fixing a real bottleneck
+## 2024-11-20 - [Avoid Unreadable Micro-Optimizations]
+**Learning:** [Replacing ES6 array methods (`.filter()`, `.map()`) with standard `for` loops violates codebase readability rules for typical client-side datasets unless it solves an identified critical bottleneck.]
+**Action:** [Always prefer readable ES6 array methods. Only implement loop unrolling or manual loops if there is a proven performance problem and the readability sacrifice is explicitly requested or justifiable.]
+
+## 2024-11-20 - [Single-Pass String Operations]
+**Learning:** [Chaining `.map()` calls with `.join()` to build strings creates multiple intermediate array allocations that trigger garbage collection pauses, which can be avoided by using a single-pass `.reduce()`.]
+**Action:** [Use `.reduce()` when building strings from arrays to avoid intermediate array allocations, and always include explanatory comments with benchmark data to justify the optimization.]
