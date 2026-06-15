@@ -144,7 +144,7 @@
             <!-- Filter drawer: collapsed on phones, inline on desktop -->
             <div id="filter-drawer" class="crm-filter-drawer" hidden>
                 <div class="crm-filter-grid">
-                    <label>Status
+                    <label for="filter-status">Status
                         <select id="filter-status">
                             <option value="all">All</option>
                             <option value="active" selected>Active</option>
@@ -152,7 +152,7 @@
                             <option value="archived">Archived</option>
                         </select>
                     </label>
-                    <label>Last visit
+                    <label for="filter-time">Last visit
                         <select id="filter-time">
                             <option value="all">Any time</option>
                             <option value="week">Within a week</option>
@@ -163,14 +163,14 @@
                             <option value="never">Never visited</option>
                         </select>
                     </label>
-                    <label>Area
+                    <label for="filter-neighborhood">Area
                         <input id="filter-neighborhood" type="text" list="neighborhood-options"
                                placeholder="Any area" autocomplete="off">
                     </label>
-                    <label>Min score <output id="filter-minscore-out">3</output>
+                    <label for="filter-minscore">Min score <output id="filter-minscore-out">3</output>
                         <input id="filter-minscore" type="range" min="3" max="15" value="3">
                     </label>
-                    <label>Last reception
+                    <label for="filter-reception">Last reception
                         <select id="filter-reception">
                             <option value="all">Any</option>
                             <option value="warm">Warm</option>
@@ -209,11 +209,11 @@
                 <h2>Plan an outreach route</h2>
             </div>
             <div class="crm-route-controls">
-                <label>Start address
+                <label for="route-start">Start address
                     <input id="route-start" type="text" autocomplete="street-address" placeholder="Where you're starting from">
                 </label>
                 <button id="use-location-route" class="btn btn-secondary btn-sm" type="button"><i class="fas fa-location-crosshairs" aria-hidden="true"></i> Use my location</button>
-                <label>Include leads due
+                <label for="route-filter-time">Include leads due
                     <select id="route-filter-time">
                         <option value="all">Any</option>
                         <option value="due1">1+ week</option>
@@ -222,13 +222,13 @@
                         <option value="due4">1+ month</option>
                     </select>
                 </label>
-                <label>Status
+                <label for="route-filter-status">Status
                     <select id="route-filter-status">
                         <option value="active" selected>Active only</option>
                         <option value="all">All</option>
                     </select>
                 </label>
-                <label>Max stops <output id="route-maxstops-out">9</output>
+                <label for="route-maxstops">Max stops <output id="route-maxstops-out">9</output>
                     <input id="route-maxstops" type="range" min="1" max="15" value="9">
                 </label>
                 <p class="crm-route-eligible"><span id="route-eligible-count">0</span> eligible leads</p>
@@ -275,17 +275,17 @@
             <form id="lead-form" class="crm-sheet-body">
                 <input type="hidden" id="form-lead-id">
 
-                <label class="crm-field">Venue name <span class="crm-req">*</span>
+                <label class="crm-field" for="field-name">Venue name <span class="crm-req">*</span>
                     <input id="field-name" type="text" required autocomplete="organization"
                            autocapitalize="words" enterkeyhint="next" placeholder="e.g. Ironwood Taproom">
                 </label>
 
-                <label class="crm-field">Area
+                <label class="crm-field" for="field-neighborhood">Area
                     <input id="field-neighborhood" type="text" list="neighborhood-options"
                            autocapitalize="words" enterkeyhint="next" placeholder="Type or pick — e.g. Woodstock">
                 </label>
 
-                <label class="crm-field">Address
+                <label class="crm-field" for="field-address">Address
                     <input id="field-address" type="text" autocomplete="street-address"
                            autocapitalize="words" enterkeyhint="next" placeholder="Street, city, ZIP">
                     <button id="use-location-btn" class="btn btn-secondary btn-sm crm-field-aux" type="button">
@@ -294,11 +294,11 @@
                 </label>
 
                 <div class="crm-field-row">
-                    <label class="crm-field">Type
+                    <label class="crm-field" for="field-venuetype">Type
                         <input id="field-venuetype" type="text" list="venuetype-options"
                                autocapitalize="words" enterkeyhint="next" placeholder="Type or pick — e.g. Card shop">
                     </label>
-                    <label class="crm-field">Status
+                    <label class="crm-field" for="field-status">Status
                         <select id="field-status">
                             <option value="active" selected>Active</option>
                             <option value="converted">Converted</option>
@@ -349,13 +349,13 @@
                     <button id="add-contact-btn" class="btn btn-secondary btn-sm" type="button">+ Add contact</button>
                 </fieldset>
 
-                <label class="crm-field">Notes
+                <label class="crm-field" for="field-notes">Notes
                     <textarea id="field-notes" rows="3" autocapitalize="sentences" placeholder="Anything worth remembering"></textarea>
                 </label>
 
                 <!-- Quick visit: default-on in the field — log the visit you just made -->
                 <div class="crm-quickvisit">
-                    <label class="crm-check"><input id="quickvisit-toggle" type="checkbox"> Log a visit now</label>
+                    <label class="crm-check" for="quickvisit-toggle"><input id="quickvisit-toggle" type="checkbox"> Log a visit now</label>
                     <div id="quickvisit-fields" hidden>
                         <span class="crm-chips" role="radiogroup" aria-label="How did it go?">
                             <label class="crm-chip"><input type="radio" name="qv-reception" value="warm"><span>🔥 Warm</span></label>
@@ -384,7 +384,7 @@
             <form id="visit-form" class="crm-sheet-body">
                 <input type="hidden" id="visit-lead-id">
                 <input type="hidden" id="visit-id">
-                <label class="crm-field">When
+                <label class="crm-field" for="visit-date">When
                     <input id="visit-date" type="datetime-local">
                 </label>
                 <span class="crm-chips" role="radiogroup" aria-label="Reception">
@@ -392,7 +392,7 @@
                     <label class="crm-chip"><input type="radio" name="visit-reception" value="lukewarm" checked><span>🌤️ Lukewarm</span></label>
                     <label class="crm-chip"><input type="radio" name="visit-reception" value="cold"><span>❄️ Cold</span></label>
                 </span>
-                <label class="crm-field">Notes
+                <label class="crm-field" for="visit-notes">Notes
                     <textarea id="visit-notes" rows="3" autocapitalize="sentences"></textarea>
                 </label>
                 <div class="crm-sheet-actions">
@@ -411,10 +411,10 @@
                 <button class="crm-sheet-close" type="button" data-close aria-label="Close">&times;</button>
             </header>
             <div class="crm-sheet-body">
-                <label class="crm-field">Default route start address
+                <label class="crm-field" for="setting-start-address">Default route start address
                     <input id="setting-start-address" type="text" autocomplete="street-address">
                 </label>
-                <label class="crm-field">Geocoding country code
+                <label class="crm-field" for="setting-country">Geocoding country code
                     <input id="setting-country" type="text" maxlength="2" placeholder="us" inputmode="latin">
                 </label>
                 <hr>
