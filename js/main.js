@@ -278,18 +278,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Upcoming appearances. Featured slot = next firm-dated event, ticks live.
     // List slot = remaining future events. When featured passes, next event auto-promotes.
+
+    function escapeHtml(text) {
+        if (text === null || text === undefined) return '';
+        return String(text)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
     const upcomingEvents = [
         {
             name: 'FlexFest',
             where: 'Downtown Woodstock',
-            when: 'Mid-Aug 2026 &middot; TBC',
+            when: 'Mid-Aug 2026 · TBC',
             date: new Date('2026-08-15T16:00:00Z'),
             cause: null,
         },
         {
             name: 'Golfing for Respite',
             where: 'Iron Horse Golf Club, Alpharetta GA',
-            when: 'Mon Oct 5, 2026 &middot; 8:30 AM',
+            when: 'Mon Oct 5, 2026 · 8:30 AM',
             date: new Date('2026-10-05T12:30:00Z'),
             cause: 'Benefiting Special Needs Respite (501c3)',
         },
@@ -305,10 +316,10 @@ document.addEventListener('DOMContentLoaded', function() {
             featured.innerHTML =
                 `<div class="countdown-event-info">` +
                     `<span class="countdown-event-overline">Up Next</span>` +
-                    `<span class="countdown-event-name">${ev.name}</span>` +
-                    `<span class="countdown-event-when">${ev.when}</span>` +
-                    `<span class="countdown-event-where">${ev.where}</span>` +
-                    (ev.cause ? `<span class="countdown-event-cause">${ev.cause}</span>` : '') +
+                    `<span class="countdown-event-name">${escapeHtml(ev.name)}</span>` +
+                    `<span class="countdown-event-when">${escapeHtml(ev.when)}</span>` +
+                    `<span class="countdown-event-where">${escapeHtml(ev.where)}</span>` +
+                    (ev.cause ? `<span class="countdown-event-cause">${escapeHtml(ev.cause)}</span>` : '') +
                 `</div>` +
                 `<div class="countdown-timer" id="countdown-timer">` +
                     `<div class="countdown-unit"><span class="countdown-number" id="countdown-days">--</span><span class="countdown-label">Days</span></div>` +
@@ -326,10 +337,10 @@ document.addEventListener('DOMContentLoaded', function() {
             const header = `<li class="upcoming-events-header">Also On The Calendar</li>`;
             const items = events.map(ev =>
                 `<li class="upcoming-event">` +
-                    `<span class="upcoming-event-when">${ev.when}</span>` +
-                    `<span class="upcoming-event-name">${ev.name}</span>` +
-                    `<span class="upcoming-event-where">${ev.where}</span>` +
-                    (ev.cause ? `<span class="upcoming-event-cause">${ev.cause}</span>` : '') +
+                    `<span class="upcoming-event-when">${escapeHtml(ev.when)}</span>` +
+                    `<span class="upcoming-event-name">${escapeHtml(ev.name)}</span>` +
+                    `<span class="upcoming-event-where">${escapeHtml(ev.where)}</span>` +
+                    (ev.cause ? `<span class="upcoming-event-cause">${escapeHtml(ev.cause)}</span>` : '') +
                 `</li>`
             ).join('');
             list.innerHTML = header + items;
