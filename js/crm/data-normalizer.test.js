@@ -333,3 +333,68 @@ test('activityLog entries missing a message are dropped and flagged', () => {
   assert.strictEqual(data.activityLog.length, 1);
   assert.strictEqual(needsSave, true);
 });
+
+// --- additional tests for coverage ---
+
+test('created / updatedAt timestamp logic', () => {
+  // Test rawLead.updatedAt defaults to created if not string
+  const lead1 = cleanLead({
+    created: '2026-01-01T00:00:00.000Z',
+    updatedAt: null
+  });
+  const { lead: normalized1, changed: changed1 } = normalizeLead(lead1);
+  assert.strictEqual(normalized1.updatedAt, '2026-01-01T00:00:00.000Z');
+  assert.strictEqual(changed1, true);
+
+  // Test rawLead.created gets generated if not present
+  const lead2 = cleanLead({
+    created: null,
+    updatedAt: null
+  });
+  const { lead: normalized2, changed: changed2 } = normalizeLead(lead2);
+  assert.match(normalized2.created, /^\d{4}-\d{2}-\d{2}T/);
+  assert.strictEqual(normalized2.updatedAt, normalized2.created);
+  assert.strictEqual(changed2, true);
+});
+
+test('contacts coverage: explicit non-primary with no primary', () => {
+  // Line 320: explicit isPrimary = false
+  // Line 329-331: if no primary, force contacts[0].isPrimary = true
+  const rawLead = {
+    contacts: [
+      { id: 'c_1', name: 'A', isPrimary: false },
+      { id: 'c_2', name: 'B', isPrimary: false }
+    ]
+  };
+  const { contacts, changed } = normalizeContacts(rawLead);
+  assert.strictEqual(contacts[0].isPrimary, true);
+  assert.strictEqual(contacts[1].isPrimary, false);
+  assert.strictEqual(changed, true);
+});
+
+test('contacts coverage: explicit primary', () => {
+  // Line 320: explicit isPrimary = false with valid primary elsewhere
+  const rawLead = {
+    contacts: [
+      { id: 'c_1', name: 'A', isPrimary: false },
+      { id: 'c_2', name: 'B', isPrimary: true },
+      { id: 'c_3', name: 'C', isPrimary: false }
+    ]
+  };
+  const { contacts, changed } = normalizeContacts(rawLead);
+  assert.strictEqual(contacts[0].isPrimary, false);
+  assert.strictEqual(contacts[1].isPrimary, true);
+  assert.strictEqual(contacts[2].isPrimary, false);
+});
+
+test('normalizeLeadsData with primitive data types handles edge cases properly', () => {
+  const cases = [null, undefined, 'string', 123, true];
+
+  for (const c of cases) {
+    const { data, needsSave } = normalizeLeadsData(c);
+    assert.strictEqual(data.schemaVersion, 2);
+    assert.deepStrictEqual(data.leads, []);
+    assert.deepStrictEqual(data.activityLog, []);
+    assert.strictEqual(needsSave, true);
+  }
+});
