@@ -524,15 +524,19 @@ export function mergeNeighborhoods(leads) {
     Array.from(datalist.options).map((o) => o.value.toLowerCase())
   );
 
+  const fragment = document.createDocumentFragment();
+
   for (const lead of leads) {
     const n = (lead.neighborhood || '').trim();
     if (n && !existing.has(n.toLowerCase())) {
       const opt = document.createElement('option');
       opt.value = n; // .value is a safe sink (no HTML parsing)
-      datalist.appendChild(opt);
+      fragment.appendChild(opt);
       existing.add(n.toLowerCase());
     }
   }
+
+  datalist.appendChild(fragment);
 }
 
 // ── mergeVenueTypes ─────────────────────────────────────────────
@@ -547,15 +551,19 @@ export function mergeVenueTypes(leads) {
     Array.from(datalist.options).map((o) => o.value.toLowerCase())
   );
 
+  const fragment = document.createDocumentFragment();
+
   for (const lead of leads) {
     const t = (lead.venueType || '').trim();
     if (t && !existing.has(t.toLowerCase())) {
       const opt = document.createElement('option');
       opt.value = t; // .value is a safe sink (no HTML parsing)
-      datalist.appendChild(opt);
+      fragment.appendChild(opt);
       existing.add(t.toLowerCase());
     }
   }
+
+  datalist.appendChild(fragment);
 }
 
 // ── setSyncStatus ───────────────────────────────────────────────
