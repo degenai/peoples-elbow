@@ -1,4 +1,4 @@
-import { generateId, generateDateStr } from './utils.js';
+import { generateId } from './utils.js';
 import { normalizeLeadsData } from './data-normalizer.js';
 
 const STORAGE_KEY = 'leadOTron_demoData';
@@ -267,7 +267,7 @@ export const CrmApi = {
   },
 
   async createLead(data) {
-    const newLead = { ...data, id: generateId(), created: generateDateStr(), lastVisit: null };
+    const newLead = { ...data, id: generateId(), created: new Date().toISOString(), lastVisit: null };
     this.localState.leads.push(newLead);
     await this.saveState();
     return newLead;

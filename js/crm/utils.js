@@ -2,10 +2,6 @@ export function generateId() {
   return crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2, 15);
 }
 
-export function generateDateStr(date = new Date()) {
-  return date.toISOString();
-}
-
 export function getTimeSince(dateStr) {
   if (!dateStr) return { days: Infinity, weeks: Infinity, formatted: 'Never' };
 
