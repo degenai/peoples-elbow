@@ -25,7 +25,14 @@ export default {
       // Parse query parameters, clamped to sane bounds (max 100 for performance;
       // negative values would otherwise mean "no limit" in SQLite)
       const url = new URL(request.url);
-      const limit = Math.min(Math.max(parseInt(url.searchParams.get('limit'), 10) || 50, 1), 100);
+      const parsedLimit = parseInt(url.searchParams.get('limit'), 10);
+      if (Number.isFinite(parsedLimit) && parsedLimit > 100) {
+        return new Response(
+          JSON.stringify({ error: 'Limit cannot exceed 100' }),
+          { status: 400, headers: corsHeaders }
+        );
+      }
+      const limit = Math.min(Math.max(parsedLimit || 50, 1), 100);
       const offset = Math.max(parseInt(url.searchParams.get('offset'), 10) || 0, 0);
 
       // Query changelog entries from D1, ordered by insertion id (newest first)
