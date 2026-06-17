@@ -489,6 +489,11 @@ export function readForm() {
 export function renderActivity(log) {
   const listEl = document.getElementById('activity-list');
   listEl.textContent = '';
+
+  // Use a DocumentFragment to batch DOM insertions, minimizing reflows
+  // Expected to significantly reduce render time for large activity logs.
+  const fragment = document.createDocumentFragment();
+
   for (const entry of log) {
     const li = document.createElement('li');
     li.className = 'crm-activity-item';
@@ -508,8 +513,10 @@ export function renderActivity(log) {
 
     li.appendChild(time);
     li.appendChild(msg);
-    listEl.appendChild(li);
+    fragment.appendChild(li);
   }
+
+  listEl.appendChild(fragment);
 }
 
 // ── mergeNeighborhoods ──────────────────────────────────────────
