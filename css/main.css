@@ -1915,7 +1915,7 @@ nav ul li a.active {
 /* Secondary overflow: book with Elbow Room when the Wednesday window does not fit */
 .book-overflow {
     max-width: 720px;
-    margin: var(--space-lg) auto 0;
+    margin: var(--space-xl) auto 0;
     padding: var(--space-lg);
     text-align: center;
     background: var(--pe-light-gray);
