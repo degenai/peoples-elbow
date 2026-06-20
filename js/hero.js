@@ -1,6 +1,6 @@
 // Act 1 — "The Body-Slam Entrance": the Bangers wordmark performs its own move.
 // Letters collapse inward from above on a hard spring; "Elbow" lands heavier with a
-// shudder; h2/tagline/subtitle/buttons follow through; gold Ben-Day dots ink in.
+// shudder; h2/tagline/subtitle/offer/buttons follow through; gold Ben-Day dots ink in.
 // Pure progressive enhancement: if this module never runs, the hero is the static page.
 import { animate, createTimeline, createSpring, stagger, splitText, utils } from './vendor/anime.esm.min.js';
 
@@ -37,6 +37,7 @@ import { animate, createTimeline, createSpring, stagger, splitText, utils } from
         const h2 = content.querySelector('h2');
         const tagline = content.querySelector('.tagline');
         const subtitle = content.querySelector('.hero-subtitle');
+        const offer = content.querySelector('.hero-offer-ribbon');
         const btns = Array.from(content.querySelectorAll('.hero-buttons > a.btn'));
 
         // Keep the wordmark readable to AT / copy-paste after splitText rewrites the DOM.
@@ -51,11 +52,13 @@ import { animate, createTimeline, createSpring, stagger, splitText, utils } from
 
         const isMobile = window.matchMedia('(max-width: 768px)').matches;
         const lift = isMobile ? '-60%' : '-110%';
+        const offerRestRotate = isMobile ? 0 : -1.2;
 
         // Seed + animate happen in the same frame, so there is no hidden flash.
         utils.set(glyphs, { display: 'inline-block', opacity: 0, translateY: lift, scale: 1.45, rotate: -5 });
         const followers = [h2, tagline, subtitle].filter(Boolean);
         followers.forEach((el) => utils.set(el, { opacity: 0 }));
+        if (offer) utils.set(offer, { opacity: 0, translateY: '16px', scale: 0.92, rotate: offerRestRotate });
         btns.forEach((b) => utils.set(b, { opacity: 0 }));
 
         inkRamp();
@@ -71,13 +74,20 @@ import { animate, createTimeline, createSpring, stagger, splitText, utils } from
             delay: stagger(26, { from: 'center' }),
         });
 
-        // Follow-through: subtitle stack rises, then the CTAs pop in (finite ease so they
-        // always land at full opacity).
+        // Follow-through: subtitle stack rises, the offer card pops like a prize card,
+        // then the CTAs pop in (finite ease so they always land at full opacity).
         if (followers.length) {
             tl.add(followers, {
                 opacity: [0, 1], translateY: ['12px', 0],
                 duration: 420, ease: 'outExpo', delay: stagger(80),
             }, '-=150');
+        }
+        if (offer) {
+            tl.add(offer, {
+                opacity: [0, 1], translateY: ['16px', 0], scale: [0.92, 1],
+                rotate: [offerRestRotate - (isMobile ? 0 : 1.3), offerRestRotate],
+                duration: 430, ease: 'outBack',
+            }, '-=120');
         }
         if (btns.length) {
             tl.add(btns, {
