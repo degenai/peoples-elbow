@@ -463,6 +463,34 @@ nav ul li a:hover::after {
     gap: var(--space-md);
 }
 
+.hero-offer-ribbon {
+    position: relative;
+    z-index: 1;
+    display: inline-block;
+    box-sizing: border-box;
+    width: calc(100vw - (2 * var(--space-lg)));
+    max-width: 600px;
+    margin: 0 auto var(--space-lg);
+    padding: var(--space-sm) var(--space-md);
+    background: var(--pe-gold);
+    color: var(--pe-green-dark);
+    font-size: 1.1rem;
+    font-weight: bold;
+    line-height: 1.5;
+    border: 3px solid var(--pe-white);
+    border-radius: 8px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+    transform: rotate(-1.2deg);
+}
+
+.hero-offer-ribbon strong {
+    color: var(--pe-green-dark);
+}
+
+.hero-offer-ribbon .fa-gift {
+    color: var(--pe-green);
+}
+
 /* Mission Section */
 .mission {
     padding: var(--space-xl) 0;
@@ -1201,6 +1229,13 @@ footer {
     
     .hero-buttons {
         flex-direction: column;
+    }
+
+    .hero-offer-ribbon {
+        width: 16.5rem;
+        max-width: calc(100vw - (2 * var(--space-md)));
+        font-size: 0.95rem;
+        transform: none;
     }
 
     .mission-content {
