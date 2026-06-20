@@ -5,6 +5,17 @@
 ### Dates in learning entries
 Always run `date +%Y-%m-%d` before writing to your `.jules/*.md` learning file. Use the output as the date. Never guess or hardcode a date.
 
+### Public changelog copy
+The D1 changelog is public-facing update history, not an internal git log. Every shipped commit can become a visible changelog card, so write commit messages as polished release notes.
+
+For meaningful site changes:
+- Use a user-facing title line. Do not start public changelog commits with internal process tags like `[verified]`.
+- Include a commit body with `WHAT:`, `WHY:`, and `QUALITY:` sections when the change affects visitors, booking, layout, animation, copy, or operations.
+- Write at the level of Steam patch notes or PR release notes: specific, readable, and clear about the visitor benefit.
+- Keep technical metadata in the body only when it helps explain quality or risk.
+- Public copy should avoid em dashes.
+- If time allows, ask a sidecar model to draft or polish the changelog comment before commit.
+
 ### CSS
 When adding styles that apply to multiple selectors, combine them into one rule. Do not duplicate identical blocks for `input`, `a`, `button`, etc.
 
