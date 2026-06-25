@@ -11,38 +11,22 @@ class ComponentLoader {
     }
 
     /**
-     * Basic HTML sanitizer to prevent DOM-based XSS
+     * Basic HTML sanitizer to prevent DOM-based XSS using DOMPurify
      */
-    sanitizeHTML(html) {
+    async sanitizeHTML(html) {
         if (!html) return '';
 
-        // Parse the HTML string into a DOM Document
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
+        if (!window.DOMPurify) {
+            try {
+                const purify = await import('https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.8/purify.es.min.js');
+                window.DOMPurify = purify.default || purify;
+            } catch (error) {
+                console.error("Failed to load DOMPurify:", error);
+                return ''; // Return empty string on failure to prevent unsafe HTML from rendering
+            }
+        }
 
-        // 1. Remove all script tags
-        const scripts = doc.querySelectorAll('script');
-        scripts.forEach(script => script.remove());
-
-        // 2. Remove all event handler attributes and javascript: URIs
-        const elements = doc.querySelectorAll('*');
-        elements.forEach(el => {
-            Array.from(el.attributes).forEach(attr => {
-                const attrName = attr.name.toLowerCase();
-                // Remove on* event handlers (e.g., onclick, onload)
-                if (attrName.startsWith('on')) {
-                    el.removeAttribute(attrName);
-                }
-                // Remove javascript: URIs in href or src attributes
-                if ((attrName === 'href' || attrName === 'src') &&
-                    attr.value.trim().toLowerCase().startsWith('javascript:')) {
-                    el.removeAttribute(attrName);
-                }
-            });
-        });
-
-        // Return the sanitized inner HTML of the body
-        return doc.body.innerHTML;
+        return window.DOMPurify.sanitize(html);
     }
 
     /**
@@ -100,7 +84,7 @@ class ComponentLoader {
             return false;
         }
 
-        targetElement.innerHTML = this.sanitizeHTML(headerHtml);
+        targetElement.innerHTML = await this.sanitizeHTML(headerHtml);
         this.highlightCurrentPage();
         return true;
     }
@@ -118,7 +102,7 @@ class ComponentLoader {
             return false;
         }
 
-        targetElement.innerHTML = this.sanitizeHTML(footerHtml);
+        targetElement.innerHTML = await this.sanitizeHTML(footerHtml);
         return true;
     }
 
