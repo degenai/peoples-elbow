@@ -25,7 +25,6 @@ const SCHEMA_VERSION = 2;
 // than reaching into DEFAULTS for keys that may not exist yet — the schema
 // contract is the source of truth, and this keeps the normalizer self-contained.
 const DEFAULT_SOURCE = 'field';
-const DEFAULT_VENUE_TYPE = '';
 const DEFAULT_SCORE = 3; // middle of the 1-5 range
 
 // Ids end up in HTML attribute positions (data-id="...") all over the UI. An id
