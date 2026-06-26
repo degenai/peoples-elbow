@@ -11,22 +11,96 @@ class ComponentLoader {
     }
 
     /**
-     * Basic HTML sanitizer to prevent DOM-based XSS using DOMPurify
+     * Sanitize trusted header/footer component HTML before injecting it.
+     *
+     * DOMPurify is still used when available, but the site header must not depend
+     * on a remote CDN module loading perfectly. If DOMPurify is unavailable, use
+     * a small local allow-list sanitizer for these first-party component fragments.
      */
     async sanitizeHTML(html) {
         if (!html) return '';
 
-        if (!window.DOMPurify) {
-            try {
-                const purify = await import('https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.8/purify.es.min.js');
-                window.DOMPurify = purify.default || purify;
-            } catch (error) {
-                console.error("Failed to load DOMPurify:", error);
-                return ''; // Return empty string on failure to prevent unsafe HTML from rendering
-            }
+        if (window.DOMPurify && typeof window.DOMPurify.sanitize === 'function') {
+            return window.DOMPurify.sanitize(html);
         }
 
-        return window.DOMPurify.sanitize(html);
+        try {
+            const purify = await import('https://cdn.jsdelivr.net/npm/dompurify@3.0.8/dist/purify.es.mjs');
+            const domPurify = purify.default || purify;
+            if (domPurify && typeof domPurify.sanitize === 'function') {
+                window.DOMPurify = domPurify;
+                return domPurify.sanitize(html);
+            }
+        } catch (error) {
+            console.warn('DOMPurify unavailable; using local component sanitizer:', error);
+        }
+
+        return this.sanitizeTrustedComponentHTML(html);
+    }
+
+    sanitizeTrustedComponentHTML(html) {
+        const allowedTags = new Set([
+            'a', 'button', 'div', 'footer', 'header', 'i', 'img', 'li',
+            'nav', 'p', 'span', 'ul'
+        ]);
+        const allowedAttributes = new Set([
+            'alt', 'aria-expanded', 'aria-hidden', 'aria-label', 'class',
+            'data-nav', 'href', 'id', 'rel', 'src', 'style', 'target'
+        ]);
+        const removableTags = new Set(['script', 'style', 'iframe', 'object', 'embed', 'template']);
+        const template = document.createElement('template');
+        template.innerHTML = html;
+
+        const isSafeUrl = (value, attributeName) => {
+            const trimmed = (value || '').trim();
+            if (!trimmed) return true;
+            if (trimmed.startsWith('#')) return true;
+            try {
+                const parsed = new URL(trimmed, window.location.origin);
+                if (attributeName === 'src') {
+                    return ['http:', 'https:'].includes(parsed.protocol);
+                }
+                return ['http:', 'https:', 'mailto:', 'tel:'].includes(parsed.protocol);
+            } catch (error) {
+                return false;
+            }
+        };
+
+        const isSafeStyle = (value) => {
+            const lowered = (value || '').toLowerCase();
+            return !/(expression|javascript:|url\s*\(|@import|<|>)/.test(lowered);
+        };
+
+        const scrub = (node) => {
+            if (node.nodeType === Node.ELEMENT_NODE) {
+                const tag = node.tagName.toLowerCase();
+                if (removableTags.has(tag)) {
+                    node.remove();
+                    return;
+                }
+                if (!allowedTags.has(tag)) {
+                    node.replaceWith(...Array.from(node.childNodes));
+                    return;
+                }
+
+                Array.from(node.attributes).forEach((attribute) => {
+                    const name = attribute.name.toLowerCase();
+                    const value = attribute.value;
+                    if (name.startsWith('on') || !allowedAttributes.has(name)) {
+                        node.removeAttribute(attribute.name);
+                    } else if ((name === 'href' || name === 'src') && !isSafeUrl(value, name)) {
+                        node.removeAttribute(attribute.name);
+                    } else if (name === 'style' && !isSafeStyle(value)) {
+                        node.removeAttribute(attribute.name);
+                    }
+                });
+            }
+
+            Array.from(node.childNodes).forEach(scrub);
+        };
+
+        Array.from(template.content.childNodes).forEach(scrub);
+        return template.innerHTML;
     }
 
     /**
