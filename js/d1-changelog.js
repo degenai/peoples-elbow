@@ -100,7 +100,11 @@ class D1Changelog {
         const renderedCount = timeline.querySelectorAll('.timeline-item').length;
 
         if (this.allData.length === 0 && renderedCount === 0) {
-            timeline.innerHTML = '<p class="no-data">No changelog entries found in D1 database.</p>';
+            timeline.innerHTML = '';
+            const p = document.createElement('p');
+            p.className = 'no-data';
+            p.textContent = 'No changelog entries found in D1 database.';
+            timeline.appendChild(p);
             return;
         }
 
@@ -140,13 +144,6 @@ class D1Changelog {
         const commitTitle = commitLines[0] || entry.commit_message;
         const fullMessage = entry.commit_message;
 
-        // Format the full message for display (preserve formatting, highlight sections)
-        let formattedFullMessage = this.escapeHtml(fullMessage);
-        // Highlight WHAT/WHY/TECHNICAL sections
-        formattedFullMessage = formattedFullMessage.replace(/\b(WHAT:|WHY:|TECHNICAL:)\b/g, '<strong>$1</strong>');
-        // Convert newlines to line breaks
-        formattedFullMessage = formattedFullMessage.replace(/\n/g, '<br>');
-
         const isDegenai = (entry.author_name || '').toLowerCase() === 'degenai';
         const contentClass = isBot ? 'timeline-content timeline-content--bot'
                            : isDegenai ? 'timeline-content timeline-content--degenai'
@@ -154,32 +151,104 @@ class D1Changelog {
         const markerClass = isBot ? 'timeline-marker timeline-marker--bot' : 'timeline-marker';
         const authorClass = isDegenai ? 'commit-author commit-author--degenai' : 'commit-author';
 
-        item.innerHTML = `
-            <div class="${markerClass}"></div>
-            <div class="${contentClass}">
-                <div class="timeline-header">
-                    <span class="commit-hash">${this.escapeHtml(shortHash)}</span>
-                    <span class="commit-date">${this.escapeHtml(formattedDate)}</span>
-                    <span class="${authorClass}">${this.escapeHtml(entry.author_name)}</span>
-                </div>
-                <div class="timeline-body">
-                    <h3 class="commit-message">${this.escapeHtml(commitTitle)}</h3>
-                    <div class="commit-details" style="display: none;">
-                        <div class="full-commit-message">
-                            <h4>Full Commit Message:</h4>
-                            <div class="verbose-message">${formattedFullMessage}</div>
-                        </div>
-                        <hr>
-                        <div class="commit-metadata">
-                            <p><strong>Full Hash:</strong> ${this.escapeHtml(entry.commit_hash)}</p>
-                            <p><strong>Author Email:</strong> ${this.escapeHtml(entry.author_email || 'N/A')}</p>
-                            <p><strong>Commit Date:</strong> ${this.escapeHtml(new Date(entry.commit_date).toLocaleString())}</p>
-                        </div>
-                    </div>
-                    <button class="toggle-details">Show Details</button>
-                </div>
-            </div>
-        `;
+        const markerDiv = document.createElement('div');
+        markerDiv.className = markerClass;
+
+        const contentDiv = document.createElement('div');
+        contentDiv.className = contentClass;
+
+        const headerDiv = document.createElement('div');
+        headerDiv.className = 'timeline-header';
+
+        const hashSpan = document.createElement('span');
+        hashSpan.className = 'commit-hash';
+        hashSpan.textContent = shortHash;
+
+        const dateSpan = document.createElement('span');
+        dateSpan.className = 'commit-date';
+        dateSpan.textContent = formattedDate;
+
+        const authorSpan = document.createElement('span');
+        authorSpan.className = authorClass;
+        authorSpan.textContent = entry.author_name || '';
+
+        headerDiv.append(hashSpan, dateSpan, authorSpan);
+
+        const bodyDiv = document.createElement('div');
+        bodyDiv.className = 'timeline-body';
+
+        const titleH3 = document.createElement('h3');
+        titleH3.className = 'commit-message';
+        titleH3.textContent = commitTitle;
+
+        const detailsDiv = document.createElement('div');
+        detailsDiv.className = 'commit-details';
+        detailsDiv.style.display = 'none';
+
+        const fullMessageDiv = document.createElement('div');
+        fullMessageDiv.className = 'full-commit-message';
+
+        const fullMessageH4 = document.createElement('h4');
+        fullMessageH4.textContent = 'Full Commit Message:';
+
+        const verboseMessageDiv = document.createElement('div');
+        verboseMessageDiv.className = 'verbose-message';
+
+        const lines = fullMessage.split('\n');
+        lines.forEach((line, i) => {
+            if (i > 0) {
+                verboseMessageDiv.appendChild(document.createElement('br'));
+            }
+            let currentIndex = 0;
+            const regex = /\b(WHAT:|WHY:|TECHNICAL:)\b/g;
+            let match;
+            while ((match = regex.exec(line)) !== null) {
+                if (match.index > currentIndex) {
+                    verboseMessageDiv.appendChild(document.createTextNode(line.substring(currentIndex, match.index)));
+                }
+                const strong = document.createElement('strong');
+                strong.textContent = match[0];
+                verboseMessageDiv.appendChild(strong);
+                currentIndex = regex.lastIndex;
+            }
+            if (currentIndex < line.length) {
+                verboseMessageDiv.appendChild(document.createTextNode(line.substring(currentIndex)));
+            }
+        });
+
+        fullMessageDiv.append(fullMessageH4, verboseMessageDiv);
+
+        const hr = document.createElement('hr');
+
+        const metadataDiv = document.createElement('div');
+        metadataDiv.className = 'commit-metadata';
+
+        const hashP = document.createElement('p');
+        const hashStrong = document.createElement('strong');
+        hashStrong.textContent = 'Full Hash: ';
+        hashP.append(hashStrong, entry.commit_hash);
+
+        const emailP = document.createElement('p');
+        const emailStrong = document.createElement('strong');
+        emailStrong.textContent = 'Author Email: ';
+        emailP.append(emailStrong, entry.author_email || 'N/A');
+
+        const dateP = document.createElement('p');
+        const dateStrong = document.createElement('strong');
+        dateStrong.textContent = 'Commit Date: ';
+        dateP.append(dateStrong, new Date(entry.commit_date).toLocaleString());
+
+        metadataDiv.append(hashP, emailP, dateP);
+
+        detailsDiv.append(fullMessageDiv, hr, metadataDiv);
+
+        const button = document.createElement('button');
+        button.className = 'toggle-details';
+        button.textContent = 'Show Details';
+
+        bodyDiv.append(titleH3, detailsDiv, button);
+        contentDiv.append(headerDiv, bodyDiv);
+        item.append(markerDiv, contentDiv);
 
         return item;
     }
@@ -225,7 +294,10 @@ class D1Changelog {
 
         const ring = document.createElement('div');
         ring.className = 'loading-ring';
-        ring.innerHTML = '<div></div><div></div><div></div><div></div>';
+        ring.appendChild(document.createElement('div'));
+        ring.appendChild(document.createElement('div'));
+        ring.appendChild(document.createElement('div'));
+        ring.appendChild(document.createElement('div'));
 
         const msg = document.createElement('p');
         msg.className = 'loading-message';
@@ -267,16 +339,6 @@ class D1Changelog {
 
         errorDiv.append(icon, heading, para, retryBtn);
         timeline.appendChild(errorDiv);
-    }
-
-    escapeHtml(text) {
-        if (text === null || text === undefined) return '';
-        return String(text)
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#39;');
     }
 }
 

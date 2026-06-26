@@ -463,6 +463,34 @@ nav ul li a:hover::after {
     gap: var(--space-md);
 }
 
+.hero-offer-ribbon {
+    position: relative;
+    z-index: 1;
+    display: inline-block;
+    box-sizing: border-box;
+    width: calc(100vw - (2 * var(--space-lg)));
+    max-width: 600px;
+    margin: 0 auto var(--space-lg);
+    padding: var(--space-sm) var(--space-md);
+    background: var(--pe-gold);
+    color: var(--pe-green-dark);
+    font-size: 1.1rem;
+    font-weight: bold;
+    line-height: 1.5;
+    border: 3px solid var(--pe-white);
+    border-radius: 8px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+    transform: rotate(-1.2deg);
+}
+
+.hero-offer-ribbon strong {
+    color: var(--pe-green-dark);
+}
+
+.hero-offer-ribbon .fa-gift {
+    color: var(--pe-green);
+}
+
 /* Mission Section */
 .mission {
     padding: var(--space-xl) 0;
@@ -1203,6 +1231,13 @@ footer {
         flex-direction: column;
     }
 
+    .hero-offer-ribbon {
+        width: 16.5rem;
+        max-width: calc(100vw - (2 * var(--space-md)));
+        font-size: 0.95rem;
+        transform: none;
+    }
+
     .mission-content {
         flex-direction: column;
     }
@@ -1910,6 +1945,38 @@ nav ul li a.active {
 .book-fallback a {
     font-weight: 700;
     margin-left: var(--space-xs);
+}
+
+/* Secondary overflow: book with Elbow Room when the Wednesday window does not fit */
+.book-overflow {
+    max-width: 720px;
+    margin: var(--space-xl) auto 0;
+    padding: var(--space-lg);
+    text-align: center;
+    background: var(--pe-light-gray);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-top: 3px solid var(--pe-gold);
+    border-radius: 8px;
+}
+
+.book-overflow-title {
+    font-family: var(--font-heading);
+    font-size: 1.6rem;
+    letter-spacing: 0.5px;
+    color: var(--pe-green-dark);
+    margin-bottom: var(--space-sm);
+}
+
+.book-overflow-body {
+    max-width: 560px;
+    margin: 0 auto var(--space-md);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: var(--pe-text-dark);
+}
+
+.book-overflow-cta i {
+    margin-right: var(--space-xs);
 }
 
 .book-info {

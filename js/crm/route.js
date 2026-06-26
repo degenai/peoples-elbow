@@ -267,16 +267,19 @@ export function createRoute({ store }) {
         { countrycodes }
       );
 
-      // Persist whatever got coords. updateLead recomputes derived fields; we
+      // Persist whatever got coords. updateLeads recomputes derived fields; we
       // only touch coords so nothing else is disturbed.
-      let saved = 0;
+      const updates = [];
       for (const lead of needed) {
         if (lead.coords && typeof lead.coords.lat === 'number' && typeof lead.coords.lon === 'number') {
-          store.updateLead(lead.id, { coords: lead.coords });
-          saved++;
+          updates.push({ id: lead.id, patch: { coords: lead.coords } });
         }
       }
+      if (updates.length > 0) {
+        store.updateLeads(updates);
+      }
 
+      const saved = updates.length;
       const failed = needed.length - saved;
       setProgress(
         failed > 0
@@ -348,10 +351,14 @@ export function createRoute({ store }) {
           (current, total, name) => setProgress(`Geocoding ${current}/${total}: ${name}`),
           { countrycodes }
         );
+        const updates = [];
         for (const lead of needGeo) {
           if (lead.coords && typeof lead.coords.lat === 'number' && typeof lead.coords.lon === 'number') {
-            store.updateLead(lead.id, { coords: lead.coords });
+            updates.push({ id: lead.id, patch: { coords: lead.coords } });
           }
+        }
+        if (updates.length > 0) {
+          store.updateLeads(updates);
         }
       }
 

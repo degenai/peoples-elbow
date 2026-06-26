@@ -134,6 +134,21 @@ export function createStore({ storage } = {}) {
     return getLead(id);
   }
 
+  function updateLeads(updates = []) {
+    let updatedCount = 0;
+    for (const { id, patch } of updates) {
+      const lead = findLead(id);
+      if (lead) {
+        Object.assign(lead, patch || {}, { id, updatedAt: nowISO() });
+        updatedCount++;
+      }
+    }
+    if (updatedCount > 0) {
+      commit();
+    }
+    return updatedCount > 0;
+  }
+
   function deleteLead(id) {
     const before = state.leads.length;
     state.leads = state.leads.filter((l) => l.id !== id);
@@ -245,7 +260,7 @@ export function createStore({ storage } = {}) {
   return {
     init, subscribe,
     getState, getLeads, getLead, getActivityLog, isDemo, recoveredBlob,
-    createLead, updateLead, deleteLead,
+    createLead, updateLead, updateLeads, deleteLead,
     addVisit, updateVisit, deleteVisit,
     logActivity, importData, exportData, replaceAll, mergeRemote, clearDemo,
   };
