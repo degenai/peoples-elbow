@@ -50,3 +50,6 @@ woodstock-plan.html
 
 # Claude Code session state
 .claude/
+
+# graphify knowledge-graph output
+graphify-out/
