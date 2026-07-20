@@ -70,6 +70,8 @@ class D1Changelog {
     displayVersionNumber() {
         const versionElement = document.getElementById('version-number');
         const headerVersionElement = document.getElementById('header-version-number'); // Add header badge
+        const badge = document.getElementById('version-badge');
+        const reveal = () => { if (badge) badge.classList.remove('version-badge--pending'); };
 
         if (this.totalCount > 0) {
             // Use the total commit count from the database as the version number
@@ -79,6 +81,7 @@ class D1Changelog {
             if (headerVersionElement) {
                 headerVersionElement.textContent = version;
             }
+            reveal();
             // Sync sessionStorage so components.js cache stays current
             try { sessionStorage.setItem('site_version', version); } catch (e) {}
         } else {
@@ -86,6 +89,7 @@ class D1Changelog {
             if (headerVersionElement) {
                 headerVersionElement.textContent = '0';
             }
+            reveal();
         }
     }
 

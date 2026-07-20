@@ -295,16 +295,21 @@ class ComponentLoader {
         const headerVersionElement = document.getElementById('header-version-number');
         if (!headerVersionElement) return;
         
+        const badge = document.getElementById('version-badge');
+        const reveal = () => { if (badge) badge.classList.remove('version-badge--pending'); };
+
         try {
             const version = await this.getVersion();
             headerVersionElement.textContent = version;
+            reveal();
 
             // Header version updated from D1 database
         } catch (error) {
             console.warn('Failed to fetch D1 version:', error);
             // Don't fall back to incorrect local data - show error state instead
-            headerVersionElement.textContent = 'v?';
+            headerVersionElement.textContent = '?';
             headerVersionElement.style.opacity = '0.6';
+            reveal();
                             // Header version showing error state due to D1 API failure
         }
     }
