@@ -288,6 +288,12 @@ header {
     cursor: pointer;
 }
 
+/* Pending state: badge stays invisible until JS resolves a version number
+   (or an error state) so visitors never see a "Loading..." flash. */
+.version-badge--pending {
+    visibility: hidden;
+}
+
 .version-badge a {
     text-decoration: none;
     color: inherit;

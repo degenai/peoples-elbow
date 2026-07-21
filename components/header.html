@@ -4,10 +4,14 @@
             <img src="images/logo.png" alt="The People's Elbow Logo" class="main-logo">
         </a>
         <!-- Version Badge - Integrated with logo -->
-        <div class="version-badge" id="version-badge">
+        <!-- Hidden until the version number resolves: a mid-load "Loading..."
+             flash reads as a bug, so the badge starts invisible and the
+             component loader reveals it once it has a number (or an error
+             state). -->
+        <div class="version-badge version-badge--pending" id="version-badge">
             <a href="changelog.html">
                 <span class="version-label">v</span>
-                <span id="header-version-number">Loading...</span>
+                <span id="header-version-number"></span>
             </a>
         </div>
     </div>

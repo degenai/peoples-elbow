@@ -254,11 +254,15 @@ document.addEventListener('DOMContentLoaded', function() {
         const headerVersionElement = document.getElementById('header-version-number');
         if (!headerVersionElement) return;
         
+        const badge = document.getElementById('version-badge');
+        const reveal = () => { if (badge) badge.classList.remove('version-badge--pending'); };
+
         try {
             // Wait for componentLoader to be available if it's not already
             if (window.componentLoader && window.componentLoader.getVersion) {
                 const version = await window.componentLoader.getVersion();
                 headerVersionElement.textContent = version;
+                reveal();
                 // Header version updated from cached D1 database
             } else {
                 // Fallback in case main.js runs before components.js
@@ -267,8 +271,9 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (error) {
             console.warn('Failed to fetch version from cache:', error);
             // Don't fall back to incorrect local data - show error state instead
-            headerVersionElement.textContent = 'v?';
+            headerVersionElement.textContent = '?';
             headerVersionElement.style.opacity = '0.6';
+            reveal();
                             // Header version showing error state due to D1 API failure
         }
     }
