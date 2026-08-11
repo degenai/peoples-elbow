@@ -2688,6 +2688,13 @@ nav ul li a.active {
     margin: 0 auto;
 }
 
+/* Routing grids carry two doors on the Elbow Room page and three on the network
+   page. Auto-fit keeps every door on one row at equal width instead of orphaning
+   the last card in a half-width second row. */
+.relationship-routing-grid {
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+}
+
 .relationship-card,
 .relationship-route {
     display: flex;
