@@ -2794,6 +2794,142 @@ nav ul li a.active {
     margin-top: auto;
 }
 
+/* Network of Residencies page */
+.network-lede {
+    max-width: 720px;
+    margin: 0 auto var(--space-xl);
+    text-align: center;
+    font-size: 1.06rem;
+    line-height: 1.75;
+}
+
+.network-homes {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-lg);
+    max-width: 1150px;
+    margin: 0 auto;
+}
+
+.network-home {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--pe-light-gray);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-top: 5px solid var(--pe-green);
+    border-radius: 14px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.07);
+}
+
+.network-home-icon {
+    display: grid;
+    place-items: center;
+    width: 58px;
+    height: 58px;
+    margin: clamp(1.25rem, 3vw, 1.75rem) clamp(1.25rem, 3vw, 1.75rem) 0;
+    color: var(--pe-gold);
+    background: var(--pe-green-dark);
+    border-radius: 50%;
+    font-size: 1.45rem;
+}
+
+.network-home-body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: clamp(1.25rem, 3vw, 1.75rem);
+}
+
+.network-home-body h3 {
+    color: var(--pe-green-dark);
+}
+
+.network-home-body > p:not(.relationship-card-label) {
+    line-height: 1.7;
+    margin-bottom: var(--space-lg);
+}
+
+.network-home-body .btn {
+    margin-top: auto;
+}
+
+.network-practice-gallery {
+    max-width: 1150px;
+    margin: var(--space-xl) auto 0;
+    padding-top: var(--space-xl);
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.network-gallery-intro {
+    max-width: 720px;
+    margin: 0 auto var(--space-lg);
+    text-align: center;
+}
+
+.network-gallery-intro p {
+    line-height: 1.7;
+}
+
+.network-gallery {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-lg);
+}
+
+.network-gallery-item {
+    margin: 0;
+    overflow: hidden;
+    background: var(--pe-white);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 14px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.07);
+}
+
+.network-gallery-item img {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    display: block;
+}
+
+.network-gallery-item figcaption {
+    padding: 0.9rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--pe-green-dark);
+}
+
+@media (max-width: 900px) {
+    .network-homes {
+        grid-template-columns: 1fr;
+        max-width: 560px;
+    }
+
+    .network-gallery {
+        grid-template-columns: 1fr;
+        max-width: 560px;
+    }
+}
+
+
+.book-network-note {
+    max-width: 720px;
+    margin: 0 auto var(--space-lg);
+    padding: 0.9rem 1.1rem;
+    text-align: center;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    background: var(--pe-light-gray);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 10px;
+}
+
+.book-network-note a {
+    color: var(--pe-green);
+    font-weight: 700;
+}
+
 .book-overflow-relationship {
     margin: -0.25rem auto var(--space-md);
     font-size: 0.92rem;
