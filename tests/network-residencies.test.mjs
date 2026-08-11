@@ -25,9 +25,24 @@ test('network copy names Alex and all three homes on equal footing', async () =>
     assert.match(html, /Hustle House Health &amp; Wellness/);
     assert.match(html, /Elbow Room Massage Therapy/);
     assert.match(html, /The People's Elbow is the brand/i);
-    // Equal pedestal: all three homes get the same booking treatment.
-    const bookButtons = (html.match(/class="btn btn-primary" href="(?:book\.html#cherokee-center|book\.html|https:\/\/elbowroommassage\.com\/book)"/g) || []).length;
-    assert.ok(bookButtons >= 3, `expected at least 3 equal booking buttons, got ${bookButtons}`);
+    // Equal pedestal: exactly one card per home, each with the same CTA treatment and its own route.
+    const homeCards = [...html.matchAll(/<article class="network-home">([\s\S]*?)<\/article>/g)]
+        .map(([, card]) => card);
+    const expectedHomes = [
+        ['Cherokee Center for Change', 'book.html#cherokee-center'],
+        ['Hustle House Health &amp; Wellness', 'book.html'],
+        ['Elbow Room Massage Therapy', 'https://elbowroommassage.com/book']
+    ];
+
+    assert.equal(homeCards.length, expectedHomes.length, 'expected exactly one card per home');
+    for (const [name, href] of expectedHomes) {
+        const matchingCards = homeCards.filter((card) => card.includes(`<h3>${name}</h3>`));
+        assert.equal(matchingCards.length, 1, `expected exactly one network-home card for ${name}`);
+        assert.ok(
+            matchingCards[0].includes(`class="btn btn-primary" href="${href}"`),
+            `expected ${name} to use the shared primary CTA and its own booking route`
+        );
+    }
 });
 
 test('network page hands business intent to the canonical Elbow Room site', async () => {
