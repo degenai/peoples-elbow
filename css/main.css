@@ -2600,3 +2600,228 @@ nav ul li a.active {
     border-radius: 6px;
     display: inline-block;
 }
+
+/* Elbow Room relationship page */
+.relationship-hero {
+    position: relative;
+    overflow: hidden;
+    padding: 5rem 0;
+    text-align: center;
+    color: var(--pe-white);
+    background:
+        linear-gradient(135deg, rgba(0, 66, 37, 0.96), rgba(0, 105, 55, 0.92)),
+        radial-gradient(circle at 80% 20%, var(--pe-gold), transparent 34%);
+    border-bottom: 5px solid var(--pe-gold);
+}
+
+.relationship-hero::after {
+    content: '';
+    position: absolute;
+    width: 320px;
+    height: 320px;
+    right: -130px;
+    bottom: -190px;
+    border: 42px solid rgba(255, 204, 0, 0.13);
+    border-radius: 50%;
+}
+
+.relationship-hero-inner {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+}
+
+.relationship-eyebrow,
+.relationship-card-label {
+    margin-bottom: var(--space-sm);
+    color: var(--pe-gold);
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+}
+
+.relationship-hero h1 {
+    margin-bottom: var(--space-sm);
+    color: var(--pe-gold);
+    font-size: clamp(3rem, 8vw, 5.5rem);
+    letter-spacing: 0.03em;
+}
+
+.relationship-tagline {
+    margin-bottom: var(--space-md);
+    font-family: var(--font-heading);
+    font-size: clamp(1.7rem, 4vw, 2.6rem);
+    letter-spacing: 0.03em;
+}
+
+.relationship-hero-copy {
+    max-width: 700px;
+    margin: 0 auto;
+    font-size: 1.08rem;
+    opacity: 0.92;
+}
+
+.relationship-explainer,
+.relationship-routing {
+    padding: var(--space-xl) 0;
+    background: var(--pe-white);
+}
+
+.relationship-intro {
+    max-width: 820px;
+    margin: 0 auto var(--space-xl);
+    text-align: center;
+}
+
+.relationship-intro p {
+    font-size: 1.06rem;
+    line-height: 1.75;
+}
+
+.relationship-grid,
+.relationship-routing-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-lg);
+    max-width: 1050px;
+    margin: 0 auto;
+}
+
+.relationship-card,
+.relationship-route {
+    display: flex;
+    flex-direction: column;
+    padding: clamp(1.5rem, 4vw, 2.5rem);
+    background: var(--pe-light-gray);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 14px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.07);
+}
+
+.relationship-card-personal {
+    border-top: 5px solid var(--pe-green);
+}
+
+.relationship-card-business {
+    border-top: 5px solid var(--pe-gold);
+}
+
+.relationship-card-icon {
+    display: grid;
+    place-items: center;
+    width: 58px;
+    height: 58px;
+    margin-bottom: var(--space-md);
+    color: var(--pe-gold);
+    background: var(--pe-green-dark);
+    border-radius: 50%;
+    font-size: 1.45rem;
+}
+
+.relationship-card .relationship-card-label,
+.relationship-route .relationship-card-label {
+    color: var(--pe-green);
+}
+
+.relationship-card h2,
+.relationship-route h3 {
+    color: var(--pe-green-dark);
+}
+
+.relationship-card > p:not(.relationship-card-label),
+.relationship-route > p:not(.relationship-card-label) {
+    line-height: 1.7;
+}
+
+.relationship-list {
+    display: grid;
+    gap: 0.8rem;
+    margin: var(--space-sm) 0 var(--space-lg);
+}
+
+.relationship-list li {
+    display: grid;
+    grid-template-columns: 1.1rem 1fr;
+    gap: 0.55rem;
+    line-height: 1.5;
+}
+
+.relationship-list i {
+    margin-top: 0.25rem;
+    color: var(--pe-green);
+}
+
+.relationship-text-link {
+    margin-top: auto;
+    font-weight: 700;
+}
+
+.relationship-short-version {
+    padding: var(--space-xl) 0;
+    color: var(--pe-white);
+    background: var(--pe-green-dark);
+}
+
+.relationship-quote-card {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: clamp(1.5rem, 5vw, 3rem);
+    text-align: center;
+    border: 2px solid var(--pe-gold);
+    border-radius: 14px;
+}
+
+.relationship-quote {
+    margin-bottom: var(--space-sm);
+    color: var(--pe-gold);
+    font-family: var(--font-heading);
+    font-size: clamp(2rem, 5vw, 3.4rem);
+    line-height: 1.15;
+}
+
+.relationship-quote-card p:last-child {
+    margin-bottom: 0;
+    font-size: 1.05rem;
+}
+
+.relationship-route {
+    align-items: flex-start;
+    box-shadow: none;
+}
+
+.relationship-route .btn {
+    margin-top: auto;
+}
+
+.book-overflow-relationship {
+    margin: -0.25rem auto var(--space-md);
+    font-size: 0.92rem;
+    font-weight: 700;
+}
+
+@media (max-width: 768px) {
+    .relationship-hero {
+        padding: 4rem 0;
+    }
+
+    .relationship-grid,
+    .relationship-routing-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .relationship-card,
+    .relationship-route {
+        padding: var(--space-lg);
+    }
+}
+
+@media (max-width: 480px) {
+    .relationship-hero h1 {
+        font-size: 2.8rem;
+    }
+
+    .relationship-tagline {
+        font-size: 1.6rem;
+    }
+}
