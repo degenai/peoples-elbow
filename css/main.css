@@ -2725,8 +2725,14 @@ nav ul li a.active {
 }
 
 .relationship-card h2,
+.relationship-card h3,
 .relationship-route h3 {
     color: var(--pe-green-dark);
+}
+
+/* Card titles sit one level under their section heading but keep card scale. */
+.relationship-card h3 {
+    font-size: 2.5rem;
 }
 
 .relationship-card > p:not(.relationship-card-label),
