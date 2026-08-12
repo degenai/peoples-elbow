@@ -198,5 +198,20 @@
   </footer>
 
 </div>
-</body>
+<script>
+  window.addEventListener('load', function(){
+    var s = document.querySelector('.sheet');
+    var t = document.querySelector('table');
+    var st = document.querySelector('.stamp');
+    var out = 'PROBE vp=' + window.innerWidth +
+      ' media640=' + window.matchMedia('(max-width: 640px)').matches +
+      ' sheetW=' + s.getBoundingClientRect().width +
+      ' sheetSW=' + s.scrollWidth +
+      ' tableW=' + t.getBoundingClientRect().width +
+      ' tableSW=' + t.scrollWidth +
+      ' stampR=' + Math.round(st.getBoundingClientRect().right) +
+      ' docSW=' + document.documentElement.scrollWidth;
+    document.title = out;
+  });
+</script></body>
 </html>
