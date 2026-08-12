@@ -298,8 +298,8 @@ document.addEventListener('DOMContentLoaded', function() {
         {
             name: 'FlexFest',
             where: 'Downtown Woodstock',
-            when: 'Mid-Aug 2026 · TBC',
-            date: new Date('2026-08-15T16:00:00Z'),
+            when: 'Sat Aug 22, 2026 · TBC',
+            date: new Date('2026-08-22T16:00:00Z'),
             cause: null,
         },
         {
