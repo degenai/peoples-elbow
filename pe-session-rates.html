@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Session Rates and Rebooking | The People's Elbow</title>
+<meta name="description" content="Massage therapy session rates with Alex Adamczyk, LMT. 60-minute session $85, free 15-minute intro, no membership.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --green:#006937; --green-dark:#004225; --green-light:#008a47;
+    --gold:#ffcc00; --ink:#1a2e22; --muted:#5c685f; --line:#b6c1ba; --cream:#f6f3ec; --white:#fff;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;}
+  body{font-family:'Inter',system-ui,sans-serif; color:var(--ink); background:var(--cream); line-height:1.45; font-size:13px;}
+  .sheet{background:var(--white); width:100%; max-width:8.5in; margin:18px auto; padding:0.55in 0.6in; box-shadow:0 6px 24px rgba(0,0,0,.12);}
+
+  /* Masthead */
+  header{display:flex; align-items:center; gap:14px; border-bottom:3px solid var(--green); padding-bottom:10px;}
+  header img{height:0.85in; border-radius:6px;}
+  .head-text{flex:1;}
+  .head-text h1{margin:0; font-family:'Bangers',Impact,sans-serif; font-size:26px; letter-spacing:1px; color:var(--green-dark); font-weight:400;}
+  .head-text .sub{display:block; margin-top:2px; font-size:10.5px; letter-spacing:3.5px; color:var(--gold); font-weight:700; text-transform:uppercase;}
+  .stamp{margin-left:auto; text-align:right; font-size:8.5px; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; line-height:1.5; border:2px solid var(--gold); border-radius:6px; padding:6px 10px;}
+
+  h2{font-family:'Bangers',Impact,sans-serif; font-size:15px; letter-spacing:1px; text-transform:uppercase; color:var(--green-dark); margin:0 0 6px; font-weight:400;}
+  h2 .accent{color:var(--gold);}
+  .section{margin-top:16px;}
+
+  /* Pillars */
+  .pillars{display:flex; gap:10px; margin-top:12px;}
+  .pillar{flex:1; border:1px solid var(--line); border-top:3px solid var(--gold); border-radius:8px; padding:10px 12px;}
+  .pillar h3{margin:0 0 4px; font-size:10.5px; letter-spacing:1.5px; text-transform:uppercase; color:var(--green-dark);}
+  .pillar p{margin:0; font-size:11px; color:var(--muted); line-height:1.5;}
+
+  /* Rate table */
+  table{width:100%; border-collapse:collapse; margin-top:10px;}
+  th,td{padding:9px 12px; text-align:left; border-bottom:1px solid var(--line); font-size:12px;}
+  th{font-size:9.5px; letter-spacing:2px; text-transform:uppercase; color:var(--muted); border-bottom:2px solid var(--green-dark);}
+  td.price{font-family:'Bangers',Impact,sans-serif; font-size:24px; font-weight:400; color:var(--green-dark); text-align:right; white-space:nowrap; line-height:1.15; letter-spacing:.5px;}
+  td.free{color:var(--green); font-weight:700; font-size:20px;}
+  tr.standard td{background:#fbf8ef;}
+  tr.standard td:first-child{border-radius:4px 0 0 4px;}
+  tr.standard td:last-child{border-radius:0 4px 4px 0;}
+  tr.standard td.price{color:var(--green); font-size:26px;}
+  .rate-note{margin-top:8px; font-size:10.5px; color:var(--muted); line-height:1.55;}
+
+  /* Credits */
+  .credits{display:flex; gap:12px; margin-top:12px;}
+  .credit{flex:1; border:1px solid var(--line); border-top:3px solid var(--green); border-radius:8px; padding:12px;}
+  .credit h3{margin:0 0 6px; font-size:10.5px; letter-spacing:1.5px; text-transform:uppercase; color:var(--green-dark);}
+  .credit .big{font-family:'Bangers',Impact,sans-serif; font-size:16px; font-weight:400; color:var(--gold); line-height:1.15;}
+  .credit .big small{font-size:10.5px; color:var(--muted); font-weight:600; display:block; letter-spacing:.5px; margin-top:2px;}
+  .credit p{margin:6px 0 0; font-size:11px; color:var(--ink); line-height:1.5;}
+  .credit .fine{margin-top:4px; font-size:9.5px; color:var(--muted);}
+
+  /* Rebook */
+  .rebook{border:2px solid var(--gold); border-radius:8px; padding:12px 14px; margin-top:14px;}
+  .rebook h3{margin:0 0 6px; font-size:10.5px; letter-spacing:1.5px; text-transform:uppercase; color:var(--green-dark);}
+  .rebook .rows{display:flex; gap:16px;}
+  .rebook .row{flex:1; font-size:11.5px; line-height:1.55;}
+  .rebook .row strong{color:var(--green-dark); display:block; font-size:12px;}
+  .rebook .closing{margin-top:8px; padding-top:8px; border-top:1px solid var(--line); font-size:11px; color:var(--muted); font-style:italic;}
+
+  /* Footer */
+  footer{margin-top:16px; padding-top:10px; border-top:2px solid var(--green-dark); text-align:center; font-size:10.5px; color:var(--ink); line-height:1.7;}
+  footer .cta{font-family:'Bangers',Impact,sans-serif; font-size:14px; letter-spacing:1px; color:var(--green-dark); font-weight:400;}
+  footer .meta{font-size:9.5px; color:var(--muted); letter-spacing:1px; text-transform:uppercase; margin-top:4px;}
+
+  @media print{
+    @page{size:letter; margin:0.25in;}
+    html,body{background:#fff;}
+    .sheet{box-shadow:none; margin:0; padding:0.35in 0.45in; width:8in; min-height:10.5in;}
+    .pillar,.credit,.rebook{break-inside:avoid; page-break-inside:avoid;}
+    table{break-inside:avoid; page-break-inside:avoid;}
+    *{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  }
+
+  @media screen and (max-width: 640px){
+    body{font-size:12.5px;}
+    html,body{overflow-x:hidden;}
+    .sheet{width:100%; max-width:100%; margin:0; padding:22px 18px; min-height:auto;}
+    header{flex-wrap:wrap; gap:10px;}
+    header img{height:0.7in;}
+    .stamp{margin-left:auto; padding:5px 8px; font-size:8px;}
+    .pillars{flex-direction:column;}
+    .credits{flex-direction:column;}
+    .rebook .rows{flex-direction:column; gap:10px;}
+    table{font-size:12px;}
+    th,td{padding:8px 10px;}
+    td.price{font-size:20px;}
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <header>
+    <img src="images/logo.png" alt="The People's Elbow logo">
+    <div class="head-text">
+      <h1>THE PEOPLE'S ELBOW</h1>
+      <span class="sub">Licensed Massage Therapy &middot; Session Rates &amp; Rebooking</span>
+    </div>
+    <div class="stamp">Same rate<br>every visit<br>No expiration</div>
+  </header>
+
+  <div class="pillars">
+    <div class="pillar">
+      <h3>Built for your body</h3>
+      <p>Planned around what your body is doing this week, not a template.</p>
+    </div>
+    <div class="pillar">
+      <h3>A full 60 minutes</h3>
+      <p>A true sixty minutes of hands-on work, not fifty with the clock running.</p>
+    </div>
+    <div class="pillar">
+      <h3>No membership</h3>
+      <p>Nothing to join, nothing to cancel. Just massage therapy.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Session rates <span class="accent">&middot; scaled off the hour</span></h2>
+    <table>
+      <thead>
+        <tr><th>Session</th><th>Focus</th><th>Rate</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>15 minutes</strong></td>
+          <td>The intro, on the house</td>
+          <td class="price free">FREE</td>
+        </tr>
+        <tr>
+          <td><strong>30 minutes</strong></td>
+          <td>Focused work, one area</td>
+          <td class="price">$45</td>
+        </tr>
+        <tr class="standard">
+          <td><strong>60 minutes</strong></td>
+          <td>The standard session</td>
+          <td class="price">$85</td>
+        </tr>
+        <tr>
+          <td><strong>90 minutes</strong></td>
+          <td>Full body, unhurried</td>
+          <td class="price">$125</td>
+        </tr>
+        <tr>
+          <td><strong>120 minutes</strong></td>
+          <td>Long session, deep work</td>
+          <td class="price">$165</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="rate-note">All listed times are hands-on. Intake and dressing don't count against you. No packages to buy, nothing to sign.</p>
+  </div>
+
+  <div class="section">
+    <h2>Two standing credits <span class="accent">&middot; no expiration date</span></h2>
+    <div class="credits">
+      <div class="credit">
+        <h3>First visit</h3>
+        <div class="big">$25 off<small>your first session, any length</small></div>
+        <p>A $25 first-visit credit, applied automatically. No code, no sign-up. New clients, one visit.</p>
+        <p class="fine">A first 60-minute session: $60 instead of $85.</p>
+      </div>
+      <div class="credit">
+        <h3>Referral credit</h3>
+        <div class="big">$25<small>toward your next session</small></div>
+        <p>Know someone who could use this? Send them my way. When they book and rebook, $25 lands on your next visit.</p>
+        <p class="fine">The credit matches the free 15-minute intro.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="rebook">
+    <h3>Recommended rebook &middot; your call, always</h3>
+    <div class="rows">
+      <div class="row">
+        <strong>60 minutes, about once a month.</strong>
+        The steady rhythm for most bodies.
+      </div>
+      <div class="row">
+        <strong>30 to 60 minutes, every two weeks.</strong>
+        When work, training, or stress is asking more.
+      </div>
+    </div>
+    <div class="closing">Yours may look different. Whatever fits your body and your week is the honest answer.</div>
+  </div>
+
+  <footer>
+    <div class="cta">Book at elbowroommassage.com/book</div>
+    <div>Questions: hello@elbowroommassage.com</div>
+    <div class="meta">Georgia License #MT013193 &middot; ABMP Member</div>
+  </footer>
+
+</div>
+</body>
+</html>
