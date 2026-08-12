@@ -2847,6 +2847,14 @@ nav ul li a.active {
     font-size: 1.45rem;
 }
 
+.network-home-photo {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    display: block;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
 .network-home-body {
     display: flex;
     flex-direction: column;
