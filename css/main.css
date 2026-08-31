@@ -1985,9 +1985,17 @@ nav ul li a.active {
     margin-right: var(--space-xs);
 }
 
+/* Closing program notes: pale slab, corner vignette, gold hairline off the top. */
 .book-info {
     padding: var(--space-xl) 0;
-    background: var(--pe-light-gray);
+    background-color: #f2f3ee;
+    background-image:
+        linear-gradient(180deg, var(--pe-gold) 0 2px, rgba(255, 204, 0, 0) 2px),
+        radial-gradient(85% 55% at 50% 0%, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0) 68%),
+        radial-gradient(130% 110% at 50% 10%, #f7f8f4 0%, #eceee7 62%, #e0e3da 100%);
+    background-repeat: no-repeat;
+    background-size: 100% 2px, 100% 100%, 100% 100%;
+    background-position: top left, center, center;
 }
 
 .book-info .section-title {
@@ -2007,16 +2015,32 @@ nav ul li a.active {
 }
 
 .book-info-item {
-    background: var(--pe-white);
+    background-color: var(--pe-white);
+    background-image: linear-gradient(180deg, #ffffff 0%, #fbfcf8 60%, #f4f6ef 100%);
     padding: var(--space-lg);
+    border: 1px solid rgba(0, 66, 37, 0.09);
     border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.95),
+        0 1px 2px rgba(0, 0, 0, 0.06),
+        0 10px 24px rgba(0, 0, 0, 0.07);
     text-align: center;
 }
 
+/* The icon earns its keep as a struck medallion instead of a floating glyph. */
 .book-info-item i {
-    font-size: 2rem;
-    color: var(--pe-green);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    font-size: 1.4rem;
+    color: var(--pe-gold);
+    background: linear-gradient(180deg, var(--pe-green) 0%, var(--pe-green-dark) 100%);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.32),
+        0 6px 14px rgba(var(--pe-green-rgb), 0.3);
     margin-bottom: var(--space-md);
 }
 
@@ -2025,12 +2049,12 @@ nav ul li a.active {
     color: var(--pe-green-dark);
     font-size: 1.4rem;
     margin-bottom: var(--space-sm);
-    letter-spacing: 0.5px;
+    letter-spacing: 0.07em;
 }
 
 .book-info-item p {
     font-size: 0.95rem;
-    line-height: 1.55;
+    line-height: 1.6;
     color: var(--pe-text-dark);
 }
 
@@ -2508,9 +2532,14 @@ nav ul li a.active {
 /* ============================================================
    book.html - the menu / offerings block
    ============================================================ */
+/* Warm program-paper slab: canvas tone and a house-light wash from the rafters.
+   The diagonal hatch belongs to the dark arena sections. Paper stays paper. */
 .book-menu-section {
-    padding: var(--space-xl) 0 0;
-    background: var(--pe-white);
+    padding: var(--space-xl) 0;
+    background-color: #fbfbf7;
+    background-image:
+        radial-gradient(88% 58% at 50% 0%, rgba(var(--pe-green-rgb), 0.07), rgba(var(--pe-green-rgb), 0) 72%);
+    border-top: 1px solid rgba(var(--pe-green-rgb), 0.14);
 }
 
 .book-menu-section .section-title {
@@ -2535,39 +2564,84 @@ nav ul li a.active {
     gap: var(--space-lg);
     max-width: 1000px;
     margin: 0 auto var(--space-lg);
+    align-items: stretch;
 }
 
+/* Menu cards lift off the paper: top-lit face, contact shadow, soft cast shadow. */
 .book-menu-card {
-    background: var(--pe-light-gray);
+    --menu-rgb: var(--pe-green-rgb);
+    position: relative;
+    background-color: var(--pe-white);
+    background-image: linear-gradient(180deg, #ffffff 0%, #fafbf7 58%, #f1f3ec 100%);
+    border: 1px solid rgba(0, 66, 37, 0.09);
     border-radius: 10px;
     padding: var(--space-lg);
     text-align: center;
-    border-top: 4px solid var(--pe-green);
+    border-top: 4px solid rgb(var(--menu-rgb));
     display: flex;
     flex-direction: column;
     gap: var(--space-sm);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.9),
+        0 1px 2px rgba(0, 0, 0, 0.07),
+        0 8px 20px rgba(0, 0, 0, 0.07);
+    transition: box-shadow 0.25s ease, transform 0.2s ease;
 }
 
+/* The main event on the menu: gold rope on top, warm face, real height. */
 .book-menu-card.featured {
-    border-top-color: var(--pe-gold);
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+    --menu-rgb: 255, 204, 0;
+    background-image:
+        radial-gradient(120% 70% at 50% 0%, rgba(255, 204, 0, 0.16), rgba(255, 204, 0, 0) 62%),
+        linear-gradient(180deg, #ffffff 0%, #fdfaee 58%, #f6f1de 100%);
+    border-color: rgba(255, 204, 0, 0.45);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.95),
+        0 2px 4px rgba(0, 0, 0, 0.08),
+        0 16px 34px rgba(0, 0, 0, 0.11),
+        0 26px 54px -22px rgba(255, 153, 0, 0.42);
 }
 
+.book-menu-card:hover {
+    transform: translateY(-3px);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.95),
+        0 2px 4px rgba(0, 0, 0, 0.09),
+        0 18px 38px rgba(0, 0, 0, 0.12),
+        0 26px 54px -22px rgba(var(--menu-rgb), 0.45);
+}
+
+/* You are buying time, not a number. The duration is the billing; the price is
+   the line underneath it. Hairline rule sits between the two. */
 .book-menu-dur {
     font-family: var(--font-heading);
-    font-size: 1.5rem;
+    font-size: 2.5rem;
+    line-height: 1;
     color: var(--pe-green-dark);
-    letter-spacing: 0.5px;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    text-shadow: 0 2px 0 rgba(0, 0, 0, 0.07);
+}
+
+.book-menu-dur::after {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 2px;
+    margin: 12px auto 2px;
+    background: linear-gradient(90deg, rgba(var(--menu-rgb), 0), rgb(var(--menu-rgb)), rgba(var(--menu-rgb), 0));
 }
 
 .book-menu-price {
     font-family: var(--font-heading);
-    font-size: 2.4rem;
+    font-size: 1.75rem;
+    line-height: 1;
     color: var(--pe-green);
+    letter-spacing: 0.03em;
 }
 
 .book-menu-card.featured .book-menu-price {
-    color: var(--pe-orange);
+    color: #b36b00;
 }
 
 .book-menu-desc {
@@ -2601,9 +2675,31 @@ nav ul li a.active {
     display: inline-block;
 }
 /* ===== Residency Network booking page (book.html) ===== */
+
+/* THE MARQUEE. A gold top rope strung across the section, house lights aimed
+   down from the rafters, faint speed lines raking the field, and the corners
+   falling off into the dark. The chips hang from the rope like fight billing. */
 .day-strip-section {
-    padding: var(--space-xl) 0;
-    background: linear-gradient(180deg, var(--pe-green-dark) 0%, var(--pe-green) 100%);
+    position: relative;
+    padding: calc(var(--space-xl) + 0.5rem) 0 var(--space-xl);
+    background-color: var(--pe-green-dark);
+    background-image:
+        /* three-strand ring rope across the top */
+        linear-gradient(180deg,
+            var(--pe-gold) 0 3px,
+            rgba(0, 0, 0, 0.5) 3px 5px,
+            rgba(255, 255, 255, 0.45) 5px 6px,
+            rgba(0, 0, 0, 0) 6px),
+        /* house light from above center */
+        radial-gradient(120% 85% at 50% -8%, rgba(255, 204, 0, 0.15), rgba(255, 204, 0, 0) 58%),
+        /* speed lines */
+        repeating-linear-gradient(115deg, rgba(255, 255, 255, 0.035) 0 2px, rgba(255, 255, 255, 0) 2px 14px),
+        /* field + corner vignette */
+        radial-gradient(145% 125% at 50% 0%, var(--pe-green) 0%, var(--pe-green-dark) 55%, #00170c 100%);
+    background-repeat: no-repeat;
+    background-size: 100% 6px, 100% 100%, 100% 100%, 100% 100%;
+    background-position: top left, center, center, center;
+    box-shadow: inset 0 -1px 0 rgba(255, 204, 0, 0.3);
 }
 
 .day-strip {
@@ -2615,132 +2711,268 @@ nav ul li a.active {
     margin: 0 auto;
 }
 
+/* Chip material: lit along the top edge, falling into shadow at the base,
+   sitting on a real cast shadow instead of floating on flat black. */
 .day-chip {
+    --chip-rgb: 255, 204, 0;
+    position: relative;
     flex: 1 1 220px;
     max-width: 320px;
-    background: rgba(0, 0, 0, 0.28);
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    border-top: 4px solid var(--pe-gold);
-    border-radius: 10px;
-    padding: var(--space-md) var(--space-lg);
+    background-color: rgba(0, 0, 0, 0.34);
+    background-image: linear-gradient(180deg,
+        rgba(255, 255, 255, 0.11) 0%,
+        rgba(255, 255, 255, 0.02) 45%,
+        rgba(0, 0, 0, 0.3) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 4px solid rgb(var(--chip-rgb));
+    border-radius: 10px 10px 8px 8px;
+    padding: var(--space-md) var(--space-lg) calc(var(--space-md) + 0.15rem);
     text-align: center;
-    transition: box-shadow 0.25s ease, transform 0.2s ease, border-color 0.25s ease;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.18),
+        inset 0 -20px 26px -20px rgba(0, 0, 0, 0.75),
+        0 10px 22px rgba(0, 0, 0, 0.4);
+    transition: box-shadow 0.25s ease, transform 0.2s ease, border-color 0.25s ease, background-color 0.25s ease;
 }
 
-.day-chip.chip-ccc { border-top-color: var(--pe-gold); }
-.day-chip.chip-hh { border-top-color: #ffffff; }
-.day-chip.chip-er { border-top-color: #5484ed; }
-.day-chip.chip-off { border-top-color: rgba(255, 255, 255, 0.35); opacity: 0.9; }
+.day-chip.chip-ccc { --chip-rgb: 0, 105, 55; }
+.day-chip.chip-hh { --chip-rgb: 255, 204, 0; }
+.day-chip.chip-er { --chip-rgb: 84, 132, 237; }
+
+/* Rest day: the house lights are down on this one. */
+.day-chip.chip-off {
+    --chip-rgb: 148, 168, 156;
+    background-color: rgba(0, 0, 0, 0.42);
+    border-top-color: rgba(255, 255, 255, 0.28);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        inset 0 -20px 26px -20px rgba(0, 0, 0, 0.8),
+        0 6px 14px rgba(0, 0, 0, 0.32);
+}
 
 .chip-days {
     display: block;
     font-family: var(--font-heading);
-    font-size: 1.5rem;
-    letter-spacing: 1px;
+    font-size: 1.65rem;
+    letter-spacing: 0.1em;
     color: var(--pe-white);
+    text-shadow: 0 2px 0 rgba(0, 0, 0, 0.45);
+}
+
+.day-chip.chip-off .chip-days { color: rgba(255, 255, 255, 0.72); }
+
+/* Kicker rule: a short strand of the venue's own color above the billing. */
+.chip-venue::before {
+    content: '';
+    display: block;
+    width: 30px;
+    height: 2px;
+    margin: 9px auto 8px;
+    background: linear-gradient(90deg, rgba(var(--chip-rgb), 0), rgb(var(--chip-rgb)), rgba(var(--chip-rgb), 0));
 }
 
 .chip-venue {
     display: block;
-    margin-top: 4px;
+    margin-top: 0;
     font-size: 0.72rem;
     font-weight: 700;
-    letter-spacing: 1.5px;
+    letter-spacing: 0.18em;
+    line-height: 1.45;
     color: var(--pe-gold);
     text-transform: uppercase;
 }
 
+.day-chip.chip-off .chip-venue { color: rgba(255, 255, 255, 0.76); }
+
+/* TODAY. Not a border change: the spotlight actually finds this chip. The beam
+   and the ring do the work, so the wash stays light enough to keep the gold
+   billing legible against it. No ambient bloom on top of both. */
 .day-chip.chip-today,
 .day-chip.chip-today-off {
-    border-color: var(--pe-gold);
-    box-shadow: 0 0 0 2px var(--pe-gold), 0 6px 24px rgba(255, 204, 0, 0.35);
-    transform: translateY(-2px);
+    border-color: rgba(255, 204, 0, 0.55);
+    border-top-color: var(--pe-gold);
+    background-color: rgba(0, 0, 0, 0.2);
+    background-image: linear-gradient(180deg,
+        rgba(255, 204, 0, 0.18) 0%,
+        rgba(255, 204, 0, 0.05) 40%,
+        rgba(0, 0, 0, 0.36) 100%);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.42),
+        0 0 0 1px rgba(255, 204, 0, 0.7),
+        0 16px 34px rgba(0, 0, 0, 0.48);
+    transform: translateY(-4px);
+}
+
+/* The beam itself, spilling off the top edge of the lit chip. */
+.day-chip.chip-today::before,
+.day-chip.chip-today-off::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: -18px;
+    width: 76%;
+    height: 18px;
+    transform: translateX(-50%);
+    background: radial-gradient(58% 100% at 50% 100%, rgba(255, 204, 0, 0.55), rgba(255, 204, 0, 0) 72%);
+    pointer-events: none;
+}
+
+.day-chip.chip-today .chip-days,
+.day-chip.chip-today-off .chip-days {
+    color: var(--pe-gold);
+    text-shadow: 0 2px 0 rgba(0, 0, 0, 0.55), 0 0 18px rgba(255, 204, 0, 0.45);
+}
+
+.day-chip.chip-today .chip-venue,
+.day-chip.chip-today-off .chip-venue {
+    color: var(--pe-white);
+}
+
+.day-chip.chip-today-off {
+    --chip-rgb: 255, 204, 0;
 }
 
 .day-strip-note {
     max-width: 760px;
-    margin: var(--space-lg) auto 0;
+    margin: calc(var(--space-lg) + 0.25rem) auto 0;
+    padding-top: var(--space-md);
     text-align: center;
-    color: rgba(255, 255, 255, 0.92);
+    color: rgba(255, 255, 255, 0.94);
     font-weight: 700;
     font-size: 1.05rem;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.02em;
+    background: linear-gradient(90deg,
+        rgba(255, 204, 0, 0) 0%,
+        rgba(255, 204, 0, 0.55) 22%,
+        rgba(255, 204, 0, 0.55) 78%,
+        rgba(255, 204, 0, 0) 100%) top center / 100% 1px no-repeat;
 }
 
-/* The Weekly Card */
+/* The Weekly Card: three prongs on a lit canvas. */
 .weekly-card-section {
     padding: var(--space-xl) 0;
-    background: var(--pe-white);
+    background-color: var(--pe-white);
+    background-image:
+        radial-gradient(80% 45% at 50% 0%, rgba(var(--pe-green-rgb), 0.08), rgba(var(--pe-green-rgb), 0) 70%),
+        radial-gradient(60% 40% at 50% 100%, rgba(0, 0, 0, 0.04), rgba(0, 0, 0, 0) 72%);
 }
 
 .weekly-card-intro {
     text-align: center;
     max-width: 640px;
-    margin: -var(--space-lg) auto var(--space-xl);
+    margin: calc(var(--space-lg) * -1) auto var(--space-xl);
     color: var(--pe-text-dark);
+    font-size: 1.05rem;
 }
 
 .venue-card-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
     gap: var(--space-lg);
     max-width: 1200px;
     margin: 0 auto;
     align-items: stretch;
 }
 
+/* Each card carries its venue color as a variable, so the shared anatomy stays
+   one rule and the identity rides along in the wash, glow, and ink. */
 .venue-card {
+    --venue-rgb: var(--pe-green-rgb);
+    --venue-ink: var(--pe-green-dark);
     position: relative;
     display: flex;
     flex-direction: column;
-    background: var(--pe-light-gray);
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    background-color: #fafbf7;
+    background-image:
+        radial-gradient(115% 72% at 100% 0%, rgba(var(--venue-rgb), 0.13), rgba(var(--venue-rgb), 0) 60%),
+        linear-gradient(180deg, #ffffff 0%, #f8f9f4 55%, #eef0e9 100%);
+    border: 1px solid rgba(0, 66, 37, 0.1);
     border-radius: 12px;
-    padding: var(--space-xl) var(--space-lg) var(--space-lg);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    transition: box-shadow 0.25s ease, transform 0.2s ease;
+    padding: calc(var(--space-xl) - 0.75rem) var(--space-lg) var(--space-lg);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.9),
+        0 1px 2px rgba(0, 0, 0, 0.08),
+        0 10px 24px rgba(0, 0, 0, 0.09),
+        0 26px 50px -22px rgba(0, 66, 37, 0.24);
+    transition: box-shadow 0.28s ease, transform 0.22s ease;
 }
 
+.venue-hh { --venue-rgb: 255, 153, 0; --venue-ink: #8a5200; }
+.venue-er { --venue-rgb: 84, 132, 237; --venue-ink: #24408f; }
+
+.venue-card:hover {
+    transform: translateY(-4px);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.95),
+        0 1px 2px rgba(0, 0, 0, 0.09),
+        0 16px 34px rgba(0, 0, 0, 0.12),
+        0 30px 60px -22px rgba(var(--venue-rgb), 0.45);
+}
+
+/* Beveled accent bar: bright along the top lip, dark hairline underneath. */
 .venue-card-accent {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    height: 6px;
+    height: 7px;
     border-radius: 12px 12px 0 0;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.5),
+        0 1px 0 rgba(0, 0, 0, 0.12);
 }
 
-.venue-ccc .venue-card-accent { background: var(--pe-green); }
-.venue-hh .venue-card-accent { background: var(--pe-gold); }
-.venue-er .venue-card-accent { background: #5484ed; }
+.venue-ccc .venue-card-accent { background: linear-gradient(90deg, var(--pe-green-dark), var(--pe-green) 45%, var(--pe-green-light)); }
+.venue-hh .venue-card-accent { background: linear-gradient(90deg, var(--pe-orange), var(--pe-gold) 55%, #ffe066); }
+.venue-er .venue-card-accent { background: linear-gradient(90deg, #2f5fd0, #5484ed 55%, #8fadf6); }
 
+/* Tonight's venue: card comes forward with its own colored light on it. The
+   ring is drawn in the venue's ink, not its wash, so all three clear 3:1
+   against the paper (the orange at 55% did not). */
 .venue-card-today {
-    box-shadow: 0 0 0 2px var(--pe-green), 0 10px 30px rgba(0, 105, 55, 0.22);
-    transform: translateY(-3px);
+    background-image:
+        radial-gradient(115% 78% at 100% 0%, rgba(var(--venue-rgb), 0.2), rgba(var(--venue-rgb), 0) 62%),
+        linear-gradient(180deg, #ffffff 0%, #f9faf5 55%, #eff1ea 100%);
+    border-color: var(--venue-ink);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.95),
+        0 0 0 2px var(--venue-ink),
+        0 18px 38px rgba(0, 0, 0, 0.13),
+        0 34px 64px -24px rgba(var(--venue-rgb), 0.5);
+    transform: translateY(-5px);
 }
 
-.venue-ccc.venue-card-today { box-shadow: 0 0 0 2px var(--pe-green), 0 10px 30px rgba(0, 105, 55, 0.22); }
-.venue-hh.venue-card-today { box-shadow: 0 0 0 2px var(--pe-gold), 0 10px 30px rgba(255, 204, 0, 0.30); }
-.venue-er.venue-card-today { box-shadow: 0 0 0 2px #5484ed, 0 10px 30px rgba(84, 132, 237, 0.30); }
-
+/* Day billing: wide-tracked, inked, with a venue-colored strand beneath it. */
 .venue-card-days {
     font-family: var(--font-heading);
-    font-size: 1.9rem;
-    letter-spacing: 2px;
-    color: var(--pe-green-dark);
-    margin-bottom: var(--space-xs);
+    font-size: 2rem;
+    letter-spacing: 0.12em;
+    color: var(--venue-ink);
+    margin-bottom: var(--space-sm);
+    text-shadow: 0 2px 0 rgba(0, 0, 0, 0.07);
+}
+
+.venue-card-days::after {
+    content: '';
+    display: block;
+    width: 46px;
+    height: 3px;
+    margin-top: 10px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, rgb(var(--venue-rgb)), rgba(var(--venue-rgb), 0));
 }
 
 .venue-card-name {
     font-size: 1.15rem;
     font-weight: 700;
+    letter-spacing: 0.01em;
     color: var(--pe-text-dark);
     margin-bottom: var(--space-sm);
 }
 
 .venue-card-copy {
     font-size: 0.95rem;
-    line-height: 1.55;
+    line-height: 1.6;
     color: var(--pe-text-dark);
     flex: 1;
     margin-bottom: var(--space-md);
@@ -2753,32 +2985,122 @@ nav ul li a.active {
     gap: var(--space-sm);
 }
 
+/* Press-worthy buttons: they sit on a plinth and they travel when you push. */
+.venue-card-cta {
+    position: relative;
+    display: block;
+    width: 100%;
+    font-family: var(--font-body);
+    font-size: 0.95rem;
+    line-height: 1.4;
+    text-align: center;
+    padding: 0.85rem var(--space-md);
+    border-radius: 6px;
+    letter-spacing: 0.05em;
+    background-image: linear-gradient(180deg, var(--pe-green-light) 0%, var(--pe-green) 62%);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.28),
+        0 4px 0 var(--pe-green-dark),
+        0 8px 16px rgba(0, 0, 0, 0.22);
+    transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.2s ease;
+}
+
+.venue-card-cta:hover {
+    transform: translateY(-1px);
+    background-image: linear-gradient(180deg, #00a355 0%, var(--pe-green-light) 62%);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.35),
+        0 5px 0 var(--pe-green-dark),
+        0 12px 24px rgba(0, 0, 0, 0.26);
+}
+
+.venue-card-cta:active {
+    transform: translateY(4px);
+    box-shadow:
+        inset 0 2px 6px rgba(0, 0, 0, 0.3),
+        0 0 0 var(--pe-green-dark),
+        0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.venue-card-cta i {
+    margin-right: 0.4rem;
+}
+
 .venue-card-sublabel {
     font-size: 0.82rem;
     text-align: center;
+    letter-spacing: 0.04em;
     color: var(--pe-text-dark);
     opacity: 0.8;
 }
 
 .venue-card-fine {
     margin-top: var(--space-md);
+    padding-top: var(--space-md);
     font-size: 0.82rem;
-    line-height: 1.5;
+    line-height: 1.6;
     color: var(--pe-text-dark);
-    opacity: 0.85;
     text-align: center;
+    background: linear-gradient(90deg,
+        rgba(var(--venue-rgb), 0) 0%,
+        rgba(var(--venue-rgb), 0.4) 25%,
+        rgba(var(--venue-rgb), 0.4) 75%,
+        rgba(var(--venue-rgb), 0) 100%) top center / 100% 1px no-repeat;
 }
 
+a.venue-card-fine,
+.venue-card-fine a {
+    display: block;
+    color: var(--venue-ink);
+    font-weight: 700;
+}
+
+a.venue-card-fine:hover,
+.venue-card-fine a:hover {
+    color: var(--pe-green-light);
+    text-decoration: underline;
+}
+
+/* Same foot rule recipe as the fine print, so opening the calendar does not
+   introduce a second, heavier kind of divider inside the same card. */
 .hh-widget-wrap {
     margin-top: var(--space-md);
+    padding-top: var(--space-md);
+    background: linear-gradient(90deg,
+        rgba(var(--venue-rgb), 0) 0%,
+        rgba(var(--venue-rgb), 0.4) 25%,
+        rgba(var(--venue-rgb), 0.4) 75%,
+        rgba(var(--venue-rgb), 0) 100%) top center / 100% 1px no-repeat;
 }
 
 .hh-widget-wrap[hidden] { display: none; }
 
-/* First visit banner */
+/* First visit banner: a gold ring apron, roped top and bottom, lit from above.
+   The weave came off: on gold it just muddied the field the copy sits on, and
+   the orange stop moved later so the body text keeps the brighter half. */
 .first-visit-banner {
-    padding: var(--space-xl) 0;
-    background: linear-gradient(135deg, var(--pe-gold) 0%, var(--pe-orange) 100%);
+    position: relative;
+    padding: calc(var(--space-xl) + 0.5rem) 0;
+    background-color: var(--pe-gold);
+    background-image:
+        /* rope, top */
+        linear-gradient(180deg,
+            var(--pe-green-dark) 0 3px,
+            rgba(255, 255, 255, 0.35) 3px 4px,
+            rgba(0, 66, 37, 0.55) 4px 6px,
+            rgba(0, 0, 0, 0) 6px),
+        /* rope, bottom */
+        linear-gradient(0deg,
+            var(--pe-green-dark) 0 3px,
+            rgba(255, 255, 255, 0.35) 3px 4px,
+            rgba(0, 66, 37, 0.55) 4px 6px,
+            rgba(0, 0, 0, 0) 6px),
+        /* overhead highlight */
+        radial-gradient(78% 62% at 50% -4%, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0) 64%),
+        linear-gradient(150deg, #ffd94d 0%, var(--pe-gold) 54%, var(--pe-orange) 100%);
+    background-repeat: no-repeat;
+    background-size: 100% 6px, 100% 6px, 100% 100%, 100% 100%;
+    background-position: top left, bottom left, center, center;
     color: var(--pe-black);
     text-align: center;
 }
@@ -2787,55 +3109,295 @@ nav ul li a.active {
 
 .first-visit-title {
     font-family: var(--font-heading);
-    font-size: 2rem;
+    font-size: 2.3rem;
     color: var(--pe-green-dark);
     margin-bottom: var(--space-sm);
-    letter-spacing: 1px;
+    letter-spacing: 0.06em;
+    text-shadow: 0 2px 0 rgba(255, 255, 255, 0.35);
 }
 
 .first-visit-body {
     font-size: 1.05rem;
-    line-height: 1.55;
+    line-height: 1.6;
     margin-bottom: var(--space-sm);
 }
 
 .first-visit-fine {
     font-size: 0.9rem;
-    opacity: 0.85;
+    color: rgba(0, 0, 0, 0.82);
     margin-bottom: var(--space-xs);
 }
 
-.first-visit-fine a { font-weight: 700; }
+.first-visit-fine a {
+    color: var(--pe-green-dark);
+    font-weight: 700;
+    text-decoration: underline;
+}
 
-/* Not sure which day fits */
+.first-visit-fine a:hover { color: var(--pe-black); }
+
+/* Not sure which day fits: the announcer's table. A dark green strip that
+   breaks up the run of pale slabs at the foot of the page. */
 .book-help {
     padding: var(--space-xl) 0;
-    background: var(--pe-white);
+    background-color: var(--pe-green-dark);
+    background-image:
+        radial-gradient(70% 120% at 50% 0%, rgba(255, 204, 0, 0.12), rgba(255, 204, 0, 0) 62%),
+        repeating-linear-gradient(115deg, rgba(255, 255, 255, 0.035) 0 2px, rgba(255, 255, 255, 0) 2px 14px),
+        radial-gradient(140% 130% at 50% 0%, var(--pe-green) 0%, var(--pe-green-dark) 58%, #00170c 100%);
     text-align: center;
+    box-shadow:
+        inset 0 1px 0 rgba(255, 204, 0, 0.45),
+        inset 0 -1px 0 rgba(255, 204, 0, 0.25);
 }
 
 .book-help-title {
     font-family: var(--font-heading);
-    font-size: 1.7rem;
-    color: var(--pe-green-dark);
-    letter-spacing: 0.5px;
+    font-size: 2rem;
+    color: var(--pe-gold);
+    letter-spacing: 0.06em;
     margin-bottom: var(--space-sm);
+    text-shadow: 0 2px 0 rgba(0, 0, 0, 0.4);
 }
 
 .book-help-body {
-    color: var(--pe-text-dark);
-    margin-bottom: var(--space-sm);
+    color: rgba(255, 255, 255, 0.92);
+    margin-bottom: var(--space-md);
 }
 
 .book-help-contact {
-    color: var(--pe-text-dark);
+    display: inline-block;
+    margin: 0;
+    padding: var(--space-sm) var(--space-lg);
+    border: 1px solid rgba(255, 204, 0, 0.35);
+    border-radius: 8px;
+    background: rgba(0, 0, 0, 0.28);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    color: var(--pe-white);
     font-weight: 700;
+    letter-spacing: 0.03em;
 }
 
+.book-help-contact i { color: var(--pe-gold); }
+
+/* Rate-sheet pointer, set as a stamped note rather than a loose line of text. */
 .book-menu-note {
     max-width: 720px;
-    margin: var(--space-md) auto 0;
+    margin: var(--space-lg) auto 0;
+    padding: var(--space-sm) var(--space-md);
     text-align: center;
     font-size: 0.92rem;
     color: var(--pe-text-dark);
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(var(--pe-green-rgb), 0.16);
+    border-left: 3px solid var(--pe-gold);
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.book-menu-note i { color: var(--pe-green); margin-right: 0.3rem; }
+
+/* ===== Booking page polish round 1: material, rope motif, poster type ===== */
+
+/* Poster header. Scoped to book.html so the other coming-soon heroes are
+   untouched: spotlight behind the headline, speed lines raking across, and the
+   field going dark at the bottom so it hands off into the marquee below.
+   The hatch is now one recipe (115deg / 2px / 14px / 0.035) shared by all three
+   dark sections, so the arena air reads as one material top to bottom. */
+.book-hero {
+    position: relative;
+    padding: calc(var(--space-xl) + 1rem) 0 calc(var(--space-xl) + 0.5rem);
+    background-color: var(--pe-green-dark);
+    background-image:
+        radial-gradient(70% 90% at 50% 18%, rgba(255, 204, 0, 0.16), rgba(255, 204, 0, 0) 62%),
+        repeating-linear-gradient(115deg, rgba(255, 255, 255, 0.035) 0 2px, rgba(255, 255, 255, 0) 2px 14px),
+        radial-gradient(135% 120% at 50% 8%, var(--pe-green-light) 0%, var(--pe-green) 32%, var(--pe-green-dark) 72%, #00190d 100%);
+}
+
+.book-hero h1 {
+    font-size: 3.4rem;
+    letter-spacing: 0.04em;
+    color: var(--pe-gold);
+    text-shadow:
+        0 3px 0 rgba(0, 0, 0, 0.5),
+        0 0 32px rgba(255, 204, 0, 0.35);
+}
+
+.book-hero .book-tagline {
+    max-width: 640px;
+    letter-spacing: 0.02em;
+    color: rgba(255, 255, 255, 0.94);
+    opacity: 1;
+}
+
+/* Round 1 hung a rope hairline above every section title. It went: the site
+   already gives .section-title a gold bar underneath, and reveal.js inks an
+   animated stroke there on top of that. Three marks on one heading, and only on
+   this page. The rope now lives where it means something structural: the
+   marquee lip and the apron edges. Titles keep the type treatment only. */
+.weekly-card-section .section-title,
+.book-menu-section .section-title,
+.book-info .section-title {
+    letter-spacing: 0.05em;
+    text-shadow: 0 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+.weekly-card-section .section-title {
+    font-size: 2.6rem;
+    color: var(--pe-green-dark);
+}
+
+@media (max-width: 600px) {
+    .book-hero {
+        padding: var(--space-xl) 0;
+    }
+
+    .book-hero h1 { font-size: 2.5rem; }
+
+    .weekly-card-section .section-title { font-size: 2rem; }
+
+    .book-menu-section .section-title,
+    .book-info .section-title { font-size: 1.9rem; }
+
+    .day-strip-section { padding: calc(var(--space-lg) + 0.75rem) 0 var(--space-lg); }
+
+    .day-chip {
+        padding: var(--space-md) var(--space-md) calc(var(--space-md) + 0.15rem);
+    }
+
+    .chip-days { font-size: 1.4rem; }
+
+    .chip-venue { font-size: 0.68rem; letter-spacing: 0.14em; }
+
+    .day-strip-note { font-size: 0.98rem; }
+
+    .venue-card {
+        padding: calc(var(--space-lg) + 0.25rem) var(--space-md) var(--space-lg);
+    }
+
+    .venue-card-days { font-size: 1.7rem; }
+
+    .venue-card-cta { font-size: 0.9rem; padding: 0.8rem var(--space-sm); }
+
+    .book-menu-dur { font-size: 2.1rem; }
+
+    .book-menu-price { font-size: 1.6rem; }
+
+    .first-visit-title { font-size: 1.9rem; }
+
+    .book-help-title { font-size: 1.7rem; }
+
+    .book-help-contact {
+        display: block;
+        padding: var(--space-sm) var(--space-md);
+        font-size: 0.92rem;
+    }
+}
+
+/* ===== Booking page polish round 2: contrast, focus, the belt ===== */
+
+/* Keyboard focus. The site-wide .btn ring is gold, which is right on the dark
+   hero and dead wrong on the pale venue cards (gold on white is 1.5:1). On this
+   page's paper and apron, the ring is drawn in green ink instead. */
+.venue-card-cta:focus-visible,
+.venue-card-fine a:focus-visible,
+a.venue-card-fine:focus-visible,
+.book-menu-note a:focus-visible {
+    outline: 3px solid var(--pe-green-dark);
+    outline-offset: 3px;
+    border-radius: 6px;
+}
+
+/* On the gold apron the link is already green ink, so the ring goes black. */
+.first-visit-fine a:focus-visible {
+    outline: 3px solid var(--pe-black);
+    outline-offset: 3px;
+    border-radius: 4px;
+}
+
+/* Today's card was losing a pixel of lift on hover: .venue-card:hover outranks
+   .venue-card-today, so the raised card sank when you pointed at it. */
+.venue-card-today:hover {
+    transform: translateY(-9px);
+}
+
+/* Hustle House keeps the Square link inside the button group, so its foot rule
+   was floating a full rem below the sublabel while the other two sat tight
+   against the card foot. Same anatomy, same spacing. */
+.venue-card-actions a.venue-card-fine {
+    margin-top: var(--space-sm);
+    padding-top: var(--space-sm);
+}
+
+/* SIGNATURE: the champion's belt. Today's venue gets one slow pass of polished
+   gold along its accent bar and then holds the glint where the light landed.
+   It happens once, in one place, on the whole page. */
+.venue-card-today .venue-card-accent::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background-image: linear-gradient(100deg,
+        rgba(255, 255, 255, 0) 40%,
+        rgba(255, 255, 255, 0.6) 47%,
+        rgba(255, 236, 150, 0.95) 50%,
+        rgba(255, 255, 255, 0.6) 53%,
+        rgba(255, 255, 255, 0) 60%);
+    background-size: 220% 100%;
+    background-position: 68% 0;
+    background-repeat: no-repeat;
+    pointer-events: none;
+}
+
+@keyframes pe-belt-glint {
+    from { background-position: -130% 0; }
+    to { background-position: 68% 0; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .venue-card-today .venue-card-accent::after {
+        animation: pe-belt-glint 2.4s cubic-bezier(0.35, 0, 0.2, 1) 0.5s 1 both;
+    }
+}
+
+/* Narrow phones. The marquee stacks one chip per row down here, so the gaps and
+   the chip padding come in to keep four chips from becoming a scroll. */
+@media (max-width: 420px) {
+    .day-strip { gap: var(--space-sm); }
+
+    .day-chip {
+        flex-basis: 100%;
+        padding: calc(var(--space-sm) + 0.15rem) var(--space-sm) calc(var(--space-md) - 0.15rem);
+    }
+
+    .chip-days { font-size: 1.3rem; letter-spacing: 0.08em; }
+
+    .chip-venue { font-size: 0.66rem; letter-spacing: 0.1em; }
+
+    .chip-venue::before { margin: 7px auto 6px; }
+
+    .day-strip-note { margin-top: var(--space-lg); }
+}
+
+/* Motion is decoration here. The lit states stay, the travel does not, and the
+   belt holds its resting glint without ever sweeping. */
+@media (prefers-reduced-motion: reduce) {
+    .day-chip,
+    .venue-card,
+    .venue-card-cta,
+    .book-menu-card {
+        transition: none;
+    }
+
+    .venue-card:hover,
+    .venue-card-today:hover,
+    .venue-card-cta:hover,
+    .venue-card-cta:active,
+    .book-menu-card:hover {
+        transform: none;
+    }
+
+    .venue-card-today:hover {
+        transform: translateY(-5px);
+    }
 }
