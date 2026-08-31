@@ -4,21 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Book a Session | The People's Elbow</title>
-    <meta name="description" content="Book a chair or table massage session with The People's Elbow. Licensed massage therapy in Woodstock, GA and the Atlanta metro.">
+    <meta name="description" content="Book with The People's Elbow across the Residency Network: Cherokee Center for Change, Hustle House, and Elbow Room. Licensed massage therapy in Woodstock, GA.">
     <link rel="canonical" href="https://peoples-elbow.com/book.html">
 
     <!-- Open Graph -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://peoples-elbow.com/book.html">
     <meta property="og:title" content="Book a Session | The People's Elbow">
-    <meta property="og:description" content="Online booking for licensed chair and table massage in Woodstock, GA. No membership traps, no contracts.">
+    <meta property="og:description" content="Same hands, all week. Three venues, one network. Pick your day: Cherokee Center for Change, Hustle House, or Elbow Room.">
     <meta property="og:image" content="https://peoples-elbow.com/images/logo.png">
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="https://peoples-elbow.com/book.html">
     <meta name="twitter:title" content="Book a Session | The People's Elbow">
-    <meta name="twitter:description" content="Online booking for licensed chair and table massage in Woodstock, GA. No membership traps, no contracts.">
+    <meta name="twitter:description" content="Same hands, all week. Three venues, one network. Pick your day.">
     <meta name="twitter:image" content="https://peoples-elbow.com/images/logo.png">
 
     <link rel="shortcut icon" href="images/favicon-32.png" type="image/png">
@@ -34,14 +34,103 @@
         <section class="book-hero">
             <div class="container">
                 <h1>Book a Session</h1>
-                <p class="book-tagline">Pick a time. Drop the tension. Walk out lighter.</p>
+                <p class="book-tagline">Same hands, all week. Three venues, one network. Pick your day.</p>
             </div>
         </section>
 
+        <!-- Day strip: the network at a glance. Today's chip lights up via JS. -->
+        <section class="day-strip-section" aria-label="Weekly schedule at a glance">
+            <div class="container">
+                <div class="day-strip" id="day-strip">
+                    <div class="day-chip chip-ccc" data-days="2,4,5">
+                        <span class="chip-days">TUE THU FRI</span>
+                        <span class="chip-venue">CHEROKEE CENTER FOR CHANGE</span>
+                    </div>
+                    <div class="day-chip chip-hh" data-days="3">
+                        <span class="chip-days">WED</span>
+                        <span class="chip-venue">HUSTLE HOUSE</span>
+                    </div>
+                    <div class="day-chip chip-er" data-days="6,0">
+                        <span class="chip-days">SAT SUN</span>
+                        <span class="chip-venue">ELBOW ROOM</span>
+                    </div>
+                    <div class="day-chip chip-off" data-days="1">
+                        <span class="chip-days">MON</span>
+                        <span class="chip-venue">REST DAY. THE ELBOW TAKES THE DAY OFF.</span>
+                    </div>
+                </div>
+                <p class="day-strip-note" id="day-strip-note">Same days. Same places. Every week.</p>
+            </div>
+        </section>
+
+        <!-- The Weekly Card: three equal prongs. -->
+        <section class="weekly-card-section">
+            <div class="container">
+                <h2 class="section-title">The Weekly Card</h2>
+                <p class="weekly-card-intro">Three doors, same therapist. Pick the day that fits your week.</p>
+
+                <div class="venue-card-grid">
+                    <!-- Cherokee Center for Change -->
+                    <article class="venue-card venue-ccc" id="venue-ccc">
+                        <div class="venue-card-accent" aria-hidden="true"></div>
+                        <h3 class="venue-card-days">TUE / THU / FRI</h3>
+                        <h4 class="venue-card-name">Cherokee Center for Change</h4>
+                        <p class="venue-card-copy">Where Alex works, alongside counselors on the equine campus. Booking and rates run through their front desk.</p>
+                        <div class="venue-card-actions">
+                            <a class="btn btn-primary venue-card-cta" href="tel:+17709287300">
+                                <i class="fas fa-phone" aria-hidden="true"></i> Call the front desk
+                            </a>
+                            <span class="venue-card-sublabel">(770) 928-7300 &middot; Tue / Thu / Fri</span>
+                        </div>
+                        <p class="venue-card-fine">
+                            <a href="ccc-rate-sheet/">See the Cherokee rates &rarr;</a><br>
+                            First visit $30 through the front desk. Mention it when you call.
+                        </p>
+                    </article>
+
+                    <!-- Hustle House -->
+                    <article class="venue-card venue-hh" id="venue-hh">
+                        <div class="venue-card-accent" aria-hidden="true"></div>
+                        <h3 class="venue-card-days">WED</h3>
+                        <h4 class="venue-card-name">Hustle House Health &amp; Wellness</h4>
+                        <p class="venue-card-copy">Wednesdays at the gym. Chair or table, whatever fits the day. Book a slot below.</p>
+                        <div class="venue-card-actions">
+                            <button class="btn btn-primary venue-card-cta" id="hh-reveal" type="button" aria-expanded="false" aria-controls="hh-widget-wrap">
+                                <i class="fas fa-calendar-day" aria-hidden="true"></i> Book Wednesday
+                            </button>
+                            <span class="venue-card-sublabel">Live calendar below</span>
+                            <a class="venue-card-fine" href="https://peoples-elbow.square.site" target="_blank" rel="noopener noreferrer">Prefer direct? Book on Square &rarr;</a>
+                        </div>
+                        <div class="hh-widget-wrap" id="hh-widget-wrap" hidden>
+                            <div class="book-widget-container" id="book-widget-container"></div>
+                        </div>
+                    </article>
+
+                    <!-- Elbow Room -->
+                    <article class="venue-card venue-er" id="venue-er">
+                        <div class="venue-card-accent" aria-hidden="true"></div>
+                        <h3 class="venue-card-days">SAT / SUN</h3>
+                        <h4 class="venue-card-name">Elbow Room Massage</h4>
+                        <p class="venue-card-copy">Clinical massage therapy on Sundays and select Saturdays. Scheduled through Elbow Room's own system.</p>
+                        <div class="venue-card-actions">
+                            <a class="btn btn-primary venue-card-cta" href="https://elbowroommassage.com/book" target="_blank" rel="noopener noreferrer">
+                                <i class="fas fa-calendar-alt" aria-hidden="true"></i> Schedule at Elbow Room
+                            </a>
+                            <span class="venue-card-sublabel">Sat + Sun &middot; opens elbowroommassage.com</span>
+                        </div>
+                        <p class="venue-card-fine">
+                            External link, opens in a new tab. Mention your first visit when you schedule.
+                        </p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- The Menu: shared by Hustle House and Elbow Room. -->
         <section class="book-menu-section">
             <div class="container">
                 <h2 class="section-title">The Menu</h2>
-                <p class="book-menu-intro">People's Elbow at Hustle House. Chair or table, whatever fits the day. Sessions are built around preparation and recovery: gearing up for an event or bouncing back after one. You do not have to be an athlete, everybody preps for something and recovers from something.</p>
+                <p class="book-menu-intro">One menu at Hustle House and Elbow Room. Chair or table, whatever fits the day. Sessions are built around preparation and recovery: gearing up for an event or bouncing back after one. You do not have to be an athlete, everybody preps for something and recovers from something.</p>
                 <div class="book-menu-grid">
                     <div class="book-menu-card">
                         <span class="book-menu-dur">15 min</span>
@@ -61,46 +150,27 @@
                 </div>
                 <div class="book-addons">
                     <p><i class="fas fa-plus-circle" aria-hidden="true"></i> <strong>Add to any session:</strong> <strong>Cryoderm</strong> topical finish &middot; <strong>scraping</strong> (instrument-assisted soft-tissue work / gua sha)</p>
-                    <p class="book-firstvisit"><i class="fas fa-gift" aria-hidden="true"></i> <strong>First visit?</strong> Your first 15-minute massage is free, a $25 value. Or apply that same $25 toward a longer session, so your first full hour is $60 instead of $85. One first-visit credit, your choice.</p>
                 </div>
+                <p class="book-menu-note"><i class="fas fa-info-circle" aria-hidden="true"></i> Cherokee Center for Change keeps its own rates: <a href="ccc-rate-sheet/">see the Cherokee rate sheet &rarr;</a></p>
             </div>
         </section>
 
-        <section class="book-widget-section">
+        <!-- First visit banner: one offer, two homes. -->
+        <section class="first-visit-banner">
             <div class="container">
-                <!-- Availability note slot. Populated by JS when the Square API proxy is wired up. Hidden by default. -->
-                <div id="book-availability" class="book-availability-note" hidden></div>
+                <h2 class="first-visit-title">First Visit?</h2>
+                <p class="first-visit-body">At Hustle House or Elbow Room, your first 15-minute massage is free, a $25 value. Or apply that same $25 toward a longer session, so your first full hour is $60 instead of $85. One first-visit credit, your choice.</p>
+                <p class="first-visit-fine">At Cherokee Center for Change, first visit is $30 through the front desk.</p>
+                <p class="first-visit-fine">New client? <a href="/intake/">Print or save the intake form before your visit &rarr;</a></p>
+            </div>
+        </section>
 
-                <p class="book-location-note">
-                    <i class="fas fa-info-circle" aria-hidden="true"></i>
-                    All sessions book for <strong>Hustle House Health &amp; Wellness</strong>, Woodstock GA &middot; Wednesdays only.
-                </p>
-
-                <p class="book-fallback">
-                    <i class="fas fa-clipboard-list" aria-hidden="true"></i>
-                    New client?
-                    <a href="/intake/">Print or save the intake form before your visit &rarr;</a>
-                </p>
-
-                <div class="book-widget-container" id="book-widget-container">
-                    <!-- Start Square Appointments Embed Code -->
-                    <script src="https://square.site/appointments/buyer/widget/nxipfwu0q8gx9k/L9ZZX52ET3XGJ.js"></script>
-                    <!-- End Square Appointments Embed Code -->
-                </div>
-
-                <p class="book-fallback">
-                    <i class="fas fa-external-link-alt" aria-hidden="true"></i>
-                    Prefer the full Square experience?
-                    <a href="https://peoples-elbow.square.site" target="_blank" rel="noopener noreferrer">Book direct on Square &rarr;</a>
-                </p>
-
-                <div class="book-overflow">
-                    <h2 class="book-overflow-title">Need another day?</h2>
-                    <p class="book-overflow-body">If the regular booking window does not fit your week, you can also book with me through Elbow Room Massage on Sundays and select Saturdays. Same hands, different calendar.</p>
-                    <a class="btn btn-secondary book-overflow-cta" href="https://elbowroommassage.com/book" target="_blank" rel="noopener noreferrer" aria-label="Find a Sunday or Saturday time with Elbow Room Massage (opens in a new tab)">
-                        <i class="fas fa-calendar-alt" aria-hidden="true"></i> Find a Sunday or Saturday time
-                    </a>
-                </div>
+        <!-- Not sure which day fits -->
+        <section class="book-help">
+            <div class="container">
+                <h2 class="book-help-title">Not sure which day fits?</h2>
+                <p class="book-help-body">Reach out and we will find you a slot.</p>
+                <p class="book-help-contact"><i class="fas fa-envelope" aria-hidden="true"></i> info@peoples-elbow.com &middot; <i class="fab fa-instagram" aria-hidden="true"></i> @peoples_elbow_massage</p>
             </div>
         </section>
 
@@ -111,7 +181,7 @@
                     <div class="book-info-item">
                         <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
                         <h3>Where</h3>
-                        <p>Woodstock, GA. Weekly residency at Hustle House Health &amp; Wellness every Wednesday.</p>
+                        <p>Woodstock, GA. The Residency Network: Cherokee Center for Change, Hustle House, and Elbow Room.</p>
                     </div>
                     <div class="book-info-item">
                         <i class="fas fa-id-card" aria-hidden="true"></i>
@@ -121,7 +191,7 @@
                     <div class="book-info-item">
                         <i class="fas fa-hand-holding-usd" aria-hidden="true"></i>
                         <h3>How It Works</h3>
-                        <p>Payment runs through Square at the time of service. Reschedule or cancel up to 24 hours ahead at no charge.</p>
+                        <p>Payment runs through Square at Hustle House and Elbow Room. Reschedule or cancel up to 24 hours ahead at no charge. Cherokee Center handles its own desk.</p>
                     </div>
                 </div>
             </div>
@@ -135,5 +205,68 @@
     <script src="js/components.js"></script>
     <script src="js/main.js"></script>
     <script type="module" src="js/reveal.js"></script>
+    <script>
+    (function () {
+        // Day-aware highlight: light up today's venue, celebrate the Monday day off.
+        function dayIndex() { return new Date().getDay(); } // 0 Sun, 1 Mon ... 6 Sat
+        function applyDay() {
+            var today = dayIndex();
+            var chips = document.querySelectorAll('#day-strip .day-chip');
+            var note = document.getElementById('day-strip-note');
+            var lines = {
+                1: 'Monday. Day off. Recovery is part of the program. The card resumes Tuesday.',
+                2: 'Tuesday. Cherokee Center day. The front desk picks up at (770) 928-7300.',
+                3: 'Wednesday. Hustle House day. Book a slot below.',
+                4: 'Thursday. Cherokee Center day. The front desk picks up at (770) 928-7300.',
+                5: 'Friday. Cherokee Center day. The front desk picks up at (770) 928-7300.',
+                6: 'Saturday. Elbow Room day. Schedule through Elbow Room.',
+                0: 'Sunday. Elbow Room day. Schedule through Elbow Room.'
+            };
+            var active = null;
+            for (var i = 0; i < chips.length; i++) {
+                var d = (chips[i].getAttribute('data-days') || '').split(',');
+                if (d.indexOf(String(today)) !== -1) {
+                    chips[i].classList.add('chip-today');
+                    active = chips[i];
+                }
+            }
+            var cardId = { 1: 'venue-none', 2: 'venue-ccc', 3: 'venue-hh', 4: 'venue-ccc', 5: 'venue-ccc', 6: 'venue-er', 0: 'venue-er' }[today];
+            if (cardId !== 'venue-none') {
+                var card = document.getElementById(cardId);
+                if (card) { card.classList.add('venue-card-today'); }
+            } else {
+                var offChip = document.querySelector('.chip-off');
+                if (offChip) { offChip.classList.add('chip-today-off'); }
+            }
+            if (note) { note.textContent = lines[today]; }
+        }
+        var squareLoaded = false;
+        function initWidgetReveal() {
+            var btn = document.getElementById('hh-reveal');
+            var wrap = document.getElementById('hh-widget-wrap');
+            if (!btn || !wrap) { return; }
+            btn.addEventListener('click', function () {
+                var opening = wrap.hidden;
+                wrap.hidden = !wrap.hidden;
+                btn.setAttribute('aria-expanded', String(opening));
+                if (opening) {
+                    if (!squareLoaded) {
+                        squareLoaded = true;
+                        var s = document.createElement('script');
+                        s.src = 'https://square.site/appointments/buyer/widget/nxipfwu0q8gx9k/L9ZZX52ET3XGJ.js';
+                        document.getElementById('book-widget-container').appendChild(s);
+                    }
+                    try { wrap.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) { wrap.scrollIntoView(); }
+                }
+            });
+        }
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function () { applyDay(); initWidgetReveal(); });
+        } else {
+            applyDay();
+            initWidgetReveal();
+        }
+    })();
+    </script>
 </body>
 </html>

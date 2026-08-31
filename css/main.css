@@ -2600,3 +2600,242 @@ nav ul li a.active {
     border-radius: 6px;
     display: inline-block;
 }
+/* ===== Residency Network booking page (book.html) ===== */
+.day-strip-section {
+    padding: var(--space-xl) 0;
+    background: linear-gradient(180deg, var(--pe-green-dark) 0%, var(--pe-green) 100%);
+}
+
+.day-strip {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--space-md);
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+.day-chip {
+    flex: 1 1 220px;
+    max-width: 320px;
+    background: rgba(0, 0, 0, 0.28);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-top: 4px solid var(--pe-gold);
+    border-radius: 10px;
+    padding: var(--space-md) var(--space-lg);
+    text-align: center;
+    transition: box-shadow 0.25s ease, transform 0.2s ease, border-color 0.25s ease;
+}
+
+.day-chip.chip-ccc { border-top-color: var(--pe-gold); }
+.day-chip.chip-hh { border-top-color: #ffffff; }
+.day-chip.chip-er { border-top-color: #5484ed; }
+.day-chip.chip-off { border-top-color: rgba(255, 255, 255, 0.35); opacity: 0.9; }
+
+.chip-days {
+    display: block;
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    letter-spacing: 1px;
+    color: var(--pe-white);
+}
+
+.chip-venue {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: var(--pe-gold);
+    text-transform: uppercase;
+}
+
+.day-chip.chip-today,
+.day-chip.chip-today-off {
+    border-color: var(--pe-gold);
+    box-shadow: 0 0 0 2px var(--pe-gold), 0 6px 24px rgba(255, 204, 0, 0.35);
+    transform: translateY(-2px);
+}
+
+.day-strip-note {
+    max-width: 760px;
+    margin: var(--space-lg) auto 0;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.92);
+    font-weight: 700;
+    font-size: 1.05rem;
+    letter-spacing: 0.5px;
+}
+
+/* The Weekly Card */
+.weekly-card-section {
+    padding: var(--space-xl) 0;
+    background: var(--pe-white);
+}
+
+.weekly-card-intro {
+    text-align: center;
+    max-width: 640px;
+    margin: -var(--space-lg) auto var(--space-xl);
+    color: var(--pe-text-dark);
+}
+
+.venue-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--space-lg);
+    max-width: 1200px;
+    margin: 0 auto;
+    align-items: stretch;
+}
+
+.venue-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background: var(--pe-light-gray);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    padding: var(--space-xl) var(--space-lg) var(--space-lg);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    transition: box-shadow 0.25s ease, transform 0.2s ease;
+}
+
+.venue-card-accent {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    border-radius: 12px 12px 0 0;
+}
+
+.venue-ccc .venue-card-accent { background: var(--pe-green); }
+.venue-hh .venue-card-accent { background: var(--pe-gold); }
+.venue-er .venue-card-accent { background: #5484ed; }
+
+.venue-card-today {
+    box-shadow: 0 0 0 2px var(--pe-green), 0 10px 30px rgba(0, 105, 55, 0.22);
+    transform: translateY(-3px);
+}
+
+.venue-ccc.venue-card-today { box-shadow: 0 0 0 2px var(--pe-green), 0 10px 30px rgba(0, 105, 55, 0.22); }
+.venue-hh.venue-card-today { box-shadow: 0 0 0 2px var(--pe-gold), 0 10px 30px rgba(255, 204, 0, 0.30); }
+.venue-er.venue-card-today { box-shadow: 0 0 0 2px #5484ed, 0 10px 30px rgba(84, 132, 237, 0.30); }
+
+.venue-card-days {
+    font-family: var(--font-heading);
+    font-size: 1.9rem;
+    letter-spacing: 2px;
+    color: var(--pe-green-dark);
+    margin-bottom: var(--space-xs);
+}
+
+.venue-card-name {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--pe-text-dark);
+    margin-bottom: var(--space-sm);
+}
+
+.venue-card-copy {
+    font-size: 0.95rem;
+    line-height: 1.55;
+    color: var(--pe-text-dark);
+    flex: 1;
+    margin-bottom: var(--space-md);
+}
+
+.venue-card-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-sm);
+}
+
+.venue-card-sublabel {
+    font-size: 0.82rem;
+    text-align: center;
+    color: var(--pe-text-dark);
+    opacity: 0.8;
+}
+
+.venue-card-fine {
+    margin-top: var(--space-md);
+    font-size: 0.82rem;
+    line-height: 1.5;
+    color: var(--pe-text-dark);
+    opacity: 0.85;
+    text-align: center;
+}
+
+.hh-widget-wrap {
+    margin-top: var(--space-md);
+}
+
+.hh-widget-wrap[hidden] { display: none; }
+
+/* First visit banner */
+.first-visit-banner {
+    padding: var(--space-xl) 0;
+    background: linear-gradient(135deg, var(--pe-gold) 0%, var(--pe-orange) 100%);
+    color: var(--pe-black);
+    text-align: center;
+}
+
+.first-visit-banner .container { max-width: 760px; }
+
+.first-visit-title {
+    font-family: var(--font-heading);
+    font-size: 2rem;
+    color: var(--pe-green-dark);
+    margin-bottom: var(--space-sm);
+    letter-spacing: 1px;
+}
+
+.first-visit-body {
+    font-size: 1.05rem;
+    line-height: 1.55;
+    margin-bottom: var(--space-sm);
+}
+
+.first-visit-fine {
+    font-size: 0.9rem;
+    opacity: 0.85;
+    margin-bottom: var(--space-xs);
+}
+
+.first-visit-fine a { font-weight: 700; }
+
+/* Not sure which day fits */
+.book-help {
+    padding: var(--space-xl) 0;
+    background: var(--pe-white);
+    text-align: center;
+}
+
+.book-help-title {
+    font-family: var(--font-heading);
+    font-size: 1.7rem;
+    color: var(--pe-green-dark);
+    letter-spacing: 0.5px;
+    margin-bottom: var(--space-sm);
+}
+
+.book-help-body {
+    color: var(--pe-text-dark);
+    margin-bottom: var(--space-sm);
+}
+
+.book-help-contact {
+    color: var(--pe-text-dark);
+    font-weight: 700;
+}
+
+.book-menu-note {
+    max-width: 720px;
+    margin: var(--space-md) auto 0;
+    text-align: center;
+    font-size: 0.92rem;
+    color: var(--pe-text-dark);
+}
