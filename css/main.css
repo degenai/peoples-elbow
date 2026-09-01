@@ -2900,6 +2900,57 @@ nav ul li a.active {
 .venue-hh { --venue-rgb: 255, 153, 0; --venue-ink: #8a5200; }
 .venue-er { --venue-rgb: 84, 132, 237; --venue-ink: #24408f; }
 
+.venue-card-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 152px;
+    margin: 0.25rem 0 1rem;
+    padding: 0.6rem 0.9rem;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 1px 3px rgba(0, 0, 0, 0.05);
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.3)),
+        radial-gradient(90% 100% at 50% 0%, rgba(var(--venue-rgb), 0.22), transparent 75%);
+}
+
+/* CCC ships as an opaque white lockup: give it a solid white plate so the
+   rectangular asset sits on matching ground instead of a tinted seam. */
+.venue-card-logo--plate {
+    background: #ffffff;
+}
+
+/* ER's mark is gold line art; a blue wash would fight it. Neutral plate. */
+.venue-er .venue-card-logo {
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.35)),
+        radial-gradient(90% 100% at 50% 0%, rgba(0, 0, 0, 0.06), transparent 75%);
+}
+
+/* One shared plate height keeps the three cards' lower rows aligned. Every
+   mark is height-bounded; the CCC lockup also gets a width bound because its
+   three lines of type go illegible below roughly 190px wide. */
+.venue-card-logo img {
+    display: block;
+    max-height: 128px;
+}
+
+.venue-ccc .venue-card-logo img {
+    width: min(78%, 206px);
+    max-height: 140px;
+}
+
+@media (max-width: 640px) {
+    .venue-card-logo {
+        height: 128px;
+    }
+    .venue-ccc .venue-card-logo img {
+        width: min(84%, 220px);
+        max-height: 116px;
+    }
+}
+
 .venue-card:hover {
     transform: translateY(-4px);
     box-shadow:
