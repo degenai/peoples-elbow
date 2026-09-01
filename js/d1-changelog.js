@@ -3,6 +3,22 @@
  * Fetches changelog data from Cloudflare D1 database via changelog reader worker
  */
 
+// Safely parse the D1 stored format "YYYY-MM-DD HH:MM:SS ±HHMM".
+// iOS Safari (JavaScriptCore) does not accept this format in `new Date()`,
+// so parse it by hand instead of rendering "Invalid Date" on iPhones.
+function parseCommitDate(value) {
+    if (!value) return null;
+    const match = String(value).trim().match(/^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2}) ([+-])(\d{2})(\d{2})$/);
+    if (match) {
+        const [, year, month, day, hour, minute, second, sign, offH, offM] = match;
+        const utcMs = Date.UTC(+year, +month - 1, +day, +hour, +minute, +second);
+        const offsetMs = (parseInt(offH, 10) * 60 + parseInt(offM, 10)) * 60000;
+        return new Date(sign === '-' ? utcMs + offsetMs : utcMs - offsetMs);
+    }
+    const fallback = new Date(value);
+    return isNaN(fallback.getTime()) ? null : fallback;
+}
+
 class D1Changelog {
     constructor() {
         this.CONFIG = {
@@ -134,12 +150,12 @@ class D1Changelog {
         item.className = isBot ? 'timeline-item timeline-item--bot' : 'timeline-item';
         item.dataset.index = index;
 
-        const date = new Date(entry.commit_date);
-        const formattedDate = date.toLocaleDateString('en-US', {
+        const date = parseCommitDate(entry.commit_date);
+        const formattedDate = date ? date.toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'short',
             day: 'numeric'
-        });
+        }) : 'Date unknown';
 
         const shortHash = entry.commit_hash.substring(0, 7);
 
@@ -240,7 +256,8 @@ class D1Changelog {
         const dateP = document.createElement('p');
         const dateStrong = document.createElement('strong');
         dateStrong.textContent = 'Commit Date: ';
-        dateP.append(dateStrong, new Date(entry.commit_date).toLocaleString());
+        const commitDate = parseCommitDate(entry.commit_date);
+        dateP.append(dateStrong, commitDate ? commitDate.toLocaleString() : 'Date unknown');
 
         metadataDiv.append(hashP, emailP, dateP);
 
