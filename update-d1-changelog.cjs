@@ -17,9 +17,25 @@ const READER_WORKER_URL = 'https://changelog-reader.alex-adamczyk.workers.dev';
 /**
  * Smart filtering for meaningful development commits
  * (Same logic as generate-changelog-sql.js)
+ *
+ * DENYLISTED_COMMITS: commits whose stories are already carried by a
+ * neighbouring commit, or pure housekeeping noise that would read as junk
+ * on the public timeline. They stay in git history (the repo rule "no yeet"
+ * protects that story), but the changelog feed never surfaces them.
  */
+const DENYLISTED_COMMITS = new Set([
+    // Polish rounds: story fully covered by 23151fb "Visual polish rounds 1 and 2"
+    '49bf7f9f79aabf5ab367754f929105362ecd123f', // captured temp renders, then removed
+    '00b2b2103e8d3a70eb457a303bcd83a6762236ba'  // removed stray temp/sentinel files
+]);
+
 function isMeaningfulCommit(commit, index, allCommits) {
     const msg = commit.message.toLowerCase();
+
+    if (DENYLISTED_COMMITS.has(commit.hash)) {
+        console.log(` Skipping denylisted commit ${commit.hash.substring(0, 7)} (${commit.message.substring(0, 50)}...)`);
+        return false;
+    }
     
     // Always include early commits (first 20) regardless of format
     if (index < 20) {
