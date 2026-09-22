@@ -1,0 +1,22 @@
+Nitpick relay: a broad bug-fix and linting sweep
+
+This update comes from a nitpick relay, a broad maintenance pass to find and clean up bugs, lint issues and rough edges across the site. It keeps the existing design and makes the everyday paths more dependable.
+
+WHAT:
+- Navigation is more resilient when a shared component or outside resource fails. The mobile menu keeps a visible button, and section highlighting follows navigation more consistently.
+- Inquiry forms give clearer feedback, recover from a stalled request, prevent duplicate clicks while sending, and explain when delivery is uncertain. They do not automatically resend. If JavaScript fails to start, form details stay out of the page address.
+- The booking page offers a retry when its embedded scheduler fails to load and preserves its direct-booking fallback.
+- Decorative motion respects reduced-motion settings, including a preference change while the page is open.
+- First-visit offers, Saturday availability and privacy wording are clearer. Rate sheets and print intake materials are tidier, and gift-coupon green matches the existing logo.
+- Lead import recognizes structured notifications more carefully and warns instead of guessing when a pasted thread contains multiple records. Marker-like text inside a message is preserved.
+- Offline caching is more conservative about failed downloads, interrupted updates and storage errors, so a temporary failure does not casually replace a usable cached page.
+
+WHY:
+Small failures can make an otherwise simple site frustrating: a menu that will not open, a form stuck on Sending, an unclear offer or a booking widget with no retry. This sweep addresses those rough edges without turning the site into a redesign.
+
+QUALITY:
+The reviewed candidate passed 143 unit tests and 43 Chromium browser tests on Windows. The Linux gate passed 142 unit tests, skipped one Windows-specific case and passed all 43 browser tests. Eight deliberate guard removals were caught by the checks.
+
+Build and publishing checks now validate the generated site, local asset references, JavaScript imports and offline precache files before the GitHub Pages release step. A separate review build visibly labels its simulated forms and disables live booking, sign-in and persistent app storage.
+
+Testing used synthetic submissions and controlled failures. It did not send real emails, reserve appointments or write to Google Drive. The email-formatting Worker is a separate deployment; website publication alone does not install that part of the change.
