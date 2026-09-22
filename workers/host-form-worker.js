@@ -109,11 +109,11 @@ async function processFormSubmission({ env, subject, emailContent, successMessag
  * directly and so the CRM's email-lead-parser has a single source of truth for
  * the exact text shape it parses. The body has two parts:
  *
- *   1. A human-readable section -- what shows up in the inbox for a person to read.
- *   2. A machine-readable fenced block (--- LEAD JSON v1 ---) so the CRM can
+ *   1. A machine-readable fenced block (--- LEAD JSON v1 ---) so the CRM can
  *      ingest the lead without anyone re-typing it. The JSON is produced with
  *      JSON.stringify so ALL user input is properly escaped -- never hand-glue
  *      user strings into JSON, that's how you get broken parses or injection.
+ *   2. A line-quoted human section preserving literal submitted text.
  *
  * @param {Object} fields
  * @param {string} fields.venueName
@@ -142,23 +142,29 @@ function formatHostEmail({ venueName, contactName, contactEmail, venueType, mess
     sourceDate: isoDate
   });
 
-  // Human section first, then the fence. The fence is just plain text living
-  // inside the same plaintext body -- no MIME changes, no separate part.
-  return `
-    New Host Connection Request
+  // Quote every human line so literal markers there cannot become records.
+  // The canonical block remains first for older CRM parsers.
+  const human = `New Host Connection Request
 
-    Venue Name: ${venueName}
-    Contact Name: ${contactName}
-    Contact Email: ${contactEmail}
-    Venue Type: ${venueType}
+Venue Name: ${venueName}
+Contact Name: ${contactName}
+Contact Email: ${contactEmail}
+Venue Type: ${venueType}
 
-    Message:
-    ${message}
-
---- LEAD JSON v1 ---
+Message:
+${message}`;
+  return `--- LEAD JSON v1 ---
 ${leadJson}
 --- END LEAD JSON ---
-  `;
+
+${human.split(/\r\n|\r|\n/).map(line => '| ' + line).join('\n')}
+`;
+}
+
+// A fixed subject prevents header-inclusive pastes from confusing older parsers.
+// Venue and contact strings remain intact in the canonical JSON and body.
+export function formatHostNotification(fields) {
+  return { subject: 'New Host Request', emailContent: formatHostEmail(fields) };
 }
 
 /**
@@ -179,8 +185,8 @@ async function handleHostForm(formData, env) {
     return errorResponse('Please fill in all required fields', 400);
   }
 
-  // Format the email content (human section + machine-readable LEAD JSON fence)
-  const emailContent = formatHostEmail({
+  // Produce headers and body together so both obey the framing contract.
+  const notification = formatHostNotification({
     venueName,
     contactName,
     contactEmail,
@@ -190,8 +196,7 @@ async function handleHostForm(formData, env) {
 
   return processFormSubmission({
     env,
-    subject: `New Host Request: ${venueName}`,
-    emailContent,
+    ...notification,
     successMessage: 'Your hosting request has been received! We\'ll be in touch soon.'
   });
 }

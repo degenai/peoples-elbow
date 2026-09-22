@@ -678,7 +678,7 @@ byId('paste-email-btn').addEventListener('click', () => {
   const text = byId('paste-email-text').value;
   const result = parseLeadEmail(text);
   if (!result || !result.lead || !result.lead.name) {
-    toast('No lead found in that text.', 'error');
+    toast(result?.warnings?.[0] || 'No lead found in that text.', 'error');
     return;
   }
   const lead = store.createLead(result.lead);

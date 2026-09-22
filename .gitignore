@@ -53,3 +53,10 @@ woodstock-plan.html
 
 # graphify knowledge-graph output
 graphify-out/
+
+# Local validation and preview artifacts
+_site/
+.preview/
+.venv/
+__pycache__/
+*.pyc

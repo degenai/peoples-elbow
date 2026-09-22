@@ -193,6 +193,11 @@
       min-height: 34px;
     }
 
+    .fill-inline {
+      display: inline-block;
+      min-width: 4em;
+    }
+
     .checks {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -401,6 +406,7 @@
         <div>
           <h1 class="title">Client Intake Form</h1>
           <div class="note">The People's Elbow &middot; Alex Adamczyk, LMT &middot; GA License #MT013193</div>
+          <div class="note">Print and complete by hand. Bring it to your appointment.</div>
         </div>
       </div>
       <div class="meta">
@@ -442,7 +448,8 @@
       <div class="row">
         <div class="f"><label>Currently in pain? Level (0 = none, 10 = worst)</label><div class="fill"></div></div>
         <div class="f"><label>Currently under chiropractic care?</label>
-          <div class="inline-yn"><span class="chk"><span class="box"></span> Yes</span> <span class="chk"><span class="box"></span> No</span> <span class="note">If yes, with whom:</span></div>
+          <div class="inline-yn"><span class="chk"><span class="box"></span> Yes</span> <span class="chk"><span class="box"></span> No</span></div>
+          <label>Chiropractic provider name</label><div class="fill"></div>
         </div>
       </div>
     </section>
@@ -458,7 +465,7 @@
       </div>
       <div class="row">
         <div class="f"><label>Are you pregnant?</label>
-          <div class="inline-yn"><span class="chk"><span class="box"></span> No</span> <span class="chk"><span class="box"></span> Yes, weeks: ______</span></div>
+          <div class="inline-yn"><span class="chk"><span class="box"></span> No</span> <span class="chk"><span class="box"></span> Yes, weeks: <span class="fill fill-inline" aria-hidden="true"></span></span></div>
         </div>
         <div class="f"><label>Recent illness or fever?</label><div class="fill"></div></div>
       </div>

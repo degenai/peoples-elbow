@@ -1,3 +1,4 @@
+// Frozen compatibility fixture from 52bcaa77e0ea728319c990451743a0e6d3737dbf.
 /**
  * email-lead-parser.js
  *
@@ -182,42 +183,51 @@ function extractJsonObject(text, from) {
 }
 
 /**
- * Recognize complete line-delimited records, never marker substrings in values.
- * A thread with multiple records needs the operator to select one message.
+ * Try the fenced-JSON path. Returns {lead, warnings} or null if no usable fence.
  */
 function parseFence(joined) {
-  const markers = [...joined.matchAll(/^[\t ]*--- LEAD JSON v1 ---[\t ]*$/gm)];
-  if (!markers.length) return null;
-  const records = markers.map(marker => {
-    const tail = joined.slice(marker.index + marker[0].length).trimStart();
-    if (!tail.startsWith('{')) return null;
-    const raw = extractJsonObject(tail, 0);
-    if (!raw || !/^[\t ]*\n[\t ]*--- END LEAD JSON ---[\t ]*(?:\n|$)/.test(tail.slice(raw.length))) return null;
-    try {
-      const payload = JSON.parse(raw);
-      if (payload.schema !== 'lead-v1' || typeof payload.name !== 'string' || !payload.name.trim()) return null;
-      return payload;
-    } catch {
-      return null;
-    }
-  }).filter(Boolean);
-  if (records.length > 1) {
-    return { lead: null, warnings: ['Multiple lead records found. Paste only one complete notification at a time.'] };
+  // Find the opening fence marker. Tolerant of surrounding whitespace; the
+  // marker itself is fixed text the worker emits.
+  const openIdx = joined.indexOf('--- LEAD JSON v1 ---');
+  if (openIdx === -1) return null;
+  const afterOpen = openIdx + '--- LEAD JSON v1 ---'.length;
+
+  // Extract the JSON object by brace-balancing, NOT by slicing to the closing
+  // marker -- string values may legitimately contain "}" or even the literal
+  // "--- END LEAD JSON ---".
+  const rawBlock = extractJsonObject(joined, afterOpen);
+  if (rawBlock === null) {
+    return { lead: null, warnings: ['Found LEAD JSON fence but the JSON object was incomplete/unbalanced.'] };
   }
-  if (records.length !== 1) {
-    return { lead: null, warnings: ['The lead record is incomplete or invalid. Paste one complete notification; no fields were imported.'] };
-  }
-  const payload = records[0];
+
   const warnings = [];
-  const firstContact = Array.isArray(payload.contacts) ? payload.contacts[0] || {} : {};
+  let payload;
+  try {
+    payload = JSON.parse(rawBlock);
+  } catch (err) {
+    // The fence existed but the JSON was corrupted (line-wrapped by a client,
+    // truncated, etc.). Warn and let the caller fall through to the legacy path.
+    return { lead: null, warnings: [`Found LEAD JSON fence but could not parse it: ${err.message}`] };
+  }
+
+  if (!payload || typeof payload !== 'object') {
+    return { lead: null, warnings: ['LEAD JSON fence did not contain an object.'] };
+  }
+
+  // Pull the primary contact out of the JSON's contacts array, if present.
+  const firstContact = Array.isArray(payload.contacts) && payload.contacts.length > 0
+    ? payload.contacts[0]
+    : {};
+
   const lead = buildPartialLead({
-    name: payload.name,
+    name: typeof payload.name === 'string' ? payload.name : '',
     venueType: typeof payload.venueType === 'string' ? payload.venueType : '',
     message: typeof payload.message === 'string' ? payload.message : '',
     email: typeof firstContact.email === 'string' ? firstContact.email : '',
     contactName: typeof firstContact.name === 'string' ? firstContact.name : '',
     sourceDate: typeof payload.sourceDate === 'string' ? payload.sourceDate : undefined
   }, warnings);
+
   return { lead, warnings };
 }
 
@@ -288,10 +298,22 @@ export function parseLeadEmail(text) {
 
   const { lines, joined } = dequote(text);
 
-  // Recognized machine framing is authoritative, including a refused import.
+  // 1. Preferred: the machine-readable fence.
   const fenceResult = parseFence(joined);
-  if (fenceResult) return fenceResult;
+  if (fenceResult && fenceResult.lead) {
+    return fenceResult;
+  }
 
-  // Pre-fence historical notifications keep their best-effort compatibility.
-  return parseLegacyTemplate(lines, joined);
+  // 2. Fallback: legacy template scraping. If the fence existed but was
+  //    corrupted, carry its warning forward so the operator sees both.
+  const legacyResult = parseLegacyTemplate(lines, joined);
+  if (legacyResult && legacyResult.lead) {
+    if (fenceResult && Array.isArray(fenceResult.warnings)) {
+      legacyResult.warnings = [...fenceResult.warnings, ...legacyResult.warnings];
+    }
+    return legacyResult;
+  }
+
+  // Nothing recognizable.
+  return null;
 }

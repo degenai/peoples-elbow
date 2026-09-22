@@ -1,3 +1,4 @@
+// Frozen upgrade-compatibility fixture from 52bcaa77e0ea728319c990451743a0e6d3737dbf.
 /*
  * Lead-o-Tron v2 — Service Worker
  * ================================
@@ -21,13 +22,13 @@
 // it ships (users are at most one load behind), and navigations are network-first
 // so crm.html is never stale online. Bump this VERSION to FORCE an immediate full
 // purge of the old cache on activate (e.g. for a breaking app-shell change).
-const VERSION = 'lot-v2.0.3';
+const VERSION = 'lot-v2.0.2';
 const CACHE_NAME = VERSION; // one cache per version keeps cleanup trivial.
 
-// The app shell: everything the CRM needs to boot offline. Every one of these
-// is essential — install is atomic (see below), so either the whole shell
-// caches or none of it does. The js/crm/* list must match app.js's static
-// import graph, or a cold offline first-load will fail to resolve a module.
+// The app shell: everything the CRM needs to boot offline. We add each file
+// individually and tolerate a miss (see the install handler) rather than failing
+// the whole batch if a path is ever renamed. The js/crm/* list must match app.js's
+// static import graph, or a cold offline first-load will fail to resolve a module.
 const PRECACHE_URLS = [
   'crm.html',
   'css/main.css',
@@ -40,7 +41,7 @@ const PRECACHE_URLS = [
   'components/footer.html',
   'images/favicon-32.png',
   'images/logo.png',
-  // The CRM engine, plain ES modules. Keep in sync with the imports in app.js.
+  // The CRM engine, plain ES modules. Keep in sync with app.js's imports.
   'js/crm/app.js',
   'js/crm/store.js',
   'js/crm/sync.js',
@@ -58,34 +59,28 @@ const PRECACHE_URLS = [
   'js/crm/email-lead-parser.js',
 ];
 
-// --- INSTALL: precache the app shell, atomically -----------------------------
+// --- INSTALL: precache the app shell ---------------------------------------
 self.addEventListener('install', (event) => {
+  // skipWaiting() means a freshly installed worker doesn't sit in "waiting"
+  // behind the old one — it activates as soon as it's ready. Paired with
+  // clients.claim() in activate, an update takes effect on next load.
+  self.skipWaiting();
+
   event.waitUntil((async () => {
-    const cacheExisted = (await caches.keys()).includes(CACHE_NAME);
     const cache = await caches.open(CACHE_NAME);
-    try {
-      // cache.addAll() is atomic: every URL must fetch successfully or
-      // nothing is committed to this cache. That's exactly what we want for
-      // an app-shell install — a half-cached CRM (missing a module the JS
-      // import graph needs) is worse than no offline support at all, so we
-      // let one missing/renamed file fail the whole install rather than
-      // silently limping onward.
-      await cache.addAll(PRECACHE_URLS);
-    } catch (err) {
-      // Remove only a newly-created empty cache. An atomic addAll failure
-      // leaves existing entries untouched, including a same-version retry.
-      if (!cacheExisted) await caches.delete(CACHE_NAME);
-      // Re-throw so this event.waitUntil promise rejects: the browser treats
-      // that as install failure, meaning we never reach skipWaiting() below
-      // and this worker never gets to activate (so it can never purge the
-      // previous healthy cache either).
-      throw err;
-    }
-    // Only now that every essential file is safely cached do we skip the
-    // "waiting" phase. skipWaiting() means this freshly installed worker
-    // doesn't sit behind the old one — it activates as soon as it's ready,
-    // instead of waiting for every old tab to close first.
-    await self.skipWaiting();
+    // We deliberately do NOT use cache.addAll(): addAll is all-or-nothing, so a
+    // single missing/renamed file would reject the whole install and the app
+    // would never go offline-capable. Instead we add each URL on its own and use
+    // allSettled, which never rejects — present files get cached, misses skipped.
+    const results = await Promise.allSettled(
+      PRECACHE_URLS.map((url) => cache.add(url))
+    );
+    // Surface the misses in the console so a dev knows what didn't precache.
+    results.forEach((r, i) => {
+      if (r.status === 'rejected') {
+        console.warn('[sw] precache skipped (not found yet?):', PRECACHE_URLS[i]);
+      }
+    });
   })());
 });
 
@@ -101,12 +96,8 @@ self.addEventListener('activate', (event) => {
         .filter((key) => key.startsWith('lot-v') && key !== CACHE_NAME)
         .map((key) => caches.delete(key))
     );
-    // Take control of any already-open tabs right now, instead of waiting for
-    // them to be closed and reopened. This only changes who answers requests
-    // those tabs make from this point forward (fetch/navigate) — it does NOT
-    // reload the tab or hot-swap any JS already sitting in memory. A page
-    // that was open before this activated keeps running its already-loaded
-    // code until the user actually navigates or refreshes.
+    // Take control of any already-open tabs right now, instead of waiting
+    // for them to be closed and reopened.
     await self.clients.claim();
   })());
 });
@@ -141,14 +132,7 @@ self.addEventListener('fetch', (event) => {
   // Everything else same-origin (CSS, JS modules, images): cache-first with a
   // background revalidate ("stale-while-revalidate"). The page paints instantly
   // from cache; meanwhile we quietly fetch a fresh copy for next time.
-  //
-  // That background fetch+put isn't covered by respondWith (which may already
-  // have resolved with the cached copy before the network even answers), so
-  // it needs its own lifetime. We register it with event.waitUntil() right
-  // here, synchronously, in the same turn the fetch event fires — not later,
-  // after some `await caches.open(...)` — so the browser can't decide the
-  // event is "done" and tear the worker down mid-revalidate.
-  event.respondWith(staleWhileRevalidate(request, event));
+  event.respondWith(staleWhileRevalidate(request));
 });
 
 // Network-first: try the network, fall back to cache, then to a cached
@@ -157,28 +141,10 @@ async function networkFirst(request) {
   const cache = await caches.open(CACHE_NAME);
   try {
     const fresh = await fetch(request);
-    // Only stash real, healthy 200 responses. A transient 5xx, or a live
-    // 401/403 from an auth check, must never overwrite the last known-good
-    // cached copy — otherwise a later offline load would resurrect the
-    // failure instead of the working app. This request's own live response
-    // is still returned below either way; we're only guarding what we cache.
-    if (fresh && fresh.ok) {
-      // Awaited here (not fire-and-forget) so this write's promise is owned
-      // by the respondWith chain the caller hands to event.respondWith(),
-      // which keeps it alive for the life of the fetch event.
-      try {
-        await cache.put(request, fresh.clone());
-      } catch (err) {
-        // Cache write failed (quota, etc). That must not turn into an
-        // unhandled rejection, and must not discard an otherwise-good
-        // network response — the user still gets `fresh` below.
-        console.warn('[sw] cache.put failed for navigation (quota?):', err);
-      }
-    }
+    // Stash a copy so the next offline launch has the newest shell.
+    cache.put(request, fresh.clone());
     return fresh;
   } catch (err) {
-    // Actual network failure (offline, DNS, etc) — not a live HTTP error
-    // status, which resolves fetch() normally and is handled above.
     const cached = await cache.match(request);
     if (cached) return cached;
     // This worker is root-scoped (it governs the whole site), so only fall back
@@ -197,34 +163,20 @@ async function networkFirst(request) {
 // Stale-while-revalidate: answer from cache immediately if we have it, and
 // kick off a network refresh in the background regardless. If we have no
 // cached copy, we await the network instead.
-async function staleWhileRevalidate(request, event) {
-  // Kick off (and register) the background revalidation FIRST, before any
-  // `await`, so event.waitUntil() is called synchronously within this fetch
-  // event's turn — required for the browser to keep the worker alive for it,
-  // and required so this promise (fetch + cache.put) is never detached.
+async function staleWhileRevalidate(request) {
+  const cache = await caches.open(CACHE_NAME);
+  const cached = await cache.match(request);
+
   const networkFetch = fetch(request)
-    .then(async (response) => {
-      // Only cache real, complete, healthy responses. Opaque/error responses
-      // get skipped so we never poison the cache with a broken file.
+    .then((response) => {
+      // Only cache real, complete responses. Opaque/error responses get
+      // skipped so we never poison the cache with a broken file.
       if (response && response.ok) {
-        try {
-          const cache = await caches.open(CACHE_NAME);
-          await cache.put(request, response.clone());
-        } catch (err) {
-          // Quota or other cache failure: don't let it become an unhandled
-          // rejection, and don't discard the otherwise-valid network
-          // response we're about to hand back below.
-          console.warn('[sw] cache.put failed for asset (quota?):', err);
-        }
+        cache.put(request, response.clone());
       }
       return response;
     })
-    .catch(() => undefined); // offline/network failure: swallow so cached copy can win.
-
-  event.waitUntil(networkFetch);
-
-  const cache = await caches.open(CACHE_NAME);
-  const cached = await cache.match(request);
+    .catch(() => undefined); // offline: swallow so cached copy can win.
 
   // Cached copy first (fast), otherwise wait on the network.
   return cached || (await networkFetch) || Response.error();
