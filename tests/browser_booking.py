@@ -7,6 +7,24 @@ WIDGET = 'https://square.site/appointments/buyer/widget/**'
 SCRIPT = "window.fixtureSquareLoads=(window.fixtureSquareLoads||0)+1; const frame=document.createElement('iframe');frame.id='fixture-square';frame.title='Synthetic booking calendar';document.querySelector('#book-widget-container').appendChild(frame);"
 
 class BookingChecks(BrowserFixture):
+    def test_missing_status_keeps_direct_link_usable_without_a_click_exception(self):
+        page = self.new_page()
+        errors = []
+        page.on('pageerror', lambda error: errors.append(str(error)))
+        def without_status(route):
+            from browser_support import SITE
+            html = (SITE / 'book.html').read_text(encoding='utf-8')
+            html = html.replace('id="hh-widget-status"', 'id="fixture-removed-status"')
+            route.fulfill(status=200, content_type='text/html', body=html)
+        page.route(self.origin + '/book.html', without_status)
+        page.goto(self.origin + '/book.html', wait_until='networkidle')
+        page.locator('#hh-reveal').click()
+        expect(page.locator('a[href="https://peoples-elbow.square.site"]').first).to_be_visible()
+        self.assertEqual(errors, [], 'An incomplete optional widget must not throw on interaction')
+        self.assertEqual(page.locator('#book-widget-container script').count(), 0)
+        self.assertFalse(self.submissions)
+        page.close()
+
     def test_failure_displays_an_accessible_retry_instruction(self):
         page = self.new_page()
         page.route(WIDGET, lambda route: route.abort())

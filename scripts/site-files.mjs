@@ -6,7 +6,7 @@ export const ROOT = fileURLToPath(new URL('../', import.meta.url));
 export function sourceFiles() {
     const list = (...args) => execFileSync('git', ['ls-files', ...args, '-z'], { cwd: ROOT, encoding: 'utf8' }).split('\0').filter(Boolean);
     const untracked = list('--others', '--exclude-standard');
-    if (untracked.some(name => isPublic(name) || /\.(test|spec)\.(js|mjs|cjs)$/i.test(name) || /^tests\/browser.*\.py$/i.test(name))) {
+    if (untracked.some(name => isPublic(name) || /\.(test|spec)\.(js|mjs|cjs)$/i.test(name) || /^tests\/.*\.py$/i.test(name))) {
         throw new Error('Untracked publication assets or regression tests: stage intended files or explicitly ignore private drafts before verification.');
     }
     return [...new Set(list('--cached'))].sort();

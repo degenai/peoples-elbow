@@ -6,9 +6,12 @@
     "test": "node scripts/test-unit.mjs",
     "test:workers": "node --test workers/",
     "build": "node scripts/build-site.mjs",
+    "build:preview": "node scripts/build-preview.mjs",
+    "preview": "node scripts/serve-preview.mjs",
     "verify": "node scripts/verify.mjs"
   },
   "devDependencies": {
+    "acorn": "8.18.0",
     "html-validate": "11.16.0",
     "parse5": "8.0.1",
     "stylelint": "17.15.0",

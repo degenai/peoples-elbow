@@ -38,6 +38,9 @@ test('untracked publishable assets and tests cannot silently enter or escape the
         assert.throws(() => sourceFiles(),/untracked/i,'new regressions must not be silently omitted');
         git('add','new-case.test.mjs');
         assert.ok(sourceFiles().includes('new-case.test.mjs'));
+        mkdirSync(join(fixture,'tests'));
+        writeFileSync(join(fixture,'tests/preview_browser.py'),'# synthetic new preview regression');
+        assert.throws(()=>sourceFiles(),/untracked/i,'preview-browser regression must be committed too');
     } finally { rmSync(fixture,{recursive:true,force:true}); }
 });
 

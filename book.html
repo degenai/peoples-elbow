@@ -255,7 +255,7 @@
             var btn = document.getElementById('hh-reveal');
             var wrap = document.getElementById('hh-widget-wrap');
             var status = document.getElementById('hh-widget-status');
-            if (!btn || !wrap) { return; }
+            if (!btn || !wrap || !status) { return; }
             btn.addEventListener('click', function () {
                 var opening = wrap.hidden;
                 wrap.hidden = !wrap.hidden;
