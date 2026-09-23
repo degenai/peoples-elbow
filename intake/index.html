@@ -1,577 +1,924 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Client Intake Form | The People's Elbow</title>
-  <meta name="robots" content="noindex, nofollow">
-  <meta name="description" content="Printable client intake form for The People's Elbow massage therapy at Hustle House Health & Wellness in Woodstock, GA.">
-  <meta name="theme-color" content="#006937">
-  <link rel="canonical" href="https://peoples-elbow.com/intake">
-  <link rel="icon" href="/images/favicon-32.png" type="image/png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --pe-green: #006937;
-      --pe-green-dark: #004225;
-      --pe-gold: #ffcc00;
-      --pe-orange: #ff9900;
-      --ink: #1f2a25;
-      --muted: #5e6863;
-      --line: #b8c0bb;
-      --paper: #ffffff;
-      --wash: #f5f2e8;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- The page lives at /intake/ but the shared header, footer, and component
+         loader use root-relative paths (index.html, components/header.html).
+         The base keeps them pointed at the site root. Every link on this page
+         is absolute, so the base changes nothing else. -->
+    <base href="/">
+    <title>Client Intake Form | The People's Elbow</title>
+    <meta name="description" content="Fill out your client intake for The People's Elbow online before your massage. About five minutes, straight to Alex's inbox, nothing stored on the site.">
+    <meta name="robots" content="noindex, follow">
+    <meta name="theme-color" content="#006937">
+    <link rel="canonical" href="https://peoples-elbow.com/intake/">
+    <link rel="shortcut icon" href="/images/favicon-32.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Open+Sans:wght@400;600;700&display=swap">
+    <link rel="stylesheet" href="/css/main.css">
+    <style>
+        /* Page-local form styles, scoped under .intake so the shared
+           stylesheet and this form never fight over h2, input, or label. */
+        .intake {
+            --ink: #1f2a25;
+            --muted: #5e6863;
+            --line: #b8c0bb;
+            --wash: #f5f2e8;
+            --pain: #b3261e;
+            --tension: #e0a800;
+            --avoid: #006937;
+            padding: var(--space-lg) 16px var(--space-xl);
+            color: var(--ink);
+            font-size: 15px;
+            line-height: 1.45;
+        }
 
-    * {
-      box-sizing: border-box;
-    }
+        .intake .sheet {
+            background: var(--pe-white);
+            max-width: 8.5in;
+            margin: 0 auto;
+            padding: 32px 36px;
+            border-top: 6px solid var(--pe-green);
+            border-radius: 6px;
+            box-shadow: 0 6px 24px rgba(0, 0, 0, .12);
+        }
 
-    html,
-    body {
-      margin: 0;
-    }
+        .intake .brandline {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px 16px;
+            border-bottom: 3px solid var(--pe-green);
+            padding-bottom: 10px;
+            margin-bottom: 16px;
+        }
 
-    body {
-      font-family: 'Open Sans', system-ui, sans-serif;
-      color: var(--ink);
-      background: #eceae4;
-      line-height: 1.4;
-      font-size: 13px;
-    }
+        .intake .brandline .title {
+            font-family: var(--font-heading);
+            font-size: 2rem;
+            letter-spacing: .04em;
+            color: var(--pe-green);
+            line-height: 1;
+            margin: 0;
+        }
 
-    .print-bar {
-      max-width: 8.5in;
-      margin: 0 auto;
-      text-align: right;
-      padding: 6px 0;
-    }
+        .intake .note,
+        .intake .hint,
+        .intake .intro {
+            color: var(--muted);
+        }
 
-    .print-bar button,
-    .print-bar a {
-      font: 700 13px 'Open Sans', sans-serif;
-      border: 0;
-      border-radius: 999px;
-      padding: 9px 18px;
-      cursor: pointer;
-      text-decoration: none;
-    }
+        .intake .note {
+            font-size: 12px;
+            margin: 0;
+        }
 
-    .print-bar button {
-      background: var(--pe-green);
-      color: #fff;
-    }
+        .intake .intro {
+            font-size: 14px;
+            margin: 0 0 18px;
+        }
 
-    .print-bar a {
-      color: var(--pe-green-dark);
-      display: inline-block;
-      margin-right: 8px;
-    }
+        .intake .intro.warn {
+            color: #7a1f18;
+        }
 
-    .sheet {
-      background: var(--paper);
-      max-width: 8.5in;
-      margin: 18px auto;
-      padding: 0.55in 0.6in;
-      box-shadow: 0 6px 24px rgba(0, 0, 0, .12);
-    }
+        .intake .hint {
+            font-size: 12.5px;
+            font-style: italic;
+            margin: 0 0 8px;
+        }
 
-    h1,
-    h2,
-    h3 {
-      color: var(--pe-green-dark);
-      margin: 0;
-    }
+        .intake .sec {
+            margin: 0 0 22px;
+        }
 
-    .head {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      border-bottom: 3px solid var(--pe-green);
-      padding-bottom: 10px;
-      margin-bottom: 14px;
-      gap: 16px;
-    }
+        .intake .sec-title {
+            display: block;
+            font-family: var(--font-heading);
+            font-size: 1.45rem;
+            letter-spacing: .04em;
+            color: var(--pe-green-dark);
+            border-left: 5px solid var(--pe-gold);
+            padding-left: 10px;
+            margin: 0 0 10px;
+            line-height: 1.1;
+        }
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
+        .intake .sec.today {
+            background: var(--wash);
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            padding: 14px 16px 6px;
+        }
 
-    .brand img {
-      height: 58px;
-      width: 58px;
-      border-radius: 12px;
-      object-fit: contain;
-    }
+        .intake .row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 18px;
+            margin-bottom: 10px;
+        }
 
-    .title {
-      font-family: 'Bangers', Impact, sans-serif;
-      font-size: 24px;
-      letter-spacing: .04em;
-      color: var(--pe-green);
-      line-height: 1;
-    }
+        .intake .f {
+            flex: 1 1 180px;
+            min-width: 150px;
+        }
 
-    .note,
-    .hint {
-      color: var(--muted);
-    }
+        .intake .f.sm {
+            flex: 1 1 110px;
+            min-width: 100px;
+        }
 
-    .note {
-      font-size: 11px;
-      line-height: 1.5;
-    }
+        .intake .f.lg {
+            flex: 1 1 100%;
+        }
 
-    .meta {
-      font-size: 11px;
-      color: var(--muted);
-      line-height: 1.5;
-      text-align: right;
-    }
+        .intake .f label,
+        .intake .lbl {
+            display: block;
+            font-size: 11px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .04em;
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
 
-    .meta b {
-      color: var(--ink);
-    }
+        .intake .req {
+            color: var(--pain);
+        }
 
-    .sec {
-      margin: 0 0 13px;
-      break-inside: avoid;
-      page-break-inside: avoid;
-    }
+        .intake input[type=text],
+        .intake input[type=tel],
+        .intake input[type=email],
+        .intake input[type=date],
+        .intake input[type=number],
+        .intake textarea {
+            width: 100%;
+            font: inherit;
+            color: var(--ink);
+            background: #fbfaf5;
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            padding: 9px 10px;
+            min-height: 40px;
+        }
 
-    .sec > h2 {
-      font-size: 13px;
-      text-transform: uppercase;
-      letter-spacing: .08em;
-      color: var(--pe-green-dark);
-      border-left: 4px solid var(--pe-gold);
-      padding-left: 8px;
-      margin-bottom: 8px;
-    }
+        .intake textarea {
+            min-height: 72px;
+            resize: vertical;
+        }
 
-    .row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px 18px;
-      margin-bottom: 6px;
-    }
+        .intake textarea.short {
+            min-height: 56px;
+        }
 
-    .f {
-      flex: 1 1 180px;
-      min-width: 150px;
-    }
+        .intake input:focus,
+        .intake textarea:focus {
+            outline: 2px solid var(--pe-gold);
+            outline-offset: 1px;
+            border-color: var(--pe-green);
+        }
 
-    .f.sm {
-      flex: 1 1 90px;
-      min-width: 80px;
-    }
+        .intake input[type=checkbox],
+        .intake input[type=radio] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--pe-green);
+            margin: 0;
+            flex: 0 0 auto;
+        }
 
-    .f.lg {
-      flex: 1 1 100%;
-    }
+        .intake .checks {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px 14px;
+            margin: 6px 0;
+        }
 
-    .f label,
-    .field-label {
-      display: block;
-      font-size: 10.5px;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: .04em;
-      margin-bottom: 2px;
-    }
+        .intake .checks.two {
+            grid-template-columns: repeat(2, 1fr);
+        }
 
-    .fill {
-      border-bottom: 1px solid var(--line);
-      min-height: 20px;
-    }
+        .intake .chk {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            padding: 4px 0;
+        }
 
-    .fill.tall {
-      min-height: 34px;
-    }
+        .intake .inline-yn {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 18px;
+            align-items: center;
+            min-height: 40px;
+        }
 
-    .fill-inline {
-      display: inline-block;
-      min-width: 4em;
-    }
+        .intake .inline-yn.big .chk {
+            font-size: 16px;
+            font-weight: 700;
+        }
 
-    .checks {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 4px 14px;
-      margin: 4px 0;
-    }
+        .intake fieldset {
+            border: 0;
+            padding: 0;
+            margin: 0;
+            min-width: 0;
+        }
 
-    .checks.two {
-      grid-template-columns: repeat(2, 1fr);
-    }
+        .intake legend {
+            padding: 0;
+        }
 
-    .chk {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      font-size: 12px;
-    }
+        .intake .bodymap {
+            display: flex;
+            gap: 24px;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
 
-    .box {
-      width: 13px;
-      height: 13px;
-      border: 1.4px solid var(--pe-green-dark);
-      border-radius: 3px;
-      flex: 0 0 auto;
-    }
+        .intake .figs {
+            display: flex;
+            gap: 20px;
+        }
 
-    .inline-yn {
-      display: inline-flex;
-      gap: 14px;
-      align-items: center;
-      padding-top: 3px;
-    }
+        .intake .figwrap {
+            text-align: center;
+        }
 
-    .hint {
-      font-size: 10.5px;
-      font-style: italic;
-    }
+        .intake .figwrap svg {
+            height: 230px;
+            width: auto;
+            display: block;
+            margin: 0 auto;
+        }
 
-    .mt-none {
-      margin-top: 0;
-    }
+        .intake .figwrap span {
+            display: block;
+            font-size: 11px;
+            letter-spacing: .1em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-top: 4px;
+        }
 
-    .mt-xs {
-      margin-top: 4px;
-    }
+        .intake .fig .r {
+            fill: #fbfaf5;
+            stroke: var(--pe-green-dark);
+            stroke-width: 2;
+            stroke-linejoin: round;
+            cursor: pointer;
+            transition: fill .15s;
+        }
 
-    .mt-sm {
-      margin-top: 6px;
-    }
+        .intake .fig .r:hover {
+            fill: #e8efe9;
+        }
 
-    .mt-md {
-      margin-top: 8px;
-    }
+        .intake .fig .r:focus {
+            outline: none;
+            stroke: var(--pe-gold);
+            stroke-width: 3;
+        }
 
-    .bodymap {
-      display: flex;
-      gap: 24px;
-      align-items: flex-start;
-      flex-wrap: wrap;
-    }
+        .intake .fig .r[data-kind=pain] {
+            fill: var(--pain);
+            fill-opacity: .55;
+        }
 
-    .figwrap {
-      text-align: center;
-    }
+        .intake .fig .r[data-kind=tension] {
+            fill: var(--tension);
+            fill-opacity: .7;
+        }
 
-    .figwrap svg {
-      height: 200px;
-      width: auto;
-    }
+        .intake .fig .r[data-kind=avoid] {
+            fill: var(--avoid);
+            fill-opacity: .55;
+        }
 
-    .figwrap span {
-      display: block;
-      font-size: 10.5px;
-      letter-spacing: .1em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-top: 2px;
-    }
+        .intake .legend {
+            font-size: 13px;
+            flex: 1 1 220px;
+            min-width: 200px;
+        }
 
-    .fig * {
-      fill: none;
-      stroke: var(--pe-green-dark);
-      stroke-width: 2.2;
-      stroke-linejoin: round;
-    }
+        .intake .legend .key {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 14px;
+            margin: 4px 0 10px;
+        }
 
-    .legend {
-      font-size: 11px;
-      color: var(--ink);
-      flex: 1 1 200px;
-      min-width: 180px;
-    }
+        .intake .legend .key span {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
 
-    .legend ul {
-      padding-left: 0;
-      margin: .3rem 0;
-    }
+        .intake .legend .key i {
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+            border: 1px solid var(--pe-green-dark);
+            display: inline-block;
+        }
 
-    .legend li {
-      margin-bottom: 4px;
-      list-style: none;
-    }
+        .intake .legend .key i.pain {
+            background: var(--pain);
+            opacity: .7;
+        }
 
-    .consent {
-      font-size: 11.5px;
-      color: var(--ink);
-      background: var(--wash);
-      border: 1px solid var(--line);
-      border-radius: 6px;
-      padding: 10px 12px;
-    }
+        .intake .legend .key i.tension {
+            background: var(--tension);
+            opacity: .8;
+        }
 
-    .sign {
-      display: flex;
-      gap: 24px;
-      margin-top: 12px;
-      flex-wrap: wrap;
-    }
+        .intake .legend .key i.avoid {
+            background: var(--avoid);
+            opacity: .7;
+        }
 
-    .sign .f {
-      min-width: 200px;
-    }
+        .intake .stack {
+            margin-bottom: 10px;
+        }
 
-    .footnote {
-      font-size: 10px;
-      color: var(--muted);
-      border-top: 1px solid var(--line);
-      margin-top: 14px;
-      padding-top: 8px;
-    }
+        .intake #marks-summary {
+            font-size: 12.5px;
+            color: var(--muted);
+            min-height: 1.2em;
+            margin: 0 0 10px;
+            white-space: pre-line;
+        }
 
-    @media (max-width: 480px) {
-      .sheet {
-        padding: 18px 16px;
-      }
+        .intake .consent {
+            font-size: 13px;
+            background: var(--wash);
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            padding: 12px 14px;
+            margin: 0;
+        }
 
-      .head {
-        flex-direction: column;
-        gap: 8px;
-      }
+        .intake .agree {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin: 12px 0;
+            font-size: 14px;
+            cursor: pointer;
+        }
 
-      .meta {
-        text-align: left;
-      }
+        .intake .agree input {
+            margin-top: 2px;
+        }
 
-      .f,
-      .f.sm,
-      .f.lg,
-      .legend {
-        flex: 1 1 100%;
-        min-width: 0;
-      }
+        .intake .sign {
+            display: flex;
+            gap: 18px;
+            flex-wrap: wrap;
+        }
 
-      .checks {
-        grid-template-columns: repeat(2, 1fr);
-      }
+        .intake .sign .f {
+            min-width: 200px;
+        }
 
-      .bodymap {
-        flex-direction: column;
-        align-items: center;
-        gap: 14px;
-      }
+        .intake #signature_name {
+            font-family: var(--font-heading);
+            font-size: 22px;
+            letter-spacing: .03em;
+        }
 
-      .figwrap svg {
-        height: 160px;
-      }
-    }
+        .intake #today {
+            padding: 9px 0;
+            font-size: 15px;
+        }
 
-    @media print {
-      body {
-        background: #fff;
-        font-size: 11.5px;
-      }
+        .intake .footnote {
+            font-size: 11px;
+            color: var(--muted);
+            border-top: 1px solid var(--line);
+            margin: 18px 0 0;
+            padding-top: 10px;
+        }
 
-      .sheet {
-        box-shadow: none;
-        margin: 0;
-        max-width: none;
-        padding: 0;
-      }
+        .intake .actions {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
 
-      .print-bar {
-        display: none;
-      }
+        .intake button.submit {
+            font: 400 1.35rem var(--font-heading);
+            letter-spacing: .06em;
+            background: var(--pe-green);
+            color: var(--pe-white);
+            border: 3px solid var(--pe-green-dark);
+            border-radius: 999px;
+            padding: 10px 30px;
+            cursor: pointer;
+            box-shadow: 0 3px 0 var(--pe-green-dark);
+        }
 
-      @page {
-        margin: 0.5in;
-      }
+        .intake button.submit:hover {
+            background: var(--pe-green-light);
+        }
 
-      .figwrap svg {
-        height: 175px;
-      }
-    }
-  </style>
+        .intake button.submit:focus-visible {
+            outline: 3px solid var(--pe-gold);
+            outline-offset: 2px;
+        }
+
+        .intake button.submit[disabled] {
+            opacity: .6;
+            cursor: wait;
+        }
+
+        .intake .status {
+            font-size: 14px;
+            border-radius: 6px;
+            padding: 10px 12px;
+            margin: 12px 0 0;
+            display: none;
+        }
+
+        .intake .status.err {
+            display: block;
+            background: #fbeaea;
+            border: 1px solid #e3b4b0;
+            color: #7a1f18;
+        }
+
+        .intake .status.err ul {
+            margin: 6px 0 0 18px;
+            padding: 0;
+        }
+
+        .intake .done {
+            display: none;
+            text-align: center;
+            padding: 30px 10px;
+        }
+
+        .intake .done h2 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+
+        .intake .done p {
+            font-size: 15px;
+        }
+
+        .intake .hp {
+            position: absolute;
+            left: -9999px;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+        }
+
+        .intake .sheet.sent form {
+            display: none;
+        }
+
+        .intake .sheet.sent .done {
+            display: block;
+        }
+
+        @media (max-width: 560px) {
+            .intake {
+                padding: var(--space-md) 10px var(--space-lg);
+            }
+
+            .intake .sheet {
+                padding: 20px 16px;
+            }
+
+            .intake .f,
+            .intake .f.sm,
+            .intake .f.lg,
+            .intake .legend {
+                flex: 1 1 100%;
+                min-width: 0;
+            }
+
+            .intake .checks {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .intake .bodymap {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 14px;
+            }
+
+            .intake .figs {
+                justify-content: center;
+            }
+
+            .intake .figwrap svg {
+                height: 200px;
+            }
+        }
+
+        @media print {
+            #header-placeholder,
+            #footer-placeholder,
+            .book-hero,
+            .intake .actions,
+            .intake .status,
+            .intake .intro {
+                display: none;
+            }
+
+            .intake {
+                padding: 0;
+                font-size: 12px;
+            }
+
+            .intake .sheet {
+                box-shadow: none;
+                max-width: none;
+                padding: 0;
+                border-top: 0;
+            }
+
+            .intake .sec,
+            .intake .figwrap,
+            .intake .bodymap {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+
+            .intake .figwrap svg {
+                height: 175px;
+            }
+
+            @page {
+                margin: 0.5in;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="print-bar">
-    <a href="/book.html">Book a Session</a>
-    <button type="button" onclick="window.print()">Print / Save as PDF</button>
-  </div>
+    <!-- Universal Header Component -->
+    <div id="header-placeholder"></div>
 
-  <main class="sheet">
-    <header class="head">
-      <div class="brand">
-        <img src="/images/logo.png" alt="The People's Elbow logo" width="512" height="512">
-        <div>
-          <h1 class="title">Client Intake Form</h1>
-          <div class="note">The People's Elbow &middot; Alex Adamczyk, LMT &middot; GA License #MT013193</div>
-          <div class="note">Print and complete by hand. Bring it to your appointment.</div>
-        </div>
-      </div>
-      <div class="meta">
-        Inside <b>Hustle House Health &amp; Wellness</b><br>
-        111 Mirramont Lake Dr<br>
-        Woodstock, GA 30189<br>
-        Wednesdays only &middot; Date: ____________________
-      </div>
-    </header>
-
-    <section class="sec">
-      <h2>Client Information</h2>
-      <div class="row">
-        <div class="f lg"><label>Full name</label><div class="fill"></div></div>
-      </div>
-      <div class="row">
-        <div class="f"><label>Date of birth</label><div class="fill"></div></div>
-        <div class="f"><label>Phone</label><div class="fill"></div></div>
-        <div class="f"><label>Email</label><div class="fill"></div></div>
-      </div>
-      <div class="row">
-        <div class="f lg"><label>Address</label><div class="fill"></div></div>
-      </div>
-      <div class="row">
-        <div class="f"><label>Occupation</label><div class="fill"></div></div>
-        <div class="f"><label>How did you hear about us?</label><div class="fill"></div></div>
-      </div>
-      <div class="row">
-        <div class="f"><label>Emergency contact (name)</label><div class="fill"></div></div>
-        <div class="f"><label>Emergency contact (phone)</label><div class="fill"></div></div>
-      </div>
-    </section>
-
-    <section class="sec">
-      <h2>Today's Visit</h2>
-      <div class="row">
-        <div class="f lg"><label>Main reason for today's visit / areas of concern</label><div class="fill tall"></div></div>
-      </div>
-      <div class="row">
-        <div class="f"><label>Currently in pain? Level (0 = none, 10 = worst)</label><div class="fill"></div></div>
-        <div class="f"><label>Currently under chiropractic care?</label>
-          <div class="inline-yn"><span class="chk"><span class="box"></span> Yes</span> <span class="chk"><span class="box"></span> No</span></div>
-          <label>Chiropractic provider name</label><div class="fill"></div>
-        </div>
-      </div>
-    </section>
-
-    <section class="sec">
-      <h2>Health History</h2>
-      <div class="row">
-        <div class="f lg"><label>Current medications</label><div class="fill"></div></div>
-      </div>
-      <div class="row">
-        <div class="f"><label>Allergies (incl. oils, lotions, scents)</label><div class="fill"></div></div>
-        <div class="f"><label>Recent surgeries or injuries (with dates)</label><div class="fill"></div></div>
-      </div>
-      <div class="row">
-        <div class="f"><label>Are you pregnant?</label>
-          <div class="inline-yn"><span class="chk"><span class="box"></span> No</span> <span class="chk"><span class="box"></span> Yes, weeks: <span class="fill fill-inline" aria-hidden="true"></span></span></div>
-        </div>
-        <div class="f"><label>Recent illness or fever?</label><div class="fill"></div></div>
-      </div>
-    </section>
-
-    <section class="sec">
-      <h2>Please check anything you have or have had</h2>
-      <p class="hint">This helps us work safely. Checking a box does not always mean we cannot work, it just tells us where to take care.</p>
-      <div class="checks">
-        <span class="chk"><span class="box"></span> Blood clots / DVT</span>
-        <span class="chk"><span class="box"></span> Heart condition</span>
-        <span class="chk"><span class="box"></span> High blood pressure</span>
-        <span class="chk"><span class="box"></span> Low blood pressure</span>
-        <span class="chk"><span class="box"></span> Stroke</span>
-        <span class="chk"><span class="box"></span> Diabetes</span>
-        <span class="chk"><span class="box"></span> Cancer (current or past)</span>
-        <span class="chk"><span class="box"></span> Osteoporosis</span>
-        <span class="chk"><span class="box"></span> Arthritis</span>
-        <span class="chk"><span class="box"></span> Fibromyalgia</span>
-        <span class="chk"><span class="box"></span> Numbness / tingling</span>
-        <span class="chk"><span class="box"></span> Varicose veins</span>
-        <span class="chk"><span class="box"></span> Recent fracture / injury</span>
-        <span class="chk"><span class="box"></span> Skin condition / rash</span>
-        <span class="chk"><span class="box"></span> Contagious condition</span>
-      </div>
-      <div class="row mt-sm">
-        <div class="f lg"><label>Please explain anything checked above</label><div class="fill"></div></div>
-      </div>
-    </section>
-
-    <section class="sec">
-      <h2>Areas of Focus</h2>
-      <div class="bodymap">
-        <div class="figwrap">
-          <svg viewBox="0 0 100 210" class="fig" aria-hidden="true">
-            <ellipse cx="50" cy="18" rx="11" ry="13"></ellipse>
-            <path d="M44 31 L56 31 L56 37 L44 37 Z"></path>
-            <path d="M31 41 Q50 35 69 41 L65 112 Q50 118 35 112 Z"></path>
-            <rect x="22" y="43" width="9" height="56" rx="4.5"></rect>
-            <rect x="69" y="43" width="9" height="56" rx="4.5"></rect>
-            <rect x="37" y="113" width="11" height="82" rx="5"></rect>
-            <rect x="52" y="113" width="11" height="82" rx="5"></rect>
-          </svg>
-          <span>Front</span>
-        </div>
-        <div class="figwrap">
-          <svg viewBox="0 0 100 210" class="fig" aria-hidden="true">
-            <ellipse cx="50" cy="18" rx="11" ry="13"></ellipse>
-            <path d="M44 31 L56 31 L56 37 L44 37 Z"></path>
-            <path d="M31 41 Q50 35 69 41 L65 112 Q50 118 35 112 Z"></path>
-            <rect x="22" y="43" width="9" height="56" rx="4.5"></rect>
-            <rect x="69" y="43" width="9" height="56" rx="4.5"></rect>
-            <rect x="37" y="113" width="11" height="82" rx="5"></rect>
-            <rect x="52" y="113" width="11" height="82" rx="5"></rect>
-          </svg>
-          <span>Back</span>
-        </div>
-        <div class="legend">
-          <p class="hint mt-none">Mark the figures:</p>
-          <ul>
-            <li><b>X</b> = pain &nbsp; <b>O</b> = tension / tightness &nbsp; <b>&#9651;</b> = please avoid</li>
-          </ul>
-          <div class="mt-md">
-            <span class="field-label">Pressure preference</span>
-            <div class="checks two mt-xs">
-              <span class="chk"><span class="box"></span> Light</span>
-              <span class="chk"><span class="box"></span> Medium</span>
-              <span class="chk"><span class="box"></span> Firm</span>
-              <span class="chk"><span class="box"></span> Deep</span>
+    <main>
+        <section class="book-hero">
+            <div class="container">
+                <h1>Client Intake</h1>
+                <p class="book-tagline">Five minutes on your phone now, more time on the massage later.</p>
             </div>
-          </div>
-          <div class="mt-md"><span class="field-label">Areas to avoid</span><div class="fill"></div></div>
-        </div>
-      </div>
-    </section>
+        </section>
 
-    <section class="sec">
-      <h2>Massage History &amp; Preferences</h2>
-      <div class="row">
-        <div class="f"><label>Had massage before?</label>
-          <div class="inline-yn"><span class="chk"><span class="box"></span> Yes</span> <span class="chk"><span class="box"></span> No</span></div>
-        </div>
-        <div class="f"><label>Scent / aromatherapy sensitivity?</label><div class="fill"></div></div>
-      </div>
-      <div class="row">
-        <div class="f lg"><label>Anything that helps you relax, or that you would like us to know?</label><div class="fill"></div></div>
-      </div>
-    </section>
+        <section class="intake">
+            <div class="sheet" id="sheet">
+                <div class="brandline">
+                    <h2 class="title">Client Intake Form</h2>
+                    <p class="note">The People's Elbow &middot; Alex Adamczyk, LMT &middot; GA License #MT013193</p>
+                </div>
 
-    <section class="sec">
-      <h2>Informed Consent</h2>
-      <div class="consent">
-        I understand that massage therapy is provided for relaxation, relief of muscular tension, and general well-being. The therapist does not diagnose illness or disease, does not prescribe, and massage is not a substitute for medical care. I have shared all relevant health information and will tell the therapist of any changes. I will stay draped except for the area being worked, and I understand I may adjust pressure, decline any technique, or stop the session at any time. I am voluntarily seeking massage from The People's Elbow and consent to treatment.
-      </div>
-      <div class="sign">
-        <div class="f"><label>Signature</label><div class="fill tall"></div></div>
-        <div class="f sm"><label>Date</label><div class="fill tall"></div></div>
-      </div>
-      <div class="sign mt-sm">
-        <div class="f"><label>Print name</label><div class="fill"></div></div>
-      </div>
-    </section>
+                <noscript><p class="intro warn">Your browser has scripts turned off. The form still works: fill it in and press Send. The body map needs scripts, so describe those areas in words instead.</p></noscript>
+                <p class="intro">Fill this out before your session so your time goes to the massage, not the clipboard. It takes about five minutes and goes straight to Alex. Fields marked <span class="req">*</span> are required.</p>
 
-    <div class="footnote">
-      Your health information is kept confidential and used only to provide and coordinate your care. &nbsp;&bull;&nbsp; The People's Elbow is not accepting clients under 18 at this time. &nbsp;&bull;&nbsp; peoples-elbow.com
-    </div>
-  </main>
+                <form id="intake" method="post" action="https://peoples-elbow-intake.alex-adamczyk.workers.dev/api/intake" novalidate>
+
+                    <!-- Honeypot: hidden from people, irresistible to bots. -->
+                    <div class="hp" aria-hidden="true">
+                        <label for="xq_leave_blank">Leave this field empty</label>
+                        <input type="text" id="xq_leave_blank" name="xq_leave_blank" tabindex="-1" autocomplete="off">
+                    </div>
+
+                    <!-- 0. TODAY (People's Elbow: we set up in a lot of places) -->
+                    <div class="sec today">
+                        <h2 class="sec-title">Today</h2>
+                        <div class="row">
+                            <div class="f"><label for="where_today">Where are we today? (event or venue)</label><input type="text" id="where_today" name="where_today" placeholder="Brewery, market, gym, event name..."></div>
+                            <fieldset class="f">
+                                <legend class="lbl">Chair or table? <span class="req">*</span></legend>
+                                <div class="inline-yn big">
+                                    <label class="chk"><input type="radio" name="session_type" value="Chair" required> Chair</label>
+                                    <label class="chk"><input type="radio" name="session_type" value="Table"> Table</label>
+                                </div>
+                            </fieldset>
+                        </div>
+                    </div>
+
+                    <!-- 1. CLIENT INFORMATION -->
+                    <div class="sec">
+                        <h2 class="sec-title">Client Information</h2>
+                        <div class="row">
+                            <div class="f lg"><label for="full_name">Full name <span class="req">*</span></label><input type="text" id="full_name" name="full_name" autocomplete="name" required></div>
+                        </div>
+                        <div class="row">
+                            <div class="f"><label for="dob">Date of birth</label><input type="date" id="dob" name="dob" autocomplete="bday"></div>
+                            <div class="f"><label for="phone">Phone <span class="req">*</span></label><input type="tel" id="phone" name="phone" autocomplete="tel" required></div>
+                            <div class="f"><label for="email">Email <span class="req">*</span></label><input type="email" id="email" name="email" autocomplete="email" required></div>
+                        </div>
+                        <div class="row">
+                            <div class="f lg"><label for="address">Address</label><input type="text" id="address" name="address" autocomplete="street-address"></div>
+                        </div>
+                        <div class="row">
+                            <div class="f"><label for="occupation">Occupation</label><input type="text" id="occupation" name="occupation" autocomplete="organization-title"></div>
+                            <div class="f"><label for="referral">How did you hear about us?</label><input type="text" id="referral" name="referral"></div>
+                        </div>
+                        <div class="row">
+                            <div class="f"><label for="emergency_name">Emergency contact (name)</label><input type="text" id="emergency_name" name="emergency_name"></div>
+                            <div class="f"><label for="emergency_phone">Emergency contact (phone)</label><input type="tel" id="emergency_phone" name="emergency_phone"></div>
+                            <div class="f sm"><label for="appointment_date">Appointment date</label><input type="date" id="appointment_date" name="appointment_date"></div>
+                        </div>
+                    </div>
+
+                    <!-- 2. THIS VISIT -->
+                    <div class="sec">
+                        <h2 class="sec-title">Your Visit</h2>
+                        <div class="row">
+                            <div class="f lg"><label for="visit_reason">Main reason for your visit / areas of concern <span class="req">*</span></label><textarea id="visit_reason" name="visit_reason" required></textarea></div>
+                        </div>
+                        <div class="row">
+                            <div class="f sm"><label for="pain_level">Pain right now (0 = none, 10 = worst)</label><input type="number" id="pain_level" name="pain_level" min="0" max="10" step="1" inputmode="numeric"></div>
+                            <fieldset class="f">
+                                <legend class="lbl">Currently under chiropractic care?</legend>
+                                <div class="inline-yn">
+                                    <label class="chk"><input type="radio" name="chiro_care" value="yes"> Yes</label>
+                                    <label class="chk"><input type="radio" name="chiro_care" value="no"> No</label>
+                                </div>
+                            </fieldset>
+                            <div class="f"><label for="chiro_with">If yes, with whom</label><input type="text" id="chiro_with" name="chiro_with"></div>
+                        </div>
+                    </div>
+
+                    <!-- 3. HEALTH HISTORY -->
+                    <div class="sec">
+                        <h2 class="sec-title">Health History</h2>
+                        <div class="row">
+                            <div class="f lg"><label for="medications">Current medications</label><input type="text" id="medications" name="medications"></div>
+                        </div>
+                        <div class="row">
+                            <div class="f"><label for="allergies">Allergies (incl. oils, lotions, scents)</label><input type="text" id="allergies" name="allergies"></div>
+                            <div class="f"><label for="surgeries">Recent surgeries or injuries (with dates)</label><input type="text" id="surgeries" name="surgeries"></div>
+                        </div>
+                        <div class="row">
+                            <fieldset class="f">
+                                <legend class="lbl">Are you pregnant?</legend>
+                                <div class="inline-yn">
+                                    <label class="chk"><input type="radio" name="pregnant" value="no"> No</label>
+                                    <label class="chk"><input type="radio" name="pregnant" value="yes"> Yes</label>
+                                </div>
+                            </fieldset>
+                            <div class="f sm"><label for="pregnant_weeks">If yes, weeks</label><input type="text" id="pregnant_weeks" name="pregnant_weeks" inputmode="numeric"></div>
+                            <div class="f"><label for="illness">Recent illness or fever?</label><input type="text" id="illness" name="illness"></div>
+                        </div>
+                    </div>
+
+                    <!-- 4. CONDITIONS -->
+                    <fieldset class="sec">
+                        <legend><span class="sec-title">Please check anything you have or have had</span></legend>
+                        <p class="hint">This helps us work safely. Checking a box does not always mean we cannot work, it just tells us where to take care.</p>
+                        <div class="checks">
+                            <label class="chk"><input type="checkbox" name="conditions" value="Blood clots / DVT"> Blood clots / DVT</label>
+                            <label class="chk"><input type="checkbox" name="conditions" value="Heart condition"> Heart condition</label>
+                            <label class="chk"><input type="checkbox" name="conditions" value="High blood pressure"> High blood pressure</label>
+                            <label class="chk"><input type="checkbox" name="conditions" value="Low blood pressure"> Low blood pressure</label>
+                            <label class="chk"><input type="checkbox" name="conditions" value="Stroke"> Stroke</label>
+                            <label class="chk"><input type="checkbox" name="conditions" value="Diabetes"> Diabetes</label>
+                            <label class="chk"><input type="checkbox" name="conditions" value="Cancer (current or past)"> Cancer (current or past)</label>
+                            <label class="chk"><input type="checkbox" name="conditions" value="Osteoporosis"> Osteoporosis</label>
+                            <label class="chk"><input type="checkbox" name="conditions" value="Arthritis"> Arthritis</label>
+                            <label class="chk"><input type="checkbox" name="conditions" value="Fibromyalgia"> Fibromyalgia</label>
+                            <label class="chk"><input type="checkbox" name="conditions" value="Numbness / tingling"> Numbness / tingling</label>
+                            <label class="chk"><input type="checkbox" name="conditions" value="Varicose veins"> Varicose veins</label>
+                            <label class="chk"><input type="checkbox" name="conditions" value="Recent fracture / injury"> Recent fracture / injury</label>
+                            <label class="chk"><input type="checkbox" name="conditions" value="Skin condition / rash"> Skin condition / rash</label>
+                            <label class="chk"><input type="checkbox" name="conditions" value="Contagious condition"> Contagious condition</label>
+                        </div>
+                        <div class="row">
+                            <div class="f lg"><label for="conditions_notes">Please explain anything checked above</label><input type="text" id="conditions_notes" name="conditions_notes"></div>
+                        </div>
+                    </fieldset>
+
+                    <!-- 5. FOCUS + BODY MAP -->
+                    <div class="sec">
+                        <h2 class="sec-title">Areas of Focus</h2>
+                        <p class="hint">Tap a body area to cycle through pain, tension, and please avoid. Tap again to clear. Or just describe it below.</p>
+                        <div class="bodymap">
+                            <div class="figs">
+                                <div class="figwrap">
+                                    <svg viewBox="0 0 100 210" class="fig" data-figure="front" role="group" aria-label="Front of body">
+                                        <ellipse class="r" data-region="head" cx="50" cy="18" rx="11" ry="13" tabindex="0" role="button" aria-label="Front: head"><title>Head</title></ellipse>
+                                        <path class="r" data-region="neck" d="M44 31 L56 31 L56 37 L44 37 Z" tabindex="0" role="button" aria-label="Front: neck"><title>Neck</title></path>
+                                        <path class="r" data-region="chest" d="M31 41 Q50 35 69 41 L67 76 L33 76 Z" tabindex="0" role="button" aria-label="Front: chest"><title>Chest</title></path>
+                                        <path class="r" data-region="abdomen" d="M33 76 L67 76 L65 112 Q50 118 35 112 Z" tabindex="0" role="button" aria-label="Front: abdomen"><title>Abdomen</title></path>
+                                        <rect class="r" data-region="right-arm" x="22" y="43" width="9" height="56" rx="4.5" tabindex="0" role="button" aria-label="Front: right arm"><title>Right arm</title></rect>
+                                        <rect class="r" data-region="left-arm" x="69" y="43" width="9" height="56" rx="4.5" tabindex="0" role="button" aria-label="Front: left arm"><title>Left arm</title></rect>
+                                        <rect class="r" data-region="right-leg" x="37" y="113" width="11" height="82" rx="5" tabindex="0" role="button" aria-label="Front: right leg"><title>Right leg</title></rect>
+                                        <rect class="r" data-region="left-leg" x="52" y="113" width="11" height="82" rx="5" tabindex="0" role="button" aria-label="Front: left leg"><title>Left leg</title></rect>
+                                    </svg>
+                                    <span>Front</span>
+                                </div>
+                                <div class="figwrap">
+                                    <svg viewBox="0 0 100 210" class="fig" data-figure="back" role="group" aria-label="Back of body">
+                                        <ellipse class="r" data-region="head" cx="50" cy="18" rx="11" ry="13" tabindex="0" role="button" aria-label="Back: head"><title>Head</title></ellipse>
+                                        <path class="r" data-region="neck" d="M44 31 L56 31 L56 37 L44 37 Z" tabindex="0" role="button" aria-label="Back: neck"><title>Neck</title></path>
+                                        <path class="r" data-region="upper-back" d="M31 41 Q50 35 69 41 L67 76 L33 76 Z" tabindex="0" role="button" aria-label="Back: upper back"><title>Upper back</title></path>
+                                        <path class="r" data-region="lower-back" d="M33 76 L67 76 L65 112 Q50 118 35 112 Z" tabindex="0" role="button" aria-label="Back: lower back"><title>Lower back</title></path>
+                                        <rect class="r" data-region="left-arm" x="22" y="43" width="9" height="56" rx="4.5" tabindex="0" role="button" aria-label="Back: left arm"><title>Left arm</title></rect>
+                                        <rect class="r" data-region="right-arm" x="69" y="43" width="9" height="56" rx="4.5" tabindex="0" role="button" aria-label="Back: right arm"><title>Right arm</title></rect>
+                                        <rect class="r" data-region="left-leg" x="37" y="113" width="11" height="82" rx="5" tabindex="0" role="button" aria-label="Back: left leg"><title>Left leg</title></rect>
+                                        <rect class="r" data-region="right-leg" x="52" y="113" width="11" height="82" rx="5" tabindex="0" role="button" aria-label="Back: right leg"><title>Right leg</title></rect>
+                                    </svg>
+                                    <span>Back</span>
+                                </div>
+                            </div>
+                            <div class="legend">
+                                <div class="key">
+                                    <span><i class="pain"></i> Pain</span>
+                                    <span><i class="tension"></i> Tension / tightness</span>
+                                    <span><i class="avoid"></i> Please avoid</span>
+                                </div>
+                                <p id="marks-summary" aria-live="polite"></p>
+                                <input type="hidden" id="body_marks" name="body_marks" value="">
+                                <div class="f lg stack"><label for="pain_areas">Where does it hurt or feel tight? (your words)</label><textarea class="short" id="pain_areas" name="pain_areas"></textarea></div>
+                                <fieldset class="stack">
+                                    <legend class="lbl">Pressure preference</legend>
+                                    <div class="checks two">
+                                        <label class="chk"><input type="radio" name="pressure" value="Light"> Light</label>
+                                        <label class="chk"><input type="radio" name="pressure" value="Medium"> Medium</label>
+                                        <label class="chk"><input type="radio" name="pressure" value="Firm"> Firm</label>
+                                        <label class="chk"><input type="radio" name="pressure" value="Deep"> Deep</label>
+                                    </div>
+                                </fieldset>
+                                <div class="f lg"><label for="avoid_areas">Areas to avoid</label><input type="text" id="avoid_areas" name="avoid_areas"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 6. MASSAGE HISTORY -->
+                    <div class="sec">
+                        <h2 class="sec-title">Massage History &amp; Preferences</h2>
+                        <div class="row">
+                            <fieldset class="f">
+                                <legend class="lbl">Had massage before?</legend>
+                                <div class="inline-yn">
+                                    <label class="chk"><input type="radio" name="massage_before" value="yes"> Yes</label>
+                                    <label class="chk"><input type="radio" name="massage_before" value="no"> No</label>
+                                </div>
+                            </fieldset>
+                            <div class="f"><label for="scent">Scent / aromatherapy sensitivity?</label><input type="text" id="scent" name="scent"></div>
+                        </div>
+                        <div class="row">
+                            <div class="f lg"><label for="relax_notes">Anything that helps you relax, or that you would like us to know?</label><textarea class="short" id="relax_notes" name="relax_notes"></textarea></div>
+                        </div>
+                    </div>
+
+                    <!-- 7. CONSENT -->
+                    <div class="sec">
+                        <h2 class="sec-title">Informed Consent</h2>
+                        <p class="consent">
+                            I understand that massage therapy is provided for relaxation, relief of muscular tension, and general well-being. The therapist does not diagnose illness or disease, does not prescribe, and massage is not a substitute for medical care. I have shared all relevant health information and will tell the therapist of any changes. I will stay draped except for the area being worked, and I understand I may adjust pressure, decline any technique, or stop the session at any time. I am voluntarily seeking massage from Alex Adamczyk, LMT and The People's Elbow and consent to treatment.
+                        </p>
+                        <label class="agree"><input type="checkbox" id="consent" name="consent" value="yes" required> <span>I have read and agree to the informed consent above. <span class="req">*</span></span></label>
+                        <div class="sign">
+                            <div class="f"><label for="signature_name">Type your full name as your signature <span class="req">*</span></label><input type="text" id="signature_name" name="signature_name" autocomplete="name" required></div>
+                            <div class="f sm"><span class="lbl">Date</span><div id="today"></div></div>
+                        </div>
+                        <p class="note">Typing your name here is your electronic signature. The date, time, and device used are recorded with your submission.</p>
+                    </div>
+
+                    <div class="actions">
+                        <button type="submit" class="submit" id="send">Send to Alex</button>
+                        <span class="note">Goes directly to Alex's inbox. Nothing is stored on this website.</span>
+                    </div>
+                    <div class="status" id="status" role="alert"></div>
+                </form>
+
+                <div class="done" id="done">
+                    <h2>Got it. Thank you.</h2>
+                    <p>Your intake is in Alex's inbox. There is nothing else to do before your session. If anything changes, just mention it when you sit down.</p>
+                    <p><a href="/book.html">Back to booking</a> &middot; <a href="/">peoples-elbow.com</a></p>
+                </div>
+
+                <p class="footnote">
+                    Your health information is kept confidential and used only to provide and coordinate your care. &nbsp;&bull;&nbsp; The People's Elbow is not accepting clients under 18 at this time. &nbsp;&bull;&nbsp; Prefer paper? <a href="/intake-print/">Printable version</a>
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Universal Footer Component -->
+    <div id="footer-placeholder"></div>
+
+    <script src="/js/components.js"></script>
+    <script>
+    (function () {
+        var form = document.getElementById('intake');
+        var status = document.getElementById('status');
+        var sendBtn = document.getElementById('send');
+        var marksInput = document.getElementById('body_marks');
+        var summary = document.getElementById('marks-summary');
+        var KINDS = ['pain', 'tension', 'avoid'];
+        var LABEL = { pain: 'Pain', tension: 'Tension', avoid: 'Avoid' };
+
+        document.getElementById('today').textContent = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+
+        // ---- body map -------------------------------------------------------
+        function regionName(el) {
+            return el.closest('svg').getAttribute('data-figure') + ' ' + el.getAttribute('data-region').replace(/-/g, ' ');
+        }
+        function syncMarks() {
+            var marks = [];
+            var by = { pain: [], tension: [], avoid: [] };
+            document.querySelectorAll('.fig .r[data-kind]').forEach(function (el) {
+                var fig = el.closest('svg').getAttribute('data-figure');
+                var kind = el.getAttribute('data-kind');
+                marks.push(fig + ':' + el.getAttribute('data-region') + '=' + kind);
+                by[kind].push(regionName(el));
+            });
+            marksInput.value = JSON.stringify(marks);
+            summary.textContent = KINDS.filter(function (k) { return by[k].length; })
+                .map(function (k) { return LABEL[k] + ': ' + by[k].join(', '); }).join('\n');
+        }
+        function cycle(el) {
+            var cur = el.getAttribute('data-kind');
+            var next = cur ? KINDS[KINDS.indexOf(cur) + 1] : KINDS[0];
+            if (next) el.setAttribute('data-kind', next); else el.removeAttribute('data-kind');
+            var base = el.getAttribute('aria-label').split(' (')[0];
+            el.setAttribute('aria-label', next ? base + ' (' + LABEL[next] + ')' : base);
+            syncMarks();
+        }
+        document.querySelectorAll('.fig .r').forEach(function (el) {
+            el.addEventListener('click', function () { cycle(el); });
+            el.addEventListener('keydown', function (e) {
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); cycle(el); }
+            });
+        });
+
+        // ---- submit ---------------------------------------------------------
+        function showErrors(list) {
+            status.className = 'status err';
+            status.innerHTML = '<b>Please check the form:</b><ul>' + list.map(function (m) {
+                return '<li>' + String(m).replace(/[&<>]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]; }) + '</li>';
+            }).join('') + '</ul>';
+            status.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        function localErrors() {
+            var errs = [];
+            if (!form.querySelector('input[name="session_type"]:checked')) errs.push('Please choose chair or table');
+            var req = [['full_name', 'your full name'], ['phone', 'a phone number'], ['email', 'an email address'],
+                ['visit_reason', 'the main reason for your visit'], ['signature_name', 'your name as a signature']];
+            req.forEach(function (r) {
+                if (!form.elements[r[0]].value.trim()) errs.push('Please add ' + r[1]);
+            });
+            var em = form.elements.email;
+            if (em.value && !em.validity.valid) errs.push('That email address does not look right');
+            if (!form.elements.consent.checked) errs.push('Please read and agree to the informed consent');
+            var pl = form.elements.pain_level;
+            if (pl.value && !pl.validity.valid) errs.push('Pain level must be a number from 0 to 10');
+            return errs;
+        }
+
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            status.className = 'status';
+            var errs = localErrors();
+            if (errs.length) { showErrors(errs); return; }
+
+            var data = {};
+            new FormData(form).forEach(function (v, k) {
+                if (k === 'conditions') { (data[k] = data[k] || []).push(v); } else { data[k] = v; }
+            });
+
+            sendBtn.disabled = true;
+            sendBtn.textContent = 'Sending...';
+            // GitHub Pages serves the site, so the intake Worker answers on its
+            // workers.dev URL, the same way the contact and host forms do.
+            fetch(form.action, {
+                method: 'POST',
+                headers: { 'content-type': 'application/json', 'accept': 'application/json' },
+                body: JSON.stringify(data)
+            }).then(function (r) {
+                return r.json().catch(function () { return { ok: false, errors: ['Unexpected reply from the server (' + r.status + ')'] }; });
+            }).then(function (res) {
+                if (res && res.ok) {
+                    document.getElementById('sheet').classList.add('sent');
+                    document.getElementById('sheet').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                } else {
+                    showErrors((res && res.errors) || ['Something went wrong. Please try again.']);
+                }
+            }).catch(function () {
+                showErrors(['Could not reach the server. Check your connection and try again.']);
+            }).then(function () {
+                sendBtn.disabled = false;
+                sendBtn.textContent = 'Send to Alex';
+            });
+        });
+    })();
+    </script>
 </body>
 </html>

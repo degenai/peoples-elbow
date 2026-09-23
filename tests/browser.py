@@ -61,7 +61,7 @@ class BrowserChecks(BrowserFixture):
 
     def test_intake_print_retains_sections_consent_and_writing_room(self):
         page = self.new_page()
-        page.goto(self.origin + '/intake/index.html', wait_until='networkidle')
+        page.goto(self.origin + '/intake-print/index.html', wait_until='networkidle')
         pdf_bytes = self.print_pdf(page)
         pdf = PdfReader(io.BytesIO(pdf_bytes))
         self.assertEqual(len(pdf.pages), 2)

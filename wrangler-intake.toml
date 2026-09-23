@@ -1,0 +1,51 @@
+# The People's Elbow - client intake Worker (workers/intake-worker.js).
+#
+# The site is static on GitHub Pages and the apex record is DNS-only (not
+# proxied), so a zone route never sees its traffic. Like the host form Worker,
+# the form at /intake/ posts to this Worker's workers.dev URL:
+#   https://peoples-elbow-intake.alex-adamczyk.workers.dev/api/intake
+# with https://peoples-elbow.com as the one allowed cross-origin caller.
+# The zone route below is kept so the same Worker answers same-origin at
+# peoples-elbow.com/api/intake the day the record is proxied.
+# One email per recipient, nothing stored.
+#
+# Setup (one time, on the account that owns the zone):
+#   npx wrangler@latest secret put INTAKE_TO --config wrangler-intake.toml
+#       # comma-separated inboxes; each a verified Email Routing destination
+#   npx wrangler@latest deploy --config wrangler-intake.toml
+#   npx wrangler@latest email sending enable peoples-elbow.com
+#       # optional (needs Email Sending write on the zone): SPF + DKIM, and lifts
+#       # the verified-destination restriction
+name = "peoples-elbow-intake"
+main = "./workers/intake-worker.js"
+compatibility_date = "2025-06-01"
+workers_dev = true
+
+routes = [
+  { pattern = "peoples-elbow.com/api/intake*", zone_name = "peoples-elbow.com" }
+]
+
+[vars]
+INTAKE_FROM = "intake@peoples-elbow.com"
+INTAKE_FROM_NAME = "People's Elbow Intake"
+# Optional extra recipients, comma-separated. Only useful once the zone is
+# onboarded for Email Sending; until then only verified Email Routing
+# destinations deliver, so keep this empty and use the INTAKE_TO secret.
+INTAKE_ALSO_TO = ""
+# The site origin that may post to the workers.dev URL. Nothing else.
+INTAKE_ALLOWED_ORIGINS = "https://peoples-elbow.com"
+
+# Email binding. No destination is pinned here: recipients live in the
+# INTAKE_TO secret so personal inboxes stay out of the public repo.
+[[send_email]]
+name = "EMAIL"
+
+# Generous burst: a market or brewery on one NAT may have several clients
+# submitting at once. Own namespace so it never shares counters with another Worker.
+[[ratelimits]]
+name = "INTAKE_RATE"
+namespace_id = "1002"
+
+  [ratelimits.simple]
+  limit = 30
+  period = 60

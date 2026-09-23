@@ -17,7 +17,7 @@ export function unitTests(files = sourceFiles()) {
 }
 
 const rootAssets = new Set(['CNAME', '.nojekyll', 'robots.txt', 'sitemap.xml', '_redirects', 'sw.js', 'manifest.webmanifest', 'LICENSE', 'README.md', 'STEAL-THIS-SITE.md', 'wiki-starter-kit.zip']);
-const directories = new Set(['css', 'js', 'components', 'images', 'promo', 'intake', 'ccc-rate-sheet', 'fonts', 'assets']);
+const directories = new Set(['css', 'js', 'components', 'images', 'promo', 'intake', 'intake-print', 'ccc-rate-sheet', 'fonts', 'assets']);
 
 // Closed publication boundary: adding a new asset family is a reviewed change.
 export function isPublic(name) {

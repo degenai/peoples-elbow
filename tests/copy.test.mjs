@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 const read = name => readFileSync(new URL('../' + name, import.meta.url), 'utf8');
 
 test('paper form clearly requests handwriting and provides provider and weeks writing lines', () => {
-    const intake = read('intake/index.html');
+    const intake = read('intake-print/index.html');
     assert.match(intake, /Print and complete by hand/);
     assert.match(intake, /Chiropractic provider name<\/label><div class="fill">/);
     assert.match(intake, /weeks: <span class="fill fill-inline"/);
@@ -30,7 +30,7 @@ test('privacy summary and collection text distinguish CRM records from emailed i
         assert.match(text, /contact|Contact/);
     }
     assert.doesNotMatch(policy, /We don't have your data|None\. The People's Elbow|It never leaves your device/);
-    assert.match(policy, /Last updated: September 22, 2026/);
+    assert.match(policy, /Last updated: September 23, 2026/);
 });
 
 test('both Cherokee booking offers explicitly say thirty dollars off, with shared rates unchanged', () => {
