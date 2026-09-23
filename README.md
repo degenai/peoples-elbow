@@ -55,7 +55,7 @@ First load seeds fictional demo data so you can see how it works. Connect Google
 Submitting POSTs to the `peoples-elbow-intake` Worker at `https://peoples-elbow-intake.alex-adamczyk.workers.dev/api/intake` (GitHub Pages serves the site on a DNS-only record, so, like the host form, the intake posts to workers.dev; only `https://peoples-elbow.com` may call it cross-origin). A zone route `peoples-elbow.com/api/intake*` is also declared and takes over same-origin if the apex record is ever proxied. The Worker validates the form, drops honeypot hits with a quiet success, rate limits per IP, caps the body before parsing, renders one email (text + HTML), and sends one copy per recipient with the client as Reply-To. One rejected recipient never sinks the others. Nothing is stored; the email is the record. Logs carry an opaque id and counts, never names or inboxes.
 
 Files:
-- `intake/index.html` - the form (shared header and footer, body map, consent + typed e-signature, no-JS fallback).
+- `intake/index.html` - the form (shared header and footer, body map, consent + typed e-signature, no-JS fallback). Free-text fields get a "Speak" dictation button when the browser has the Web Speech API; the inline block is shared verbatim with the Elbow Room intake, so change both together.
 - `intake-print/index.html` - the printable version.
 - `workers/intake-core.js` - validation, email rendering, raw-MIME fallback. Pure; covered by `workers/intake-core.test.js`.
 - `workers/intake-worker.js` - the `/api/intake` handler; covered by `workers/intake-worker.test.js`.

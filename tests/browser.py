@@ -76,6 +76,35 @@ class BrowserChecks(BrowserFixture):
             (folder / 'intake-blank.pdf').write_bytes(pdf_bytes)
         page.close()
 
+    def test_intake_dictation_and_tap_targets_on_a_phone(self):
+        stub = """delete window.SpeechRecognition;
+        window.webkitSpeechRecognition = function () { window.__rec = this; this.start = function () {}; this.stop = function () { var s = this; setTimeout(function () { s.onend(); }, 0); }; this.abort = this.stop; };"""
+        for api in (False, True):
+            page = self.new_page(viewport={'width': 390, 'height': 844}, is_mobile=True, has_touch=True)
+            page.add_init_script(stub if api else 'delete window.SpeechRecognition; delete window.webkitSpeechRecognition;')
+            page.goto(self.origin + '/intake/index.html', wait_until='networkidle')
+            with self.subTest(api=api):
+                self.assertEqual(page.locator('.dict-btn').count(), 13 if api else 0)
+                self.assertTrue(page.evaluate('document.documentElement.scrollWidth <= innerWidth'))
+                small = page.evaluate("""[...document.querySelectorAll('.chk, .agree, .dict-btn, button.submit')]
+                    .map(e => e.getBoundingClientRect()).filter(r => r.width && (r.width < 44 || r.height < 44)).length""")
+                self.assertEqual(small, 0, 'every choice and button is at least 44 x 44')
+                self.assertEqual(page.locator('#full_name ~ .dict, #email ~ .dict, #phone ~ .dict').count(), 0)
+            if api:
+                page.fill('#visit_reason', 'Neck')
+                button = page.locator('#visit_reason ~ .dict .dict-btn')
+                button.click()
+                self.assertIn('Listening', button.inner_text())
+                page.evaluate("""(() => { var r = [{ transcript: 'and shoulders' }]; r.isFinal = false;
+                    __rec.onresult({ resultIndex: 0, results: [r] }); })()""")
+                self.assertEqual(page.locator('#visit_reason ~ .dict .dict-live').inner_text(), 'and shoulders')
+                page.evaluate("""(() => { var r = [{ transcript: 'and shoulders' }]; r.isFinal = true;
+                    __rec.onresult({ resultIndex: 0, results: [r] }); })()""")
+                self.assertEqual(page.input_value('#visit_reason'), 'Neck and shoulders')
+                button.click()
+                page.wait_for_function("document.querySelector('#visit_reason ~ .dict .dict-btn').getAttribute('aria-pressed') === 'false'")
+            page.close()
+
     def test_rates_pdf_matches_first_visit_copy(self):
         pdf = PdfReader(SITE / 'pe-session-rates.pdf')
         self.assertEqual(len(pdf.pages), 1)

@@ -162,7 +162,7 @@
             border: 1px solid var(--line);
             border-radius: 6px;
             padding: 9px 10px;
-            min-height: 40px;
+            min-height: 44px;
         }
 
         .intake textarea {
@@ -183,8 +183,8 @@
 
         .intake input[type=checkbox],
         .intake input[type=radio] {
-            width: 18px;
-            height: 18px;
+            width: 24px;
+            height: 24px;
             accent-color: var(--pe-green);
             margin: 0;
             flex: 0 0 auto;
@@ -193,7 +193,7 @@
         .intake .checks {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 8px 14px;
+            gap: 10px 12px;
             margin: 6px 0;
         }
 
@@ -201,25 +201,43 @@
             grid-template-columns: repeat(2, 1fr);
         }
 
-        .intake .chk {
+        /* Every choice is a whole-row target at least 44px tall, so an older
+           thumb can hit the words, not just the little box. */
+        .intake .chk,
+        .intake .f label.chk {
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 14px;
+            gap: 10px;
+            font-size: 15px;
+            font-weight: 400;
+            color: var(--ink);
+            text-transform: none;
+            letter-spacing: normal;
+            margin: 0;
             cursor: pointer;
-            padding: 4px 0;
+            min-height: 44px;
+            padding: 8px 12px;
+            background: #fbfaf5;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            touch-action: manipulation;
+        }
+
+        .intake .chk:has(input:checked) {
+            background: #e6f0ea;
+            border-color: var(--pe-green);
         }
 
         .intake .inline-yn {
             display: flex;
             flex-wrap: wrap;
-            gap: 6px 18px;
+            gap: 10px 12px;
             align-items: center;
-            min-height: 40px;
+            min-height: 44px;
         }
 
-        .intake .inline-yn.big .chk {
-            font-size: 16px;
+        .intake .f .inline-yn.big .chk {
+            font-size: 17px;
             font-weight: 700;
         }
 
@@ -273,6 +291,19 @@
             stroke-linejoin: round;
             cursor: pointer;
             transition: fill .15s;
+        }
+
+        .intake .fig .hit {
+            fill: transparent;
+            stroke: transparent;
+            stroke-width: 12;
+            pointer-events: all;
+            cursor: pointer;
+        }
+
+        .intake .fig .r,
+        .intake .fig .hit {
+            touch-action: manipulation;
         }
 
         .intake .fig .r:hover {
@@ -366,10 +397,15 @@
         .intake .agree {
             display: flex;
             align-items: flex-start;
-            gap: 10px;
+            gap: 12px;
             margin: 12px 0;
-            font-size: 14px;
+            font-size: 15px;
             cursor: pointer;
+            min-height: 44px;
+            padding: 10px 12px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            touch-action: manipulation;
         }
 
         .intake .agree input {
@@ -421,8 +457,10 @@
             border: 3px solid var(--pe-green-dark);
             border-radius: 999px;
             padding: 10px 30px;
+            min-height: 48px;
             cursor: pointer;
             box-shadow: 0 3px 0 var(--pe-green-dark);
+            touch-action: manipulation;
         }
 
         .intake button.submit:hover {
@@ -474,6 +512,71 @@
             font-size: 15px;
         }
 
+        /* Dictation: a labelled Speak button under each free-text field. The
+           script draws it only when the browser has speech recognition. */
+        .intake .dict {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px 12px;
+            margin-top: 6px;
+        }
+
+        .intake .dict-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-width: 44px;
+            min-height: 44px;
+            padding: 8px 18px;
+            font: 700 15px/1.1 var(--font-body, inherit);
+            color: var(--pe-green-dark);
+            background: var(--pe-white);
+            border: 2px solid var(--pe-green);
+            border-radius: 999px;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+
+        .intake .dict-btn:hover {
+            background: #e6f0ea;
+        }
+
+        .intake .dict-btn:focus-visible {
+            outline: 3px solid var(--pe-gold);
+            outline-offset: 2px;
+        }
+
+        .intake .dict-btn.on {
+            color: var(--pe-white);
+            background: var(--pain);
+            border-color: var(--pain);
+        }
+
+        .intake .dict-live {
+            flex: 1 1 160px;
+            min-width: 0;
+            font-size: 14px;
+            font-style: italic;
+            color: var(--muted);
+            overflow-wrap: anywhere;
+        }
+
+        .intake .dict-live.hint {
+            font-style: normal;
+            color: #7a1f18;
+        }
+
+        .intake .vh {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            clip-path: inset(50%);
+            white-space: nowrap;
+        }
+
         .intake .hp {
             position: absolute;
             left: -9999px;
@@ -517,12 +620,21 @@
                 gap: 14px;
             }
 
+            /* On a phone the two figures share the full width, so each body
+               region is about 1.6x its desktop size. */
             .intake .figs {
                 justify-content: center;
+                gap: 16px;
+            }
+
+            .intake .figwrap {
+                flex: 1 1 0;
+                max-width: 170px;
             }
 
             .intake .figwrap svg {
-                height: 200px;
+                width: 100%;
+                height: auto;
             }
         }
 
@@ -531,6 +643,7 @@
             #footer-placeholder,
             .book-hero,
             .intake .actions,
+            .intake .dict,
             .intake .status,
             .intake .intro {
                 display: none;
@@ -599,7 +712,7 @@
                     <div class="sec today">
                         <h2 class="sec-title">Today</h2>
                         <div class="row">
-                            <div class="f"><label for="where_today">Where are we today? (event or venue)</label><input type="text" id="where_today" name="where_today" placeholder="Brewery, market, gym, event name..."></div>
+                            <div class="f"><label for="where_today">Where are we today? (event or venue)</label><input type="text" id="where_today" name="where_today" placeholder="Brewery, market, gym, event name..." data-dictate></div>
                             <fieldset class="f">
                                 <legend class="lbl">Chair or table? <span class="req">*</span></legend>
                                 <div class="inline-yn big">
@@ -625,8 +738,8 @@
                             <div class="f lg"><label for="address">Address</label><input type="text" id="address" name="address" autocomplete="street-address"></div>
                         </div>
                         <div class="row">
-                            <div class="f"><label for="occupation">Occupation</label><input type="text" id="occupation" name="occupation" autocomplete="organization-title"></div>
-                            <div class="f"><label for="referral">How did you hear about us?</label><input type="text" id="referral" name="referral"></div>
+                            <div class="f"><label for="occupation">Occupation</label><input type="text" id="occupation" name="occupation" autocomplete="organization-title" data-dictate></div>
+                            <div class="f"><label for="referral">How did you hear about us?</label><input type="text" id="referral" name="referral" data-dictate></div>
                         </div>
                         <div class="row">
                             <div class="f"><label for="emergency_name">Emergency contact (name)</label><input type="text" id="emergency_name" name="emergency_name"></div>
@@ -639,7 +752,7 @@
                     <div class="sec">
                         <h2 class="sec-title">Your Visit</h2>
                         <div class="row">
-                            <div class="f lg"><label for="visit_reason">Main reason for your visit / areas of concern <span class="req">*</span></label><textarea id="visit_reason" name="visit_reason" required></textarea></div>
+                            <div class="f lg"><label for="visit_reason">Main reason for your visit / areas of concern <span class="req">*</span></label><textarea id="visit_reason" name="visit_reason" required data-dictate></textarea></div>
                         </div>
                         <div class="row">
                             <div class="f sm"><label for="pain_level">Pain right now (0 = none, 10 = worst)</label><input type="number" id="pain_level" name="pain_level" min="0" max="10" step="1" inputmode="numeric"></div>
@@ -658,11 +771,11 @@
                     <div class="sec">
                         <h2 class="sec-title">Health History</h2>
                         <div class="row">
-                            <div class="f lg"><label for="medications">Current medications</label><input type="text" id="medications" name="medications"></div>
+                            <div class="f lg"><label for="medications">Current medications</label><input type="text" id="medications" name="medications" data-dictate></div>
                         </div>
                         <div class="row">
-                            <div class="f"><label for="allergies">Allergies (incl. oils, lotions, scents)</label><input type="text" id="allergies" name="allergies"></div>
-                            <div class="f"><label for="surgeries">Recent surgeries or injuries (with dates)</label><input type="text" id="surgeries" name="surgeries"></div>
+                            <div class="f"><label for="allergies">Allergies (incl. oils, lotions, scents)</label><input type="text" id="allergies" name="allergies" data-dictate></div>
+                            <div class="f"><label for="surgeries">Recent surgeries or injuries (with dates)</label><input type="text" id="surgeries" name="surgeries" data-dictate></div>
                         </div>
                         <div class="row">
                             <fieldset class="f">
@@ -673,7 +786,7 @@
                                 </div>
                             </fieldset>
                             <div class="f sm"><label for="pregnant_weeks">If yes, weeks</label><input type="text" id="pregnant_weeks" name="pregnant_weeks" inputmode="numeric"></div>
-                            <div class="f"><label for="illness">Recent illness or fever?</label><input type="text" id="illness" name="illness"></div>
+                            <div class="f"><label for="illness">Recent illness or fever?</label><input type="text" id="illness" name="illness" data-dictate></div>
                         </div>
                     </div>
 
@@ -699,7 +812,7 @@
                             <label class="chk"><input type="checkbox" name="conditions" value="Contagious condition"> Contagious condition</label>
                         </div>
                         <div class="row">
-                            <div class="f lg"><label for="conditions_notes">Please explain anything checked above</label><input type="text" id="conditions_notes" name="conditions_notes"></div>
+                            <div class="f lg"><label for="conditions_notes">Please explain anything checked above</label><input type="text" id="conditions_notes" name="conditions_notes" data-dictate></div>
                         </div>
                     </fieldset>
 
@@ -744,7 +857,7 @@
                                 </div>
                                 <p id="marks-summary" aria-live="polite"></p>
                                 <input type="hidden" id="body_marks" name="body_marks" value="">
-                                <div class="f lg stack"><label for="pain_areas">Where does it hurt or feel tight? (your words)</label><textarea class="short" id="pain_areas" name="pain_areas"></textarea></div>
+                                <div class="f lg stack"><label for="pain_areas">Where does it hurt or feel tight? (your words)</label><textarea class="short" id="pain_areas" name="pain_areas" data-dictate></textarea></div>
                                 <fieldset class="stack">
                                     <legend class="lbl">Pressure preference</legend>
                                     <div class="checks two">
@@ -754,7 +867,7 @@
                                         <label class="chk"><input type="radio" name="pressure" value="Deep"> Deep</label>
                                     </div>
                                 </fieldset>
-                                <div class="f lg"><label for="avoid_areas">Areas to avoid</label><input type="text" id="avoid_areas" name="avoid_areas"></div>
+                                <div class="f lg"><label for="avoid_areas">Areas to avoid</label><input type="text" id="avoid_areas" name="avoid_areas" data-dictate></div>
                             </div>
                         </div>
                     </div>
@@ -770,10 +883,10 @@
                                     <label class="chk"><input type="radio" name="massage_before" value="no"> No</label>
                                 </div>
                             </fieldset>
-                            <div class="f"><label for="scent">Scent / aromatherapy sensitivity?</label><input type="text" id="scent" name="scent"></div>
+                            <div class="f"><label for="scent">Scent / aromatherapy sensitivity?</label><input type="text" id="scent" name="scent" data-dictate></div>
                         </div>
                         <div class="row">
-                            <div class="f lg"><label for="relax_notes">Anything that helps you relax, or that you would like us to know?</label><textarea class="short" id="relax_notes" name="relax_notes"></textarea></div>
+                            <div class="f lg"><label for="relax_notes">Anything that helps you relax, or that you would like us to know?</label><textarea class="short" id="relax_notes" name="relax_notes" data-dictate></textarea></div>
                         </div>
                     </div>
 
@@ -858,6 +971,121 @@
                 if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); cycle(el); }
             });
         });
+        // Near misses count: a transparent, fatter copy of each region sits
+        // beneath the drawn ones and forwards its tap to the real region.
+        document.querySelectorAll('.fig').forEach(function (svg) {
+            var first = svg.firstChild;
+            svg.querySelectorAll('.r').forEach(function (el) {
+                var pad = el.cloneNode(false);
+                pad.setAttribute('class', 'hit');
+                ['tabindex', 'role', 'aria-label'].forEach(function (a) { pad.removeAttribute(a); });
+                pad.setAttribute('aria-hidden', 'true');
+                pad.addEventListener('click', function () { cycle(el); });
+                svg.insertBefore(pad, first);
+            });
+        });
+
+        // ---- dictation: a "Speak" button under each free-text field ----------
+        // Shared verbatim by peoples-elbow intake/index.html and elbowroom
+        // intake.html; change both together. Speech goes to the browser's own
+        // speech service (Web Speech API) and only the text comes back to the
+        // field. No API, no buttons: the form is exactly as it was.
+        var stopDictation = function () {};
+        (function () {
+            var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SR) return;
+            var lang = document.documentElement.getAttribute('lang') || 'en-US';
+            if (lang === 'en') lang = 'en-US';
+            var HINTS = {
+                'not-allowed': 'The microphone is blocked. Allow it in your browser settings, or just type.',
+                'service-not-allowed': 'Speech is turned off in this browser. Please type instead.',
+                'no-speech': 'Did not catch that. Tap Speak to try again, or type.',
+                'audio-capture': 'No microphone found. Please type instead.',
+                'network': 'Speech needs an internet connection. Please type instead.'
+            };
+            var MIC = '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false"><path fill="currentColor" d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zm5-3a5 5 0 0 1-10 0H5a7 7 0 0 0 6 6.92V21h2v-3.08A7 7 0 0 0 19 11h-2z"/></svg>';
+            var active = null;
+
+            function append(field, text) {
+                text = String(text).replace(/\s+/g, ' ').trim();
+                if (!text) return;
+                var cur = field.value.replace(/\s+$/, '');
+                field.value = cur ? cur + ' ' + text : text;
+                field.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+            function show(ui, on) {
+                ui.btn.classList.toggle('on', on);
+                ui.btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+                ui.word.textContent = on ? 'Listening... tap to stop' : 'Speak';
+            }
+            function say(ui, text, isHint) {
+                ui.live.textContent = text;
+                ui.live.classList.toggle('hint', !!isHint);
+            }
+            function start(ui) {
+                var rec = new SR();
+                var s = { rec: rec, ui: ui, hint: '', next: null };
+                rec.lang = lang;
+                rec.continuous = false;
+                rec.interimResults = true;
+                rec.maxAlternatives = 1;
+                rec.onresult = function (e) {
+                    var interim = '';
+                    for (var i = e.resultIndex; i < e.results.length; i++) {
+                        var t = e.results[i][0].transcript;
+                        if (e.results[i].isFinal) append(ui.field, t); else interim += t;
+                    }
+                    say(ui, interim, false);
+                };
+                rec.onerror = function (e) {
+                    s.hint = e.error === 'aborted' ? '' : (HINTS[e.error] || 'Speech stopped. You can type instead.');
+                };
+                rec.onend = function () {
+                    if (active === s) active = null;
+                    show(ui, false);
+                    say(ui, s.hint, !!s.hint);
+                    if (s.next) s.next();
+                };
+                try { rec.start(); } catch (err) { say(ui, 'Speech could not start. Please type instead.', true); return; }
+                active = s;
+                show(ui, true);
+                say(ui, '', false);
+            }
+            stopDictation = function () {
+                if (active) { try { active.rec.stop(); } catch (err) { /* already ended */ } }
+            };
+            document.querySelectorAll('[data-dictate]').forEach(function (field) {
+                var label = document.querySelector('label[for="' + field.id + '"]');
+                var ui = { field: field };
+                var wrap = document.createElement('div');
+                wrap.className = 'dict';
+                ui.btn = document.createElement('button');
+                ui.btn.type = 'button';
+                ui.btn.className = 'dict-btn';
+                ui.btn.setAttribute('aria-pressed', 'false');
+                ui.btn.setAttribute('aria-controls', field.id);
+                ui.btn.innerHTML = MIC;
+                ui.word = document.createElement('span');
+                ui.word.textContent = 'Speak';
+                ui.btn.appendChild(ui.word);
+                var what = document.createElement('span');
+                what.className = 'vh';
+                what.textContent = ' into: ' + (label ? label.textContent.replace(/\*/g, '').trim() : field.name);
+                ui.btn.appendChild(what);
+                ui.live = document.createElement('span');
+                ui.live.className = 'dict-live';
+                ui.live.setAttribute('aria-live', 'polite');
+                wrap.appendChild(ui.btn);
+                wrap.appendChild(ui.live);
+                field.insertAdjacentElement('afterend', wrap);
+                ui.btn.addEventListener('click', function () {
+                    if (active && active.ui === ui) { stopDictation(); return; }
+                    if (active) { active.next = function () { start(ui); }; active.rec.abort(); return; }
+                    start(ui);
+                });
+            });
+            document.addEventListener('visibilitychange', function () { if (document.hidden) stopDictation(); });
+        })();
 
         // ---- submit ---------------------------------------------------------
         function showErrors(list) {
@@ -885,6 +1113,7 @@
 
         form.addEventListener('submit', function (e) {
             e.preventDefault();
+            stopDictation();
             status.className = 'status';
             var errs = localErrors();
             if (errs.length) { showErrors(errs); return; }
