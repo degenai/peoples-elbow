@@ -16,127 +16,45 @@ concurrency:
 
 jobs:
   deploy:
+    # A manually dispatched preview branch is still not a production release.
+    if: github.ref == 'refs/heads/main'
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout exact release
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Get full history for version counting
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
         with:
-          node-version: '20'
-      
-      - name: Update D1 Changelog
-        env:
-          # Shared secret for the authenticated changelog-writer worker
-          # (Bearer auth check lives in workers/changelog-writer-worker.js).
-          # Add it under repo Settings → Secrets → Actions.
-          CHANGELOG_WRITE_TOKEN: ${{ secrets.CHANGELOG_WRITE_TOKEN }}
+          node-version: '24.21.0'
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: requirements-test.txt
+      - name: Install locked validation tools
         run: |
-          echo "🔄 Updating D1 changelog with new meaningful commits..."
-          # .cjs because package.json declares "type":"module" (for the CRM's ESM
-          # tests) — this script is CommonJS and Node needs the explicit extension.
-          node update-d1-changelog.cjs
-          echo "✅ D1 changelog update complete"
-      
-#      - name: Generate fresh version data
-#        run: |
-#          echo "Generating fresh version data..."
-#          node generate-version-data.js
-#          echo "Version generated: $(grep -o '"version": "[0-9]*"' js/version-data.js | grep -o '[0-9]*')"
-      
-#      - name: Generate fresh changelog data
-#        run: |
-#          echo "Generating fresh changelog data..."
-#          node generate-changelog.js
-#          echo "Changelog generated with $(grep -c '"version":' js/changelog-data.json) commits"
-#          echo "Latest version: $(grep -m1 '"version":' js/changelog-data.json | grep -o '[0-9]*')"
-      
-#      - name: Verify generated files
-#        run: |
-#          echo "Checking generated files..."
-#          echo "version-data.js:"
-#          ls -la js/version-data.js
-#          head -5 js/version-data.js
-#          echo ""
-#          echo "changelog-data.json:"
-#          ls -la js/changelog-data.json
-#          head -5 js/changelog-data.json
-#          echo ""
-#          echo "Generated timestamp in changelog:"
-#          grep generated js/changelog-data.json | head -1
-#          echo ""
-#          echo "Git status:"
-#          git status --porcelain
-      
-      - name: Temporarily commit generated files
-        run: |
-          echo "Creating temporary commit with generated files..."
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          # git add js/version-data.js js/changelog-data.json
-          # If other files need to be added, list them here. Otherwise, this can be removed if the commit is no longer needed.
-          # For now, ensuring no attempt to add archived files.
-          git commit -m "chore: update generated files for deployment [skip ci]" || echo "No changes to commit"
-          echo "Git log:"
-          git log --oneline -3
-      
-      - name: Run CRM test suite (a red suite blocks deploy)
-        run: |
-          # Gate the deploy on the CRM tests. `npm test` runs
-          # `node --test js/crm/*.test.js` (see package.json) — no dependencies to
-          # install, just Node's built-in test runner. The CI shell expands the
-          # glob to the test files. If any CRM test fails this step exits non-zero
-          # and the job stops here, so a broken CRM never reaches the live site.
-          npm test
-
-      - name: Assemble publish directory (deny-list — never publish the whole checkout)
-        run: |
-          # The repo is public and read-friendly ("Steal This Site"), but the working
-          # checkout also carries credentials/PII and private notes that must NOT be
-          # served. Copy the site into _site/ excluding everything server-side or private,
-          # then publish ONLY that dir. CNAME, images, css, js, components, sw.js, the
-          # manifest, and every *.html are kept automatically by being un-excluded.
-          mkdir -p _site
-          rsync -a --delete \
-            --exclude='/_site/' \
-            --exclude='/.git/' \
-            --exclude='/.github/' \
-            --exclude='node_modules/' \
-            --exclude='.wrangler/' \
-            --exclude='.mf/' \
-            --exclude='/.jules/' \
-            --exclude='/.Jules/' \
-            --exclude='/_deprecated/' \
-            --exclude='/handoffs/' \
-            --exclude='/docs/' \
-            --exclude='/workers/' \
-            --exclude='/migrations/' \
-            --exclude='*.sqlite' --exclude='*.sqlite-shm' --exclude='*.sqlite-wal' \
-            --exclude='/schema.sql' \
-            --exclude='/woodstock-plan.html' \
-            --exclude='/TODO.md' \
-            --exclude='*.test.js' \
-            --exclude='/.gitignore' \
-            --exclude='/.dev.vars' \
-            --exclude='*.toml' \
-            --exclude='/package.json' --exclude='/package-lock.json' \
-            ./ _site/
-          echo "Published files:"; find _site -maxdepth 2 -type f | sort
-
+          npm ci
+          python -m pip install -r requirements-test.txt
+          python -m playwright install --with-deps chromium
+      - name: Verify source, regressions and exact publish artifact
+        run: npm run verify
       - name: Setup Pages
         uses: actions/configure-pages@v4
-
-      - name: Upload artifact
+      - name: Upload verified artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: '_site'
-      
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+      - name: Record successfully deployed release
+        if: success() && steps.deployment.outcome == 'success'
+        env:
+          CHANGELOG_WRITE_TOKEN: ${{ secrets.CHANGELOG_WRITE_TOKEN }}
+          DEPLOYED_SHA: ${{ github.sha }}
+        run: node update-d1-changelog.cjs

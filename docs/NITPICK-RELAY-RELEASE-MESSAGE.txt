@@ -1,0 +1,32 @@
+The cleanup update: smoother booking, fewer hiccups
+
+This update brings together the fixes from my nitpick relay: repeated bug-hunting and code-cleanup passes through The People's Elbow. The focus is on making the site easier to use and more dependable, while keeping its familiar look.
+
+WHAT:
+
+Booking and contact forms
+- Added a retry option when the booking calendar fails to load, while keeping the direct booking link available.
+- Fixed forms getting stuck on "Sending" when a request stalls.
+- Made success and error messages clearer. If delivery cannot be confirmed, the form says so rather than reporting success.
+- Prevented repeated clicks while a message is sending.
+
+Navigation and accessibility
+- Fixed cases where a missing page element or outside resource could stop the mobile menu working.
+- Improved homepage section highlighting.
+- Made decorative effects respect reduced-motion settings, including changes made while the page is open.
+
+Copy and print polish
+- Clarified first-visit discounts, Saturday availability and privacy wording.
+- Tidied rate sheets and printable intake materials.
+- Matched the gift-coupon background to the logo.
+
+Behind the scenes
+- Improved recovery from failed downloads and interrupted offline updates.
+- Made inquiry imports flag ambiguous messages instead of guessing.
+- Added checks for missing files and code problems before website updates are published.
+
+WHY:
+A booking calendar that will not load, a stuck form or an unclear offer gets in the way. This maintenance pass tackles those everyday frustrations.
+
+QUALITY:
+Checked on phone-sized and desktop layouts, with automated browser tests covering both normal use and deliberately broken conditions. Test submissions were simulated; testing did not send real emails, book appointments or change customer records.

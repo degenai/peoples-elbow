@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Show loading state
             const submitButton = hostForm.querySelector('button[type="submit"]');
+            if (submitButton.disabled) return;
             const btnText = submitButton.querySelector('span');
             const spinner = submitButton.querySelector('.loading-spinner');
             const originalButtonText = btnText?.textContent;
@@ -25,16 +26,8 @@ document.addEventListener('DOMContentLoaded', function() {
             submitButton.disabled = true;
             
             try {
-                // Create FormData object
-                const formData = new FormData(hostForm);
-                
-                // Send to Cloudflare Worker
-                const response = await fetch(WORKER_URL, {
-                    method: 'POST',
-                    body: formData
-                });
-                const data = await response.json();
-                
+                const data = await sendInquiry(hostForm);
+
                 // Show success message
                 if (data.success) {
                     showFormMessage(hostForm, data.message, 'success');
@@ -44,7 +37,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             } catch (error) {
                 console.error('Error:', error);
-                showFormMessage(hostForm, 'There was an error sending your request. Please try again later.', 'error');
+                showFormMessage(hostForm, 'Delivery is unconfirmed. We may have received your inquiry. Please email info@peoples-elbow.com before retrying to avoid duplicates.', 'error');
             } finally {
                 // Restore button state
                 if (btnText) btnText.textContent = originalButtonText;
@@ -52,6 +45,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 submitButton.disabled = false;
             }
         });
+        activateForm(hostForm);
     }
 
     if (contactForm) {
@@ -59,6 +53,7 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
 
             const submitButton = contactForm.querySelector('button[type="submit"]');
+            if (submitButton.disabled) return;
             const btnText = submitButton.querySelector('span');
             const spinner = submitButton.querySelector('.loading-spinner');
             const originalButtonText = btnText?.textContent;
@@ -67,12 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {
             submitButton.disabled = true;
 
             try {
-                const formData = new FormData(contactForm);
-                const response = await fetch(WORKER_URL, {
-                    method: 'POST',
-                    body: formData
-                });
-                const data = await response.json();
+                const data = await sendInquiry(contactForm);
 
                 if (data.success) {
                     showFormMessage(contactForm, data.message, 'success');
@@ -82,15 +72,55 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             } catch (error) {
                 console.error('Error:', error);
-                showFormMessage(contactForm, 'There was an error sending your message. Please try again later.', 'error');
+                showFormMessage(contactForm, 'Delivery is unconfirmed. We may have received your inquiry. Please email info@peoples-elbow.com before retrying to avoid duplicates.', 'error');
             } finally {
                 if (btnText) btnText.textContent = originalButtonText;
                 if (spinner) spinner.style.display = 'none';
                 submitButton.disabled = false;
             }
         });
+        activateForm(contactForm);
     }
     
+    // One deadline covers both headers and body parsing, with no automatic resend.
+    async function sendInquiry(form) {
+        const controller = new AbortController();
+        let timer;
+        const deadline = new Promise((_, reject) => {
+            timer = setTimeout(() => {
+                controller.abort();
+                reject(new Error('Inquiry response deadline exceeded'));
+            }, 15000);
+        });
+        try {
+            return await Promise.race([
+                (async () => {
+                    const response = await fetch(WORKER_URL, {
+                        method: 'POST', body: new FormData(form), signal: controller.signal
+                    });
+                    const data = await response.json();
+                    if (!data || Array.isArray(data) || typeof data.success !== 'boolean' ||
+                        typeof data.message !== 'string' || !data.message.trim() ||
+                        (data.success && !response.ok)) {
+                        throw new Error('Invalid inquiry acknowledgement');
+                    }
+                    return { success: data.success, message: data.message.trim() };
+                })(),
+                deadline
+            ]);
+        } finally {
+            clearTimeout(timer);
+        }
+    }
+
+    // Keep the native form inert unless its preventDefault handler is installed.
+    function activateForm(form) {
+        const fields = form.querySelector('.inquiry-fields');
+        const fallback = form.querySelector('.form-fallback');
+        if (fields) fields.disabled = false;
+        if (fallback) fallback.hidden = true;
+    }
+
     // Helper function to show form messages
     function showFormMessage(form, message, type) {
         // Remove any existing message
@@ -133,7 +163,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
                 
                 // Update URL without page reload
+                const oldURL = window.location.href;
                 history.pushState(null, null, targetId);
+                window.dispatchEvent(new HashChangeEvent('hashchange', { oldURL, newURL: window.location.href }));
             }
         });
     });
@@ -230,20 +262,31 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        // Throttled scroll listener for performance
-        let ticking = false;
+        // Bind only while motion is allowed, including preference changes.
+        const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+        let frame = null;
         function onScroll() {
-            if (!ticking) {
-                requestAnimationFrame(() => {
+            if (frame === null) {
+                frame = requestAnimationFrame(() => {
+                    frame = null;
                     updateParallax();
-                    ticking = false;
                 });
-                ticking = true;
             }
         }
 
-        window.addEventListener('scroll', onScroll, { passive: true });
-        updateParallax(); // Initial call
+        function syncMotion() {
+            window.removeEventListener('scroll', onScroll);
+            if (frame !== null) cancelAnimationFrame(frame);
+            frame = null;
+            if (motion.matches) {
+                photoElement.style.removeProperty('transform');
+            } else {
+                window.addEventListener('scroll', onScroll, { passive: true });
+                updateParallax();
+            }
+        }
+        motion.addEventListener('change', syncMotion);
+        syncMotion();
     }
 
     initParticles();
@@ -299,7 +342,8 @@ document.addEventListener('DOMContentLoaded', function() {
             name: 'FlexFest',
             where: 'Downtown Woodstock',
             when: 'Sat Aug 22, 2026 · TBC',
-            date: new Date('2026-08-22T16:00:00Z'),
+            date: null, // TBC is not an exact start time and never gets a countdown.
+            expires: new Date('2026-08-23T04:00:00Z'), // End of Aug 22 in Georgia.
             cause: null,
         },
         {
@@ -359,7 +403,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const now = new Date();
             const future = upcomingEvents
-                .filter(e => !e.date || e.date > now)
+                .filter(e => !(e.date || e.expires) || (e.date || e.expires) > now)
                 .sort((a, b) => {
                     if (!a.date) return 1;
                     if (!b.date) return -1;

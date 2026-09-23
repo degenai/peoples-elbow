@@ -24,17 +24,10 @@ class ComponentLoader {
             return window.DOMPurify.sanitize(html);
         }
 
-        try {
-            const purify = await import('https://cdn.jsdelivr.net/npm/dompurify@3.0.8/dist/purify.es.mjs');
-            const domPurify = purify.default || purify;
-            if (domPurify && typeof domPurify.sanitize === 'function') {
-                window.DOMPurify = domPurify;
-                return domPurify.sanitize(html);
-            }
-        } catch (error) {
-            console.warn('DOMPurify unavailable; using local component sanitizer:', error);
-        }
-
+        // Do not gate navigation on an optional remote sanitizer module. If
+        // DOMPurify has not already loaded and attached itself to window,
+        // use the verified local allow-list sanitizer immediately. A pending
+        // or rejected remote import must never delay header/footer render.
         return this.sanitizeTrustedComponentHTML(html);
     }
 
@@ -79,7 +72,13 @@ class ComponentLoader {
                     return;
                 }
                 if (!allowedTags.has(tag)) {
-                    node.replaceWith(...Array.from(node.childNodes));
+                    // Unwrap the disallowed ancestor but keep cleaning its
+                    // former children now that they live in the parent -
+                    // otherwise a nested <script> or on*-handler smuggled
+                    // inside an unknown tag survives untouched.
+                    const children = Array.from(node.childNodes);
+                    node.replaceWith(...children);
+                    children.forEach(scrub);
                     return;
                 }
 
@@ -160,6 +159,10 @@ class ComponentLoader {
 
         targetElement.innerHTML = await this.sanitizeHTML(headerHtml);
         this.highlightCurrentPage();
+        // Header-dependent features (mobile menu, version badge) must come
+        // up as soon as the header itself is in the DOM. They must never
+        // wait on the footer's fetch/inject, which can fail or hang.
+        this.initializeComponentFeatures();
         return true;
     }
 
@@ -189,36 +192,55 @@ class ComponentLoader {
             link.classList.remove('active');
         });
 
+        // Compare attribute values in JS rather than interpolating them into
+        // a CSS selector string - window.location.hash is attacker/user
+        // influenced and a malformed fragment (stray quotes/brackets) must
+        // never be able to throw from querySelector's selector parser.
+        const navLinks = Array.from(document.querySelectorAll('nav a[data-nav]'));
+
         // Add active class to current page
-        document.querySelector(`nav a[data-nav="${this.currentPage}"]`)?.classList.add('active');
+        navLinks.find(link => link.dataset.nav === this.currentPage)?.classList.add('active');
 
         // Special handling for home page sections
         const hash = window.location.hash;
         if (this.currentPage === 'home' && hash) {
-            document.querySelector(`nav a[href="index.html${hash}"]`)?.classList.add('active');
+            const targetHref = 'index.html' + hash;
+            navLinks.find(link => link.getAttribute('href') === targetHref)?.classList.add('active');
         }
+    }
+
+    /**
+     * Keep the active nav link in sync with hash changes (e.g. clicking
+     * an in-page section link). Guarded so repeated header loads never
+     * attach more than one hashchange listener.
+     */
+    initializeHashListener() {
+        if (this._hashListenerAttached) return;
+        this._hashListenerAttached = true;
+        window.addEventListener('hashchange', () => this.highlightCurrentPage());
     }
 
     /**
      * Load all components
      */
     async loadAllComponents() {
-        const promises = [
+        // Header and footer load independently. Header-dependent features
+        // are initialized inside loadHeader() itself, as soon as the header
+        // is injected, so a slow/failed/never-resolving footer can never
+        // block mobile navigation from becoming usable.
+        const [headerSuccess, footerSuccess] = await Promise.all([
             this.loadHeader(),
             this.loadFooter()
-        ];
+        ]);
 
-        const results = await Promise.all(promises);
-        const success = results.every(result => result === true);
-        
-        if (success) {
-            // All components loaded successfully
-            this.initializeComponentFeatures();
-        } else {
-            console.error('Some components failed to load');
+        if (!headerSuccess) {
+            console.error('Header component failed to load');
+        }
+        if (!footerSuccess) {
+            console.error('Footer component failed to load');
         }
 
-        return success;
+        return headerSuccess && footerSuccess;
     }
 
     /**
@@ -230,6 +252,9 @@ class ComponentLoader {
 
         // Initialize mobile menu after header component is injected
         this.initializeMobileMenu();
+
+        // Keep the active nav link correct as the URL hash changes
+        this.initializeHashListener();
     }
 
     /**
@@ -320,28 +345,44 @@ class ComponentLoader {
     initializeMobileMenu() {
         const menuToggle = document.querySelector('.menu-toggle');
         const navMenu = document.querySelector('nav ul');
-        
-        if (menuToggle && navMenu) {
-            // Remove any existing listeners to avoid duplicates
-            menuToggle.removeEventListener('click', this.menuToggleHandler);
-            
-            // Store handler reference for cleanup
-            this.menuToggleHandler = function() {
-                const isOpen = navMenu.classList.toggle('mobile-menu-active');
-                menuToggle.setAttribute('aria-expanded', String(isOpen));
-            };
 
-            menuToggle.addEventListener('click', this.menuToggleHandler);
+        if (!menuToggle || !navMenu) return;
 
-            // Reset menu state on window resize
-            window.addEventListener('resize', function() {
-                if (window.innerWidth > 768) {
-                    navMenu.classList.remove('mobile-menu-active');
-                    navMenu.style.display = '';
-                    menuToggle.setAttribute('aria-expanded', 'false');
-                }
-            });
+        // Skip re-initialization if these are the exact same live elements
+        // we already wired up (e.g. initializeComponentFeatures ran twice
+        // for one header injection).
+        if (this._initializedMenuToggle === menuToggle && this._initializedNavMenu === navMenu) {
+            return;
         }
+
+        // Tear down listeners bound to a previous (now-replaced) header
+        // before attaching new ones, so nothing leaks onto window/menuToggle.
+        if (this._initializedMenuToggle && this.menuToggleHandler) {
+            this._initializedMenuToggle.removeEventListener('click', this.menuToggleHandler);
+        }
+        if (this.resizeHandler) {
+            window.removeEventListener('resize', this.resizeHandler);
+        }
+
+        // Store handler reference for cleanup
+        this.menuToggleHandler = () => {
+            const isOpen = navMenu.classList.toggle('mobile-menu-active');
+            menuToggle.setAttribute('aria-expanded', String(isOpen));
+        };
+        menuToggle.addEventListener('click', this.menuToggleHandler);
+
+        // Reset menu state on window resize
+        this.resizeHandler = () => {
+            if (window.innerWidth > 768) {
+                navMenu.classList.remove('mobile-menu-active');
+                navMenu.style.display = '';
+                menuToggle.setAttribute('aria-expanded', 'false');
+            }
+        };
+        window.addEventListener('resize', this.resizeHandler);
+
+        this._initializedMenuToggle = menuToggle;
+        this._initializedNavMenu = navMenu;
     }
 }
 

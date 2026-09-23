@@ -51,7 +51,7 @@
                         <span class="chip-venue">HUSTLE HOUSE</span>
                     </div>
                     <div class="day-chip chip-er" data-days="6,0">
-                        <span class="chip-days">SAT SUN</span>
+                        <span class="chip-days">SUN + SELECT SAT</span>
                         <span class="chip-venue">ELBOW ROOM</span>
                     </div>
                     <div class="day-chip chip-off" data-days="1">
@@ -59,7 +59,7 @@
                         <span class="chip-venue">REST DAY. THE ELBOW TAKES THE DAY OFF.</span>
                     </div>
                 </div>
-                <p class="day-strip-note" id="day-strip-note">Same days. Same places. Every week.</p>
+                <p class="day-strip-note" id="day-strip-note">Weekly residencies, with select Saturdays at Elbow Room.</p>
             </div>
         </section>
 
@@ -87,7 +87,7 @@
                         </div>
                         <p class="venue-card-fine">
                             <a href="ccc-rate-sheet/">See the Cherokee rates &rarr;</a><br>
-                            First visit $30 through the front desk. Mention it when you call.
+                            Take $30 off your first visit through the front desk. Mention it when you call.
                         </p>
                     </article>
 
@@ -108,6 +108,7 @@
                             <a class="venue-card-fine" href="https://peoples-elbow.square.site" target="_blank" rel="noopener noreferrer">Prefer direct? Book on Square &rarr;</a>
                         </div>
                         <div class="hh-widget-wrap" id="hh-widget-wrap" hidden>
+                            <p class="venue-card-fine" id="hh-widget-status" role="status" hidden></p>
                             <div class="book-widget-container" id="book-widget-container"></div>
                         </div>
                     </article>
@@ -118,14 +119,14 @@
                         <div class="venue-card-logo">
                             <img src="images/book-er-mark.png" alt="" width="240" height="240" loading="lazy">
                         </div>
-                        <h3 class="venue-card-days">SAT / SUN</h3>
+                        <h3 class="venue-card-days">SUN / SELECT SAT</h3>
                         <h4 class="venue-card-name">Elbow Room Massage</h4>
                         <p class="venue-card-copy">Clinical massage therapy on Sundays and select Saturdays. Scheduled through Elbow Room's own system.</p>
                         <div class="venue-card-actions">
                             <a class="btn btn-primary venue-card-cta" href="https://elbowroommassage.com/book" target="_blank" rel="noopener noreferrer">
                                 <i class="fas fa-calendar-alt" aria-hidden="true"></i> Schedule at Elbow Room
                             </a>
-                            <span class="venue-card-sublabel">Sat + Sun &middot; opens elbowroommassage.com</span>
+                            <span class="venue-card-sublabel">Sundays + select Saturdays &middot; opens elbowroommassage.com</span>
                         </div>
                         <p class="venue-card-fine">
                             External link, opens in a new tab. Mention your first visit when you schedule.
@@ -169,7 +170,7 @@
             <div class="container">
                 <h2 class="first-visit-title">First Visit?</h2>
                 <p class="first-visit-body">At Hustle House or Elbow Room, your first 15-minute massage is free, a $25 value. Or apply that same $25 toward a longer session, so your first full hour is $60 instead of $85. One first-visit credit, your choice.</p>
-                <p class="first-visit-fine">At Cherokee Center for Change, first visit is $30 through the front desk.</p>
+                <p class="first-visit-fine">At Cherokee Center for Change, take $30 off your first visit through the front desk.</p>
                 <p class="first-visit-fine">New client? <a href="/intake/">Print or save the intake form before your visit &rarr;</a></p>
             </div>
         </section>
@@ -228,7 +229,7 @@
                 3: 'Wednesday. Hustle House day. Book a slot below.',
                 4: 'Thursday. Cherokee Center day. The front desk picks up at (770) 928-7300.',
                 5: 'Friday. Cherokee Center day. The front desk picks up at (770) 928-7300.',
-                6: 'Saturday. Elbow Room day. Schedule through Elbow Room.',
+                6: 'Saturday. Elbow Room opens select Saturdays. Check the calendar for availability.',
                 0: 'Sunday. Elbow Room day. Schedule through Elbow Room.'
             };
             var active = null;
@@ -249,20 +250,33 @@
             }
             if (note) { note.textContent = lines[today]; }
         }
-        var squareLoaded = false;
+        var squareState = 'idle';
         function initWidgetReveal() {
             var btn = document.getElementById('hh-reveal');
             var wrap = document.getElementById('hh-widget-wrap');
-            if (!btn || !wrap) { return; }
+            var status = document.getElementById('hh-widget-status');
+            if (!btn || !wrap || !status) { return; }
             btn.addEventListener('click', function () {
                 var opening = wrap.hidden;
                 wrap.hidden = !wrap.hidden;
                 btn.setAttribute('aria-expanded', String(opening));
                 if (opening) {
-                    if (!squareLoaded) {
-                        squareLoaded = true;
+                    if (squareState === 'idle' || squareState === 'error') {
+                        squareState = 'loading';
+                        status.hidden = false;
+                        status.textContent = 'Loading the calendar. The direct Square link above is also available.';
                         var s = document.createElement('script');
                         s.src = 'https://square.site/appointments/buyer/widget/nxipfwu0q8gx9k/L9ZZX52ET3XGJ.js';
+                        s.onload = function () {
+                            squareState = 'loaded';
+                            status.textContent = '';
+                            status.hidden = true;
+                        };
+                        s.onerror = function () {
+                            squareState = 'error';
+                            s.remove();
+                            status.textContent = 'The calendar did not load. To retry, close and reopen it, or use the direct Square link above.';
+                        };
                         document.getElementById('book-widget-container').appendChild(s);
                     }
                     try { wrap.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) { wrap.scrollIntoView(); }

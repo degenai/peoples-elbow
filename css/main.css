@@ -4,6 +4,11 @@
 */
 
 /* Variables */
+.inquiry-fields {
+    border: 0;
+    min-width: 0;
+}
+
 :root {
     /* Color palette based on the logo */
     --pe-green: #006937;
@@ -356,6 +361,8 @@ header {
 
 .menu-toggle {
     display: none;
+    min-width: 44px;
+    min-height: 44px;
     font-size: 1.5rem;
     cursor: pointer;
     background: none;
@@ -1829,19 +1836,6 @@ nav ul li a.active {
 }
 
 /* Booking Page (/book.html) */
-.book-widget-section {
-    padding: var(--space-xl) 0;
-    background: var(--pe-white);
-    user-select: none;
-    -webkit-user-select: none;
-    cursor: default;
-}
-
-.book-widget-section *,
-.book-widget-section iframe {
-    user-select: auto;
-    -webkit-user-select: auto;
-}
 
 .book-availability-note {
     max-width: 700px;
@@ -3442,6 +3436,15 @@ a.venue-card-fine:focus-visible,
 /* Motion is decoration here. The lit states stay, the travel does not, and the
    belt holds its resting glint without ever sweeping. */
 @media (prefers-reduced-motion: reduce) {
+    /* Inline particle animations need priority; foreground content stays visible. */
+    #particles {
+        visibility: hidden;
+    }
+
+    #particles * {
+        animation: none !important;
+    }
+
     .day-chip,
     .venue-card,
     .venue-card-cta,
