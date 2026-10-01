@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tip Jar | The People's Elbow</title>
+    <meta name="description" content="Tip Alex Adamczyk, LMT of The People's Elbow by Venmo or Cash App. At charity events, tips are shared with that day's cause as the sign at the chair shows.">
+    <link rel="canonical" href="https://peoples-elbow.com/tip">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://peoples-elbow.com/tip">
+    <meta property="og:title" content="Tip Jar | The People's Elbow">
+    <meta property="og:description" content="Thanks for the elbow. Tip by Venmo or Cash App in one tap.">
+    <meta property="og:image" content="https://peoples-elbow.com/images/logo.png">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://peoples-elbow.com/tip">
+    <meta name="twitter:title" content="Tip Jar | The People's Elbow">
+    <meta name="twitter:description" content="Thanks for the elbow. Tip by Venmo or Cash App in one tap.">
+    <meta name="twitter:image" content="https://peoples-elbow.com/images/logo.png">
+
+    <link rel="shortcut icon" href="images/favicon-32.png" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Open+Sans:wght@400;700&display=swap">
+    <link rel="stylesheet" href="css/main.css">
+    <style>
+        .tip-hero { background: var(--pe-green); color: var(--pe-white); text-align: center; padding: var(--space-lg) var(--space-md) var(--space-md); }
+        .tip-hero img { width: 140px; height: 140px; border-radius: 50%; border: 4px solid var(--pe-gold); }
+        .tip-hero h1 { font-family: var(--font-heading); color: var(--pe-gold); font-size: clamp(2.6rem, 9vw, 3.6rem); letter-spacing: 0.04em; margin: var(--space-sm) 0 0; text-shadow: 3px 3px 0 var(--pe-black); }
+        .tip-hero p { margin: var(--space-xs) auto 0; max-width: 34rem; font-size: 1.1rem; }
+        .tip-body { max-width: 30rem; margin: 0 auto; padding: var(--space-lg) var(--space-md) var(--space-xl); display: grid; gap: var(--space-md); }
+        .tip-btn { display: flex; align-items: center; justify-content: space-between; gap: var(--space-md); min-height: 4.5rem; padding: var(--space-md) var(--space-lg); border-radius: 14px; border: 3px solid var(--pe-black); box-shadow: 5px 5px 0 var(--pe-black); color: var(--pe-white); text-decoration: none; font-family: var(--font-body); font-weight: 700; transition: transform 0.1s ease, box-shadow 0.1s ease; }
+        .tip-btn:hover, .tip-btn:active { transform: translate(2px, 2px); box-shadow: 3px 3px 0 var(--pe-black); }
+        .tip-btn:focus-visible, .tip-links a:focus-visible { outline: 3px solid var(--pe-gold); outline-offset: 3px; }
+        .tip-btn .app { font-family: var(--font-heading); font-size: 2rem; letter-spacing: 0.05em; }
+        .tip-btn .handle { font-size: 1.05rem; opacity: 0.95; }
+        .tip-venmo { background: #0074de; }
+        .tip-cashapp { background: #00a63d; }
+        .tip-note { background: var(--pe-light-gray); border-left: 5px solid var(--pe-gold); border-radius: 8px; padding: var(--space-md); color: var(--pe-text-dark); margin: 0; }
+        .tip-links { display: flex; flex-wrap: wrap; gap: var(--space-sm) var(--space-lg); justify-content: center; margin: 0; padding: 0; list-style: none; }
+        .tip-links a { color: var(--pe-green); font-weight: 700; }
+        @media (prefers-reduced-motion: reduce) { .tip-btn { transition: none; } }
+    </style>
+</head>
+<body>
+    <!-- Universal Header Component -->
+    <div id="header-placeholder"></div>
+
+    <main>
+        <section class="tip-hero">
+            <img src="images/logo.png" alt="The People's Elbow logo" width="140" height="140">
+            <h1>Tip Jar</h1>
+            <p>Thanks for the elbow. Tips keep the chair free at the events that need it most.</p>
+        </section>
+
+        <section class="tip-body" aria-label="Ways to tip">
+            <a class="tip-btn tip-venmo" href="https://venmo.com/u/AAdamczyk" rel="noopener">
+                <span class="app">Venmo</span>
+                <span class="handle">@AAdamczyk</span>
+            </a>
+            <a class="tip-btn tip-cashapp" href="https://cash.app/$Alexczyk" rel="noopener">
+                <span class="app">Cash App</span>
+                <span class="handle">$Alexczyk</span>
+            </a>
+            <p class="tip-note"><strong>Cash works too.</strong> Hand it over at the chair. At charity events, every tip is shared with that day's cause, as the sign at the chair shows.</p>
+            <ul class="tip-links">
+                <li><a href="book.html">Book a full session</a></li>
+                <li><a href="intake/">First visit? Fill out the intake</a></li>
+            </ul>
+        </section>
+    </main>
+
+    <!-- Universal Footer Component -->
+    <div id="footer-placeholder"></div>
+
+    <!-- JavaScript -->
+    <script src="js/components.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
