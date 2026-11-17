@@ -15,6 +15,11 @@ class PolishChecks(BrowserFixture):
         text = '\n'.join(p.extract_text() for p in pdf.pages)
         for label in ['60-Minute','30-Minute','HH-01','HH-04','January 31, 2027']:
             self.assertIn(label,text)
+        # Every printed sheet sends holders to Hustle House on the one booking page (Alex 2026-11-17).
+        for number, sheet in enumerate(pdf.pages, 1):
+            words = ' '.join((sheet.extract_text() or '').split())
+            for label in ['Hustle House','Wednesday, Saturday or Sunday','elbowroommassage.com/book']:
+                self.assertIn(label, words, 'page %d' % number)
         self.assertFalse(self.submissions)
         page.close()
 

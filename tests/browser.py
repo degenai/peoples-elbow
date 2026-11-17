@@ -105,6 +105,38 @@ class BrowserChecks(BrowserFixture):
                 page.wait_for_function("document.querySelector('#visit_reason ~ .dict .dict-btn').getAttribute('aria-pressed') === 'false'")
             page.close()
 
+    def test_site_chrome_text_clears_seven_to_one(self):
+        # House rule for public pages: 7:1 light against dark, measured. The current
+        # page in the nav also carries an underline, so it never rests on colour alone.
+        measure = """() => {
+            const lin = c => { c /= 255; return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); };
+            const rgba = s => { const p = s.match(/[\\d.]+/g).map(Number); return [p[0], p[1], p[2], p.length > 3 ? p[3] : 1]; };
+            const lum = c => 0.2126 * lin(c[0]) + 0.7152 * lin(c[1]) + 0.0722 * lin(c[2]);
+            const ground = el => { for (let e = el; e; e = e.parentElement) { const c = rgba(getComputedStyle(e).backgroundColor); if (c[3] === 1) return c; } return [255, 255, 255, 1]; };
+            return [...document.querySelectorAll('nav a[data-nav], footer p, footer a')].filter(e => e.getClientRects().length && e.textContent.trim()).map(e => {
+                const bg = ground(e), fg = rgba(getComputedStyle(e).color);
+                const mix = fg.slice(0, 3).map((v, i) => fg[3] * v + (1 - fg[3]) * bg[i]);
+                const a = lum(mix), b = lum(bg);
+                return {text: e.textContent.trim().slice(0, 30), ratio: (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05),
+                        active: e.classList.contains('active'), underline: getComputedStyle(e).textDecorationLine};
+            });
+        }"""
+        for width in (1440, 390):
+            with self.subTest(width=width):
+                page = self.new_page(viewport={'width': width, 'height': 900}, reduced_motion='reduce')
+                page.goto(self.origin + '/book.html', wait_until='networkidle')
+                page.wait_for_selector('footer .site-disclaimer')
+                if width == 390:
+                    page.click('.menu-toggle')
+                rows = page.evaluate(measure)
+                self.assertGreater(len(rows), 10)
+                for row in rows:
+                    self.assertGreaterEqual(row['ratio'], 7, row['text'])
+                active = [row for row in rows if row['active']]
+                self.assertEqual([row['text'] for row in active], ['Book'])
+                self.assertIn('underline', active[0]['underline'])
+                page.close()
+
     def test_rates_pdf_matches_first_visit_copy(self):
         pdf = PdfReader(SITE / 'pe-session-rates.pdf')
         self.assertEqual(len(pdf.pages), 1)
@@ -113,15 +145,18 @@ class BrowserChecks(BrowserFixture):
         for rate in ('$45', '$85', '$125', '$165'):
             self.assertIn(rate, text)
 
-    def test_saturday_is_qualified_without_moving_residency_days(self):
-        page = self.new_page()
-        page.add_init_script('Date.prototype.getDay = () => 6;')
-        page.goto(self.origin + '/book.html', wait_until='domcontentloaded')
-        self.assertIn('select Saturdays', page.locator('#day-strip-note').inner_text())
-        self.assertEqual(page.locator('.chip-ccc').get_attribute('data-days'), '2,4,5')
-        self.assertEqual(page.locator('.chip-hh').get_attribute('data-days'), '3')
-        self.assertEqual(page.locator('.chip-er').get_attribute('data-days'), '6,0')
-        page.close()
+    def test_promo_pdfs_match_the_current_sheets(self):
+        # The shelf links these PDFs as the files to print or send to FedEx, so they must carry
+        # the current copy: Elbow Room at Hustle House, Wed/Sat/Sun, never the retired days.
+        for name, pages, cards in (('free-chair-flyer', 1, 1), ('green-card-fedex', 2, 1), ('green-cards-10up', 2, 10)):
+            with self.subTest(pdf=name):
+                pdf = PdfReader(SITE / 'promo' / (name + '.pdf'))
+                self.assertEqual(len(pdf.pages), pages)
+                text = ' '.join(' '.join((page.extract_text() or '').split()) for page in pdf.pages)
+                self.assertNotRegex(text, r'(?i)\b(Sundays|Wednesdays)\b|BOOK: peoples-elbow\.com')
+                self.assertEqual(text.lower().count('elbowroommassage.com/book'), cards)
+                self.assertRegex(text, r'Hustle House')
+                self.assertRegex(text, r'Wed, Sat,? (or )?Sun')
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)

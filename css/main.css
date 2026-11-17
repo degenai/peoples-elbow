@@ -23,6 +23,10 @@
     --pe-red: #8B0000;
     --pe-light-gray: #f9f9f9;
     --pe-text-dark: #333;
+    /* Ink shades for text on white: the logo green and gold, darkened (same hue)
+       just far enough to clear 7:1. Gold on white is 1.5:1, the logo green 6.8:1. */
+    --pe-green-ink: #006635; /* 7.1:1 on white */
+    --pe-gold-ink: #6b5600;  /* 7.1:1 on white */
 
     /* Fonts */
     --font-heading: 'Bangers', cursive;
@@ -87,7 +91,7 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 400;
     line-height: 1.2;
     margin-bottom: var(--space-md);
-    color: var(--pe-green);
+    color: var(--pe-green-ink); /* 7.1:1 on white; the logo green is 6.8 */
 }
 
 h1 {
@@ -192,8 +196,8 @@ p {
 /* Buttons */
 .btn {
     display: inline-block;
-    padding: var(--space-sm) var(--space-lg);
-    background-color: var(--pe-green);
+    padding: 0.6rem var(--space-lg); /* 44px tall: a full tap target */
+    background-color: var(--pe-green-ink); /* white text 7.1:1 */
     color: var(--pe-white);
     border: none;
     border-radius: 4px;
@@ -210,7 +214,7 @@ p {
 }
 
 .btn-primary {
-    background-color: var(--pe-green);
+    background-color: var(--pe-green-ink);
 }
 
 .btn-primary:hover {
@@ -272,8 +276,8 @@ header {
 }
 
 .version-badge {
-    background: linear-gradient(135deg, #ffd700 0%, #ffed4e 25%, #ffd700 50%, #b8860b 100%);
-    color: #2d5a2d;
+    background: linear-gradient(135deg, #ffd700 0%, #ffed4e 25%, #ffd700 50%, #e0b400 100%);
+    color: #00301b; /* 7:1+ across the gold; the old #2d5a2d on a #b8860b end sat near 4.9 */
     padding: var(--space-xs) var(--space-sm);
     border-radius: 25px;
     font-weight: 900;
@@ -331,7 +335,7 @@ header {
         0 6px 16px rgba(0, 0, 0, 0.3),
         inset 0 1px 0 rgba(255, 255, 255, 0.4),
         inset 0 -1px 0 rgba(0, 0, 0, 0.15);
-    background: linear-gradient(135deg, #ffed4e 0%, #ffd700 25%, #ffed4e 50%, #b8860b 100%);
+    background: linear-gradient(135deg, #ffed4e 0%, #ffd700 25%, #ffed4e 50%, #e0b400 100%);
 }
 
 .version-badge:hover::before,
@@ -388,7 +392,7 @@ nav ul li {
 }
 
 nav ul li a {
-    color: var(--pe-green);
+    color: var(--pe-green-ink);
     font-weight: bold;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -1003,7 +1007,8 @@ nav ul li a:hover::after {
 }
 
 .map-placeholder {
-    background: linear-gradient(135deg, var(--pe-green) 0%, var(--pe-green-dark) 100%);
+    /* Reaches the dark green by 70% so the centred white lines clear 7:1 under the gold glow. */
+    background: linear-gradient(135deg, var(--pe-green-ink) 0%, var(--pe-green-dark) 70%);
     min-height: 400px;
     display: flex;
     align-items: center;
@@ -1052,7 +1057,6 @@ nav ul li a:hover::after {
 .map-coming-soon .small-text {
     font-size: 1rem;
     font-weight: normal;
-    opacity: 0.9;
 }
 
 /* Contact Section */
@@ -1092,9 +1096,10 @@ nav ul li a:hover::after {
     margin-right: var(--space-md);
 }
 
-/* Footer */
+/* Footer: on --pe-green-dark every line clears 7:1 (white 11.6, the 80% white
+   note 8.0, the gold link 8.3). On the logo green they sat at 4.9 to 6.8. */
 footer {
-    background-color: var(--pe-green);
+    background-color: var(--pe-green-dark);
     color: var(--pe-white);
     padding: var(--space-lg) 0;
 }
@@ -1109,6 +1114,8 @@ footer {
 .footer-logo-img {
     height: 60px;
     width: auto;
+    border: 2px solid var(--pe-gold); /* the PNG carries its own logo-green square; frame it as a badge */
+    border-radius: 8px;
 }
 
 .footer-info p {
@@ -1120,6 +1127,11 @@ footer {
 }
 
 .social-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
     color: var(--pe-white);
     font-size: 1.5rem;
     margin-left: var(--space-sm);
@@ -1436,7 +1448,7 @@ footer {
 
 .calendar-hub-cta {
     font-weight: 700;
-    color: var(--pe-green);
+    color: var(--pe-green-dark); /* 11:1 on the light card */
 }
 
 .calendar-hub-card:hover .calendar-hub-cta {
@@ -1453,10 +1465,14 @@ footer {
     color: var(--pe-green-dark);
 }
 
-/* Active nav link styling */
+/* Active nav link: dark gold ink (7.1:1 on white) plus a solid underline, so
+   the current page reads by shape as well as by colour. */
 nav ul li a.active {
-    color: var(--pe-gold);
+    color: var(--pe-gold-ink);
     font-weight: bold;
+    text-decoration: underline;
+    text-decoration-thickness: 3px;
+    text-underline-offset: 6px;
 }
 
 @keyframes construction-blink {
@@ -1675,13 +1691,13 @@ nav ul li a.active {
 
 .countdown-residency {
     font-size: 0.9rem;
-    color: #666;
+    color: #444; /* 9.3:1 on --pe-light-gray */
     margin-top: 1.5rem;
     text-align: center;
 }
 
 .countdown-residency a {
-    color: var(--pe-green);
+    color: var(--pe-green-dark);
     font-weight: 600;
     text-decoration: none;
     border-bottom: 1px solid currentColor;
@@ -1835,223 +1851,6 @@ nav ul li a.active {
   to { transform: rotate(360deg); }
 }
 
-/* Booking Page (/book.html) */
-
-.book-availability-note {
-    max-width: 700px;
-    margin: 0 auto var(--space-lg);
-    padding: var(--space-md) var(--space-lg);
-    background: linear-gradient(135deg, var(--pe-gold) 0%, var(--pe-orange) 100%);
-    color: var(--pe-black);
-    border-radius: 8px;
-    text-align: center;
-    font-weight: 700;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-}
-
-.book-availability-note[hidden] {
-    display: none;
-}
-
-.book-location-note {
-    max-width: 720px;
-    margin: 0 auto var(--space-md);
-    padding: var(--space-md) var(--space-lg);
-    background: var(--pe-white);
-    border-left: 4px solid var(--pe-green);
-    border-radius: 4px;
-    color: var(--pe-text-dark);
-    font-size: 1rem;
-    line-height: 1.5;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
-}
-
-.book-location-note i {
-    color: var(--pe-green);
-    margin-right: var(--space-sm);
-}
-
-.book-location-note strong {
-    color: var(--pe-green-dark);
-}
-
-.book-widget-container {
-    max-width: 720px;
-    margin: 0 auto;
-    min-height: 520px;
-    background: var(--pe-light-gray);
-    border-radius: 8px;
-    padding: var(--space-lg);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-    overflow: hidden;
-    outline: none;
-}
-
-.book-widget-container:focus,
-.book-widget-container:focus-within {
-    outline: none;
-}
-
-.book-widget-placeholder {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 460px;
-    text-align: center;
-    color: var(--pe-text-dark);
-    padding: var(--space-lg);
-}
-
-.book-widget-placeholder i {
-    font-size: 3.5rem;
-    color: var(--pe-green);
-    margin-bottom: var(--space-lg);
-    opacity: 0.6;
-}
-
-.book-widget-placeholder-title {
-    font-family: var(--font-heading);
-    font-size: 1.8rem;
-    color: var(--pe-green-dark);
-    margin-bottom: var(--space-sm);
-    letter-spacing: 0.5px;
-}
-
-.book-widget-placeholder-sub {
-    max-width: 460px;
-    font-size: 1rem;
-    line-height: 1.5;
-    opacity: 0.85;
-}
-
-.book-fallback {
-    max-width: 720px;
-    margin: var(--space-lg) auto 0;
-    padding: var(--space-md) var(--space-lg);
-    text-align: center;
-    font-size: 0.95rem;
-    color: var(--pe-text-dark);
-    background: rgba(0, 105, 55, 0.05);
-    border-left: 3px solid var(--pe-green);
-    border-radius: 4px;
-}
-
-.book-fallback i {
-    color: var(--pe-green);
-    margin-right: var(--space-xs);
-}
-
-.book-fallback a {
-    font-weight: 700;
-    margin-left: var(--space-xs);
-}
-
-/* Secondary overflow: book with Elbow Room when the Wednesday window does not fit */
-.book-overflow {
-    max-width: 720px;
-    margin: var(--space-xl) auto 0;
-    padding: var(--space-lg);
-    text-align: center;
-    background: var(--pe-light-gray);
-    border: 1px solid rgba(0, 0, 0, 0.08);
-    border-top: 3px solid var(--pe-gold);
-    border-radius: 8px;
-}
-
-.book-overflow-title {
-    font-family: var(--font-heading);
-    font-size: 1.6rem;
-    letter-spacing: 0.5px;
-    color: var(--pe-green-dark);
-    margin-bottom: var(--space-sm);
-}
-
-.book-overflow-body {
-    max-width: 560px;
-    margin: 0 auto var(--space-md);
-    font-size: 0.95rem;
-    line-height: 1.5;
-    color: var(--pe-text-dark);
-}
-
-.book-overflow-cta i {
-    margin-right: var(--space-xs);
-}
-
-/* Closing program notes: pale slab, corner vignette, gold hairline off the top. */
-.book-info {
-    padding: var(--space-xl) 0;
-    background-color: #f2f3ee;
-    background-image:
-        linear-gradient(180deg, var(--pe-gold) 0 2px, rgba(255, 204, 0, 0) 2px),
-        radial-gradient(85% 55% at 50% 0%, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0) 68%),
-        radial-gradient(130% 110% at 50% 10%, #f7f8f4 0%, #eceee7 62%, #e0e3da 100%);
-    background-repeat: no-repeat;
-    background-size: 100% 2px, 100% 100%, 100% 100%;
-    background-position: top left, center, center;
-}
-
-.book-info .section-title {
-    font-family: var(--font-heading);
-    font-size: 2.2rem;
-    color: var(--pe-green-dark);
-    text-align: center;
-    margin-bottom: var(--space-lg);
-}
-
-.book-info-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: var(--space-lg);
-    max-width: 1100px;
-    margin: 0 auto;
-}
-
-.book-info-item {
-    background-color: var(--pe-white);
-    background-image: linear-gradient(180deg, #ffffff 0%, #fbfcf8 60%, #f4f6ef 100%);
-    padding: var(--space-lg);
-    border: 1px solid rgba(0, 66, 37, 0.09);
-    border-radius: 8px;
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.95),
-        0 1px 2px rgba(0, 0, 0, 0.06),
-        0 10px 24px rgba(0, 0, 0, 0.07);
-    text-align: center;
-}
-
-/* The icon earns its keep as a struck medallion instead of a floating glyph. */
-.book-info-item i {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 54px;
-    height: 54px;
-    border-radius: 50%;
-    font-size: 1.4rem;
-    color: var(--pe-gold);
-    background: linear-gradient(180deg, var(--pe-green) 0%, var(--pe-green-dark) 100%);
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.32),
-        0 6px 14px rgba(var(--pe-green-rgb), 0.3);
-    margin-bottom: var(--space-md);
-}
-
-.book-info-item h3 {
-    font-family: var(--font-heading);
-    color: var(--pe-green-dark);
-    font-size: 1.4rem;
-    margin-bottom: var(--space-sm);
-    letter-spacing: 0.07em;
-}
-
-.book-info-item p {
-    font-size: 0.95rem;
-    line-height: 1.6;
-    color: var(--pe-text-dark);
-}
-
 /* Book Banner on main page (homepage CTA) */
 .book-banner {
     background: linear-gradient(135deg, var(--pe-gold) 0%, var(--pe-orange) 100%);
@@ -2069,7 +1868,7 @@ nav ul li a.active {
 .book-banner h2 {
     font-family: var(--font-heading);
     font-size: 2.2rem;
-    color: var(--pe-green-dark);
+    color: #00301b; /* 7:1+ across the gold-to-orange field; --pe-green-dark sat at 6.4 */
     margin-bottom: 0.5rem;
     letter-spacing: 1px;
 }
@@ -2089,7 +1888,7 @@ nav ul li a.active {
     border-radius: 999px;
     font-size: 0.95rem;
     font-weight: 700;
-    margin-bottom: 1rem;
+    margin: 0 0.2rem 0.75rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
@@ -2097,8 +1896,16 @@ nav ul li a.active {
     display: none;
 }
 
+/* Phones: both day pills stay on one line each. */
+@media (max-width: 420px) {
+    .book-banner-availability {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.8rem;
+    }
+}
+
 .book-banner .btn {
-    background: var(--pe-green);
+    background: var(--pe-green-ink);
     color: var(--pe-white);
     padding: 1rem 2rem;
     font-weight: 700;
@@ -2114,22 +1921,6 @@ nav ul li a.active {
 }
 
 @media (max-width: 600px) {
-    .book-widget-container {
-        min-height: 580px;
-        padding: var(--space-md);
-    }
-    .book-widget-placeholder {
-        min-height: 520px;
-    }
-    .book-widget-placeholder i {
-        font-size: 2.5rem;
-    }
-    .book-widget-placeholder-title {
-        font-size: 1.4rem;
-    }
-    .book-fallback {
-        font-size: 0.9rem;
-    }
     .book-banner h2 {
         font-size: 1.8rem;
     }
@@ -2419,7 +2210,7 @@ nav ul li a.active {
 }
 
 /* ============================================================
-   People's Elbow at Hustle House - homepage residency section
+   Elbow Room Massage at Hustle House - homepage section (paid sessions)
    ============================================================ */
 .hustle-house {
     padding: var(--space-xl) 0;
@@ -2464,7 +2255,7 @@ nav ul li a.active {
 }
 
 .hh-menu {
-    background: var(--pe-green);
+    background: var(--pe-green-dark); /* gold 7.7:1, white 11.6:1; the logo green held gold at 4.5 */
     color: var(--pe-white);
     border-radius: 12px;
     padding: var(--space-lg);
@@ -2523,156 +2314,76 @@ nav ul li a.active {
     }
 }
 
-/* ============================================================
-   book.html - the menu / offerings block
-   ============================================================ */
-/* Warm program-paper slab: canvas tone and a house-light wash from the rafters.
-   The diagonal hatch belongs to the dark arena sections. Paper stays paper. */
-.book-menu-section {
-    padding: var(--space-xl) 0;
-    background-color: #fbfbf7;
-    background-image:
-        radial-gradient(88% 58% at 50% 0%, rgba(var(--pe-green-rgb), 0.07), rgba(var(--pe-green-rgb), 0) 72%);
-    border-top: 1px solid rgba(var(--pe-green-rgb), 0.14);
-}
+/* ===== Booking page (book.html): two places, one therapist ===== */
 
-.book-menu-section .section-title {
-    font-family: var(--font-heading);
-    font-size: 2.2rem;
-    color: var(--pe-green-dark);
-    text-align: center;
-    margin-bottom: var(--space-md);
-}
+/* Contrast rule for this page: every line of text clears 7:1 against the
+   ground it sits on, measured light against dark, never by hue alone. That is
+   why the arena fields run darker than the site's mid green: gold on #006937
+   is only 4.5:1, gold on --pe-green-dark is 7.7:1. */
 
-.book-menu-intro {
-    max-width: 760px;
-    margin: 0 auto var(--space-lg);
-    text-align: center;
-    line-height: 1.7;
-    color: var(--pe-text-dark);
-}
-
-.book-menu-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: var(--space-lg);
-    max-width: 1000px;
-    margin: 0 auto var(--space-lg);
-    align-items: stretch;
-}
-
-/* Menu cards lift off the paper: top-lit face, contact shadow, soft cast shadow. */
-.book-menu-card {
-    --menu-rgb: var(--pe-green-rgb);
+/* Poster header: dark arena, speed lines raking across, the field going dark
+   at the bottom so it hands off into the marquee below. The hatch is one
+   recipe (115deg / 2px / 14px / 0.035) shared by all three dark sections. */
+.book-hero {
     position: relative;
-    background-color: var(--pe-white);
-    background-image: linear-gradient(180deg, #ffffff 0%, #fafbf7 58%, #f1f3ec 100%);
-    border: 1px solid rgba(0, 66, 37, 0.09);
-    border-radius: 10px;
-    padding: var(--space-lg);
-    text-align: center;
-    border-top: 4px solid rgb(var(--menu-rgb));
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-sm);
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.9),
-        0 1px 2px rgba(0, 0, 0, 0.07),
-        0 8px 20px rgba(0, 0, 0, 0.07);
-    transition: box-shadow 0.25s ease, transform 0.2s ease;
-}
-
-/* The main event on the menu: gold rope on top, warm face, real height. */
-.book-menu-card.featured {
-    --menu-rgb: 255, 204, 0;
+    padding: calc(var(--space-xl) + 1rem) 0 calc(var(--space-xl) + 0.5rem);
+    background-color: var(--pe-green-dark);
     background-image:
-        radial-gradient(120% 70% at 50% 0%, rgba(255, 204, 0, 0.16), rgba(255, 204, 0, 0) 62%),
-        linear-gradient(180deg, #ffffff 0%, #fdfaee 58%, #f6f1de 100%);
-    border-color: rgba(255, 204, 0, 0.45);
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.95),
-        0 2px 4px rgba(0, 0, 0, 0.08),
-        0 16px 34px rgba(0, 0, 0, 0.11),
-        0 26px 54px -22px rgba(255, 153, 0, 0.42);
+        repeating-linear-gradient(115deg, rgba(255, 255, 255, 0.035) 0 2px, rgba(255, 255, 255, 0) 2px 14px),
+        radial-gradient(135% 120% at 50% 8%, var(--pe-green-dark) 0%, #00301b 60%, #00190d 100%);
 }
 
-.book-menu-card:hover {
-    transform: translateY(-3px);
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.95),
-        0 2px 4px rgba(0, 0, 0, 0.09),
-        0 18px 38px rgba(0, 0, 0, 0.12),
-        0 26px 54px -22px rgba(var(--menu-rgb), 0.45);
+.book-hero h1 {
+    font-size: 3.4rem;
+    letter-spacing: 0.04em;
+    color: var(--pe-gold);
+    text-shadow:
+        0 3px 0 rgba(0, 0, 0, 0.5),
+        0 0 32px rgba(255, 204, 0, 0.35);
 }
 
-/* You are buying time, not a number. The duration is the billing; the price is
-   the line underneath it. Hairline rule sits between the two. */
-.book-menu-dur {
-    font-family: var(--font-heading);
-    font-size: 2.5rem;
-    line-height: 1;
-    color: var(--pe-green-dark);
-    letter-spacing: 0.07em;
-    text-transform: uppercase;
-    text-shadow: 0 2px 0 rgba(0, 0, 0, 0.07);
+.book-hero .book-tagline {
+    max-width: 640px;
+    letter-spacing: 0.02em;
+    color: var(--pe-white);
+    opacity: 1;
 }
 
-.book-menu-dur::after {
-    content: '';
-    display: block;
-    width: 40px;
-    height: 2px;
-    margin: 12px auto 2px;
-    background: linear-gradient(90deg, rgba(var(--menu-rgb), 0), rgb(var(--menu-rgb)), rgba(var(--menu-rgb), 0));
+.book-hero-aside {
+    max-width: 640px;
+    margin: var(--space-md) auto 0;
+    color: var(--pe-white);
 }
 
-.book-menu-price {
-    font-family: var(--font-heading);
-    font-size: 1.75rem;
-    line-height: 1;
-    color: var(--pe-green);
-    letter-spacing: 0.03em;
+.book-hero-aside a,
+.book-about-link,
+.book-about-contact a {
+    color: var(--pe-gold);
+    font-weight: 700;
+    text-decoration: underline;
 }
 
-.book-menu-card.featured .book-menu-price {
-    color: #b36b00;
+.book-hero-aside a:hover,
+.book-about-link:hover,
+.book-about-contact a:hover {
+    color: var(--pe-white);
 }
 
-.book-menu-desc {
-    font-size: 0.92rem;
-    line-height: 1.5;
-    color: var(--pe-text-dark);
+/* Phone numbers, emails, place names and short link phrases never break mid-name. */
+.book-hero-aside a,
+.day-strip-note .nowrap,
+.hero-offer-ribbon .nowrap,
+.book-banner-availability .nowrap,
+.hh-kicker .nowrap,
+.site-disclaimer a,
+.book-practice a[href^="tel:"],
+.book-about-contact a {
+    white-space: nowrap;
 }
 
-.book-addons {
-    max-width: 760px;
-    margin: 0 auto;
-    text-align: center;
-}
-
-.book-addons p {
-    line-height: 1.6;
-    margin-bottom: var(--space-sm);
-    color: var(--pe-text-dark);
-}
-
-.book-addons i {
-    color: var(--pe-green);
-    margin-right: 0.35rem;
-}
-
-.book-firstvisit {
-    background: var(--pe-light-gray);
-    border-left: 4px solid var(--pe-gold);
-    padding: var(--space-md);
-    border-radius: 6px;
-    display: inline-block;
-}
-/* ===== Residency Network booking page (book.html) ===== */
-
-/* THE MARQUEE. A gold top rope strung across the section, house lights aimed
-   down from the rafters, faint speed lines raking the field, and the corners
-   falling off into the dark. The chips hang from the rope like fight billing. */
+/* THE MARQUEE. A gold top rope strung across the section, faint speed lines
+   raking the field, and the corners falling off into the dark. The chips hang
+   from the rope like fight billing. */
 .day-strip-section {
     position: relative;
     padding: calc(var(--space-xl) + 0.5rem) 0 var(--space-xl);
@@ -2684,15 +2395,13 @@ nav ul li a.active {
             rgba(0, 0, 0, 0.5) 3px 5px,
             rgba(255, 255, 255, 0.45) 5px 6px,
             rgba(0, 0, 0, 0) 6px),
-        /* house light from above center */
-        radial-gradient(120% 85% at 50% -8%, rgba(255, 204, 0, 0.15), rgba(255, 204, 0, 0) 58%),
         /* speed lines */
         repeating-linear-gradient(115deg, rgba(255, 255, 255, 0.035) 0 2px, rgba(255, 255, 255, 0) 2px 14px),
         /* field + corner vignette */
-        radial-gradient(145% 125% at 50% 0%, var(--pe-green) 0%, var(--pe-green-dark) 55%, #00170c 100%);
+        radial-gradient(145% 125% at 50% 0%, var(--pe-green-dark) 0%, #00301b 55%, #00170c 100%);
     background-repeat: no-repeat;
-    background-size: 100% 6px, 100% 100%, 100% 100%, 100% 100%;
-    background-position: top left, center, center, center;
+    background-size: 100% 6px, 100% 100%, 100% 100%;
+    background-position: top left, center, center;
     box-shadow: inset 0 -1px 0 rgba(255, 204, 0, 0.3);
 }
 
@@ -2705,42 +2414,40 @@ nav ul li a.active {
     margin: 0 auto;
 }
 
-/* Chip material: lit along the top edge, falling into shadow at the base,
-   sitting on a real cast shadow instead of floating on flat black. */
+/* Chip material: a dark plate lit along the top edge, falling into shadow at
+   the base, sitting on a real cast shadow. The plate is opaque so the gold
+   billing never depends on what the field happens to be doing behind it. */
 .day-chip {
     --chip-rgb: 255, 204, 0;
     position: relative;
     flex: 1 1 220px;
     max-width: 320px;
-    background-color: rgba(0, 0, 0, 0.34);
+    background-color: #00271a;
     background-image: linear-gradient(180deg,
-        rgba(255, 255, 255, 0.11) 0%,
+        rgba(255, 255, 255, 0.07) 0%,
         rgba(255, 255, 255, 0.02) 45%,
         rgba(0, 0, 0, 0.3) 100%);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.12);
     border-top: 4px solid rgb(var(--chip-rgb));
     border-radius: 10px 10px 8px 8px;
     padding: var(--space-md) var(--space-lg) calc(var(--space-md) + 0.15rem);
     text-align: center;
     box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.18),
-        inset 0 -20px 26px -20px rgba(0, 0, 0, 0.75),
+        inset 0 1px 0 rgba(255, 255, 255, 0.16),
         0 10px 22px rgba(0, 0, 0, 0.4);
-    transition: box-shadow 0.25s ease, transform 0.2s ease, border-color 0.25s ease, background-color 0.25s ease;
+    transition: box-shadow 0.25s ease, transform 0.2s ease, border-color 0.25s ease;
 }
 
-.day-chip.chip-ccc { --chip-rgb: 0, 105, 55; }
+.day-chip.chip-ccc { --chip-rgb: 0, 138, 71; }
 .day-chip.chip-hh { --chip-rgb: 255, 204, 0; }
-.day-chip.chip-er { --chip-rgb: 84, 132, 237; }
 
-/* Rest day: the house lights are down on this one. */
+/* Day off: the house lights are down on this one. */
 .day-chip.chip-off {
     --chip-rgb: 148, 168, 156;
-    background-color: rgba(0, 0, 0, 0.42);
+    background-color: #001a10;
     border-top-color: rgba(255, 255, 255, 0.28);
     box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, 0.08),
-        inset 0 -20px 26px -20px rgba(0, 0, 0, 0.8),
         0 6px 14px rgba(0, 0, 0, 0.32);
 }
 
@@ -2753,9 +2460,9 @@ nav ul li a.active {
     text-shadow: 0 2px 0 rgba(0, 0, 0, 0.45);
 }
 
-.day-chip.chip-off .chip-days { color: rgba(255, 255, 255, 0.72); }
+.day-chip.chip-off .chip-days { color: rgba(255, 255, 255, 0.8); }
 
-/* Kicker rule: a short strand of the venue's own color above the billing. */
+/* Kicker rule: a short strand of the place's own color above the billing. */
 .chip-venue::before {
     content: '';
     display: block;
@@ -2767,7 +2474,6 @@ nav ul li a.active {
 
 .chip-venue {
     display: block;
-    margin-top: 0;
     font-size: 0.72rem;
     font-weight: 700;
     letter-spacing: 0.18em;
@@ -2776,28 +2482,22 @@ nav ul li a.active {
     text-transform: uppercase;
 }
 
-.day-chip.chip-off .chip-venue { color: rgba(255, 255, 255, 0.76); }
+.day-chip.chip-off .chip-venue { color: rgba(255, 255, 255, 0.8); }
 
-/* TODAY. Not a border change: the spotlight actually finds this chip. The beam
-   and the ring do the work, so the wash stays light enough to keep the gold
-   billing legible against it. No ambient bloom on top of both. */
+/* TODAY. The spotlight finds this chip: a gold ring, a lift, a beam off the
+   top edge, and a printed TODAY tag so the cue never rests on color. */
 .day-chip.chip-today,
 .day-chip.chip-today-off {
+    --chip-rgb: 255, 204, 0;
     border-color: rgba(255, 204, 0, 0.55);
     border-top-color: var(--pe-gold);
-    background-color: rgba(0, 0, 0, 0.2);
-    background-image: linear-gradient(180deg,
-        rgba(255, 204, 0, 0.18) 0%,
-        rgba(255, 204, 0, 0.05) 40%,
-        rgba(0, 0, 0, 0.36) 100%);
     box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.42),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
         0 0 0 1px rgba(255, 204, 0, 0.7),
         0 16px 34px rgba(0, 0, 0, 0.48);
     transform: translateY(-4px);
 }
 
-/* The beam itself, spilling off the top edge of the lit chip. */
 .day-chip.chip-today::before,
 .day-chip.chip-today-off::before {
     content: '';
@@ -2822,8 +2522,20 @@ nav ul li a.active {
     color: var(--pe-white);
 }
 
-.day-chip.chip-today-off {
-    --chip-rgb: 255, 204, 0;
+.today-tag {
+    display: block;
+    width: fit-content;
+    margin: 0 auto var(--space-xs);
+    padding: 0.05rem 0.65rem;
+    border-radius: 999px;
+    background: var(--pe-gold);
+    color: var(--pe-black);
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    font-weight: 700;
+    line-height: 1.6;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
 }
 
 .day-strip-note {
@@ -2831,7 +2543,7 @@ nav ul li a.active {
     margin: calc(var(--space-lg) + 0.25rem) auto 0;
     padding-top: var(--space-md);
     text-align: center;
-    color: rgba(255, 255, 255, 0.94);
+    color: var(--pe-white);
     font-weight: 700;
     font-size: 1.05rem;
     letter-spacing: 0.02em;
@@ -2842,13 +2554,20 @@ nav ul li a.active {
         rgba(255, 204, 0, 0) 100%) top center / 100% 1px no-repeat;
 }
 
-/* The Weekly Card: three prongs on a lit canvas. */
+/* The two places, on a lit canvas. */
 .weekly-card-section {
     padding: var(--space-xl) 0;
     background-color: var(--pe-white);
     background-image:
         radial-gradient(80% 45% at 50% 0%, rgba(var(--pe-green-rgb), 0.08), rgba(var(--pe-green-rgb), 0) 70%),
         radial-gradient(60% 40% at 50% 100%, rgba(0, 0, 0, 0.04), rgba(0, 0, 0, 0) 72%);
+}
+
+.weekly-card-section .section-title {
+    font-size: 2.6rem;
+    letter-spacing: 0.05em;
+    color: var(--pe-green-dark);
+    text-shadow: 0 2px 0 rgba(0, 0, 0, 0.06);
 }
 
 .weekly-card-intro {
@@ -2863,13 +2582,14 @@ nav ul li a.active {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
     gap: var(--space-lg);
-    max-width: 1200px;
+    max-width: 920px;
     margin: 0 auto;
     align-items: stretch;
 }
 
-/* Each card carries its venue color as a variable, so the shared anatomy stays
-   one rule and the identity rides along in the wash, glow, and ink. */
+/* Each card carries its place's color as a variable, so the shared anatomy
+   stays one rule and the identity rides along in the wash, glow, and ink. The
+   ink is the only colored text, and each ink clears 7:1 on the card face. */
 .venue-card {
     --venue-rgb: var(--pe-green-rgb);
     --venue-ink: var(--pe-green-dark);
@@ -2891,8 +2611,7 @@ nav ul li a.active {
     transition: box-shadow 0.28s ease, transform 0.22s ease;
 }
 
-.venue-hh { --venue-rgb: 255, 153, 0; --venue-ink: #8a5200; }
-.venue-er { --venue-rgb: 84, 132, 237; --venue-ink: #24408f; }
+.venue-hh { --venue-rgb: 255, 153, 0; --venue-ink: #6b3f00; }
 
 .venue-card-logo {
     display: flex;
@@ -2915,19 +2634,10 @@ nav ul li a.active {
     background: #ffffff;
 }
 
-/* ER's mark is gold line art; a blue wash would fight it. Neutral plate. */
-.venue-er .venue-card-logo {
-    background:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.35)),
-        radial-gradient(90% 100% at 50% 0%, rgba(0, 0, 0, 0.06), transparent 75%);
-}
-
-/* One shared plate height keeps the three cards' lower rows aligned. Every
-   mark is height-bounded; the CCC lockup also gets a width bound because its
-   three lines of type go illegible below roughly 190px wide. */
 /* Auto dimensions on both axes keep the intrinsic ratio intact; the
-   width/height attributes on the tags must not fight the CSS clamps
-   (a fixed width plus a max-height clamp is what stretched the marks). */
+   width/height attributes on the tags must not fight the CSS clamps. The CCC
+   lockup also gets a width bound because its small type goes illegible below
+   roughly 190px wide. */
 .venue-card-logo img {
     display: block;
     width: auto;
@@ -2978,11 +2688,9 @@ nav ul li a.active {
 
 .venue-ccc .venue-card-accent { background: linear-gradient(90deg, var(--pe-green-dark), var(--pe-green) 45%, var(--pe-green-light)); }
 .venue-hh .venue-card-accent { background: linear-gradient(90deg, var(--pe-orange), var(--pe-gold) 55%, #ffe066); }
-.venue-er .venue-card-accent { background: linear-gradient(90deg, #2f5fd0, #5484ed 55%, #8fadf6); }
 
-/* Tonight's venue: card comes forward with its own colored light on it. The
-   ring is drawn in the venue's ink, not its wash, so all three clear 3:1
-   against the paper (the orange at 55% did not). */
+/* Today's place: the card comes forward, ringed in its own ink, with a TODAY
+   tag in the corner. */
 .venue-card-today {
     background-image:
         radial-gradient(115% 78% at 100% 0%, rgba(var(--venue-rgb), 0.2), rgba(var(--venue-rgb), 0) 62%),
@@ -2996,10 +2704,20 @@ nav ul li a.active {
     transform: translateY(-5px);
 }
 
-/* Day billing: wide-tracked, inked, with a venue-colored strand beneath it. */
+.venue-card .today-tag {
+    position: absolute;
+    top: 1.1rem;
+    right: 1rem;
+    margin: 0;
+    background: var(--venue-ink);
+    color: var(--pe-white);
+}
+
+/* Day billing: wide-tracked, inked, with a strand of the place's color under it. */
 .venue-card-days {
     font-family: var(--font-heading);
     font-size: 2rem;
+    line-height: 1.2;
     letter-spacing: 0.12em;
     color: var(--venue-ink);
     margin-bottom: var(--space-sm);
@@ -3016,12 +2734,27 @@ nav ul li a.active {
     background: linear-gradient(90deg, rgb(var(--venue-rgb)), rgba(var(--venue-rgb), 0));
 }
 
+/* The place name is set in the body face: Bangers at this size, faux-bolded,
+   smeared into a dark bar. Plain and legible wins for an address line. */
 .venue-card-name {
+    font-family: var(--font-body);
     font-size: 1.15rem;
     font-weight: 700;
     letter-spacing: 0.01em;
     color: var(--pe-text-dark);
+    margin-bottom: var(--space-xs);
+}
+
+.venue-card-where {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--pe-text-dark);
     margin-bottom: var(--space-sm);
+}
+
+.venue-card-where i {
+    color: var(--venue-ink);
+    margin-right: 0.3rem;
 }
 
 .venue-card-copy {
@@ -3039,7 +2772,8 @@ nav ul li a.active {
     gap: var(--space-sm);
 }
 
-/* Press-worthy buttons: they sit on a plinth and they travel when you push. */
+/* Press-worthy buttons: they sit on a plinth and they travel when you push.
+   The face stays at --pe-green-dark depth so the white label clears 8:1. */
 .venue-card-cta {
     position: relative;
     display: block;
@@ -3051,20 +2785,22 @@ nav ul li a.active {
     padding: 0.85rem var(--space-md);
     border-radius: 6px;
     letter-spacing: 0.05em;
-    background-image: linear-gradient(180deg, var(--pe-green-light) 0%, var(--pe-green) 62%);
+    background-color: var(--pe-green-dark);
+    background-image: linear-gradient(180deg, #005a30 0%, var(--pe-green-dark) 70%);
     box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.28),
-        0 4px 0 var(--pe-green-dark),
+        inset 0 1px 0 rgba(255, 255, 255, 0.22),
+        0 4px 0 #00230f,
         0 8px 16px rgba(0, 0, 0, 0.22);
-    transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.2s ease;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 
 .venue-card-cta:hover {
+    color: var(--pe-white);
     transform: translateY(-1px);
-    background-image: linear-gradient(180deg, #00a355 0%, var(--pe-green-light) 62%);
+    background-image: linear-gradient(180deg, #004d29 0%, #00331c 70%);
     box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.35),
-        0 5px 0 var(--pe-green-dark),
+        inset 0 1px 0 rgba(255, 255, 255, 0.26),
+        0 5px 0 #00230f,
         0 12px 24px rgba(0, 0, 0, 0.26);
 }
 
@@ -3072,7 +2808,7 @@ nav ul li a.active {
     transform: translateY(4px);
     box-shadow:
         inset 0 2px 6px rgba(0, 0, 0, 0.3),
-        0 0 0 var(--pe-green-dark),
+        0 0 0 #00230f,
         0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
@@ -3081,17 +2817,17 @@ nav ul li a.active {
 }
 
 .venue-card-sublabel {
-    font-size: 0.82rem;
+    font-size: 0.85rem;
+    font-weight: 700;
     text-align: center;
     letter-spacing: 0.04em;
     color: var(--pe-text-dark);
-    opacity: 0.8;
 }
 
 .venue-card-fine {
-    margin-top: var(--space-md);
+    margin: var(--space-md) 0 0;
     padding-top: var(--space-md);
-    font-size: 0.82rem;
+    font-size: 0.85rem;
     line-height: 1.6;
     color: var(--pe-text-dark);
     text-align: center;
@@ -3102,37 +2838,19 @@ nav ul li a.active {
         rgba(var(--venue-rgb), 0) 100%) top center / 100% 1px no-repeat;
 }
 
-a.venue-card-fine,
-.venue-card-fine a {
-    display: block;
-    color: var(--venue-ink);
-    font-weight: 700;
+/* Keyboard focus. The site-wide .btn ring is gold, which is right on the dark
+   sections and dead wrong on the pale cards (gold on white is 1.5:1), so on
+   the cards the ring is drawn in green ink. */
+.venue-card-cta:focus-visible {
+    outline: 3px solid var(--pe-green-dark);
+    outline-offset: 3px;
+    border-radius: 6px;
 }
 
-a.venue-card-fine:hover,
-.venue-card-fine a:hover {
-    color: var(--pe-green-light);
-    text-decoration: underline;
-}
-
-/* Same foot rule recipe as the fine print, so opening the calendar does not
-   introduce a second, heavier kind of divider inside the same card. */
-.hh-widget-wrap {
-    margin-top: var(--space-md);
-    padding-top: var(--space-md);
-    background: linear-gradient(90deg,
-        rgba(var(--venue-rgb), 0) 0%,
-        rgba(var(--venue-rgb), 0.4) 25%,
-        rgba(var(--venue-rgb), 0.4) 75%,
-        rgba(var(--venue-rgb), 0) 100%) top center / 100% 1px no-repeat;
-}
-
-.hh-widget-wrap[hidden] { display: none; }
-
-/* First visit banner: a gold ring apron, roped top and bottom, lit from above.
-   The weave came off: on gold it just muddied the field the copy sits on, and
-   the orange stop moved later so the body text keeps the brighter half. */
-.first-visit-banner {
+/* One practice behind both doors: a gold ring apron, roped top and bottom,
+   lit from above. The gradient stops at amber, not orange, so the ink keeps
+   7:1 all the way across. */
+.book-practice {
     position: relative;
     padding: calc(var(--space-xl) + 0.5rem) 0;
     background-color: var(--pe-gold);
@@ -3151,7 +2869,7 @@ a.venue-card-fine:hover,
             rgba(0, 0, 0, 0) 6px),
         /* overhead highlight */
         radial-gradient(78% 62% at 50% -4%, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0) 64%),
-        linear-gradient(150deg, #ffd94d 0%, var(--pe-gold) 54%, var(--pe-orange) 100%);
+        linear-gradient(150deg, #ffd94d 0%, var(--pe-gold) 54%, #ffb800 100%);
     background-repeat: no-repeat;
     background-size: 100% 6px, 100% 6px, 100% 100%, 100% 100%;
     background-position: top left, bottom left, center, center;
@@ -3159,146 +2877,100 @@ a.venue-card-fine:hover,
     text-align: center;
 }
 
-.first-visit-banner .container { max-width: 760px; }
+.book-practice .container,
+.book-about .container { max-width: 760px; }
 
-.first-visit-title {
+.book-practice-title {
     font-family: var(--font-heading);
     font-size: 2.3rem;
-    color: var(--pe-green-dark);
+    color: #00331c;
     margin-bottom: var(--space-sm);
     letter-spacing: 0.06em;
     text-shadow: 0 2px 0 rgba(255, 255, 255, 0.35);
 }
 
-.first-visit-body {
+.book-practice-body {
     font-size: 1.05rem;
     line-height: 1.6;
     margin-bottom: var(--space-sm);
 }
 
-.first-visit-fine {
-    font-size: 0.9rem;
-    color: rgba(0, 0, 0, 0.82);
-    margin-bottom: var(--space-xs);
-}
+.book-practice-body:last-child { margin-bottom: 0; }
 
-.first-visit-fine a {
-    color: var(--pe-green-dark);
+.book-practice a {
+    color: #00331c;
     font-weight: 700;
     text-decoration: underline;
 }
 
-.first-visit-fine a:hover { color: var(--pe-black); }
+.book-practice a:hover { color: var(--pe-black); }
 
-/* Not sure which day fits: the announcer's table. A dark green strip that
-   breaks up the run of pale slabs at the foot of the page. */
-.book-help {
+/* On the gold apron the link is already green ink, so the ring goes black. */
+.book-practice a:focus-visible {
+    outline: 3px solid var(--pe-black);
+    outline-offset: 3px;
+    border-radius: 4px;
+}
+
+/* What The People's Elbow is: the announcer's table. A dark green strip that
+   closes the page under the gold apron. */
+.book-about {
     padding: var(--space-xl) 0;
     background-color: var(--pe-green-dark);
     background-image:
-        radial-gradient(70% 120% at 50% 0%, rgba(255, 204, 0, 0.12), rgba(255, 204, 0, 0) 62%),
         repeating-linear-gradient(115deg, rgba(255, 255, 255, 0.035) 0 2px, rgba(255, 255, 255, 0) 2px 14px),
-        radial-gradient(140% 130% at 50% 0%, var(--pe-green) 0%, var(--pe-green-dark) 58%, #00170c 100%);
+        radial-gradient(140% 130% at 50% 0%, var(--pe-green-dark) 0%, #00301b 58%, #00170c 100%);
     text-align: center;
     box-shadow:
         inset 0 1px 0 rgba(255, 204, 0, 0.45),
         inset 0 -1px 0 rgba(255, 204, 0, 0.25);
 }
 
-.book-help-title {
+.book-about-title {
     font-family: var(--font-heading);
-    font-size: 2rem;
+    font-size: 2.2rem;
     color: var(--pe-gold);
     letter-spacing: 0.06em;
-    margin-bottom: var(--space-sm);
+    margin-bottom: var(--space-md);
     text-shadow: 0 2px 0 rgba(0, 0, 0, 0.4);
 }
 
-.book-help-body {
-    color: rgba(255, 255, 255, 0.92);
-    margin-bottom: var(--space-md);
-}
-
-.book-help-contact {
-    display: inline-block;
-    margin: 0;
-    padding: var(--space-sm) var(--space-lg);
-    border: 1px solid rgba(255, 204, 0, 0.35);
-    border-radius: 8px;
-    background: rgba(0, 0, 0, 0.28);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+.book-about-body {
     color: var(--pe-white);
-    font-weight: 700;
-    letter-spacing: 0.03em;
+    font-size: 1.05rem;
+    line-height: 1.7;
+    margin-bottom: var(--space-lg);
 }
 
-.book-help-contact i { color: var(--pe-gold); }
-
-/* Rate-sheet pointer, set as a stamped note rather than a loose line of text. */
-.book-menu-note {
-    max-width: 720px;
-    margin: var(--space-lg) auto 0;
-    padding: var(--space-sm) var(--space-md);
-    text-align: center;
-    font-size: 0.92rem;
-    color: var(--pe-text-dark);
-    background: rgba(255, 255, 255, 0.7);
-    border: 1px solid rgba(var(--pe-green-rgb), 0.16);
-    border-left: 3px solid var(--pe-gold);
-    border-radius: 6px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+.book-about-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: var(--space-md) var(--space-lg);
+    margin-bottom: var(--space-lg);
 }
 
-.book-menu-note i { color: var(--pe-green); margin-right: 0.3rem; }
-
-/* ===== Booking page polish round 1: material, rope motif, poster type ===== */
-
-/* Poster header. Scoped to book.html so the other coming-soon heroes are
-   untouched: spotlight behind the headline, speed lines raking across, and the
-   field going dark at the bottom so it hands off into the marquee below.
-   The hatch is now one recipe (115deg / 2px / 14px / 0.035) shared by all three
-   dark sections, so the arena air reads as one material top to bottom. */
-.book-hero {
-    position: relative;
-    padding: calc(var(--space-xl) + 1rem) 0 calc(var(--space-xl) + 0.5rem);
-    background-color: var(--pe-green-dark);
-    background-image:
-        radial-gradient(70% 90% at 50% 18%, rgba(255, 204, 0, 0.16), rgba(255, 204, 0, 0) 62%),
-        repeating-linear-gradient(115deg, rgba(255, 255, 255, 0.035) 0 2px, rgba(255, 255, 255, 0) 2px 14px),
-        radial-gradient(135% 120% at 50% 8%, var(--pe-green-light) 0%, var(--pe-green) 32%, var(--pe-green-dark) 72%, #00190d 100%);
+.book-about-link {
+    display: inline-block;
+    padding: 0.6rem 0; /* 44px tap target */
 }
 
-.book-hero h1 {
-    font-size: 3.4rem;
-    letter-spacing: 0.04em;
-    color: var(--pe-gold);
-    text-shadow:
-        0 3px 0 rgba(0, 0, 0, 0.5),
-        0 0 32px rgba(255, 204, 0, 0.35);
+.book-about-contact {
+    margin: 0;
+    color: var(--pe-white);
+    font-size: 0.95rem;
 }
 
-.book-hero .book-tagline {
-    max-width: 640px;
-    letter-spacing: 0.02em;
-    color: rgba(255, 255, 255, 0.94);
-    opacity: 1;
-}
+.book-about-contact i { color: var(--pe-gold); margin-right: 0.3rem; }
 
-/* Round 1 hung a rope hairline above every section title. It went: the site
-   already gives .section-title a gold bar underneath, and reveal.js inks an
-   animated stroke there on top of that. Three marks on one heading, and only on
-   this page. The rope now lives where it means something structural: the
-   marquee lip and the apron edges. Titles keep the type treatment only. */
-.weekly-card-section .section-title,
-.book-menu-section .section-title,
-.book-info .section-title {
-    letter-spacing: 0.05em;
-    text-shadow: 0 2px 0 rgba(0, 0, 0, 0.06);
-}
-
-.weekly-card-section .section-title {
-    font-size: 2.6rem;
-    color: var(--pe-green-dark);
+/* Links on the dark sections get a gold ring, like the site's buttons. */
+.book-hero-aside a:focus-visible,
+.book-about-link:focus-visible,
+.book-about-contact a:focus-visible {
+    outline: 3px solid var(--pe-gold);
+    outline-offset: 3px;
+    border-radius: 4px;
 }
 
 @media (max-width: 600px) {
@@ -3309,9 +2981,6 @@ a.venue-card-fine:hover,
     .book-hero h1 { font-size: 2.5rem; }
 
     .weekly-card-section .section-title { font-size: 2rem; }
-
-    .book-menu-section .section-title,
-    .book-info .section-title { font-size: 1.9rem; }
 
     .day-strip-section { padding: calc(var(--space-lg) + 0.75rem) 0 var(--space-lg); }
 
@@ -3333,40 +3002,9 @@ a.venue-card-fine:hover,
 
     .venue-card-cta { font-size: 0.9rem; padding: 0.8rem var(--space-sm); }
 
-    .book-menu-dur { font-size: 2.1rem; }
+    .book-practice-title { font-size: 1.9rem; }
 
-    .book-menu-price { font-size: 1.6rem; }
-
-    .first-visit-title { font-size: 1.9rem; }
-
-    .book-help-title { font-size: 1.7rem; }
-
-    .book-help-contact {
-        display: block;
-        padding: var(--space-sm) var(--space-md);
-        font-size: 0.92rem;
-    }
-}
-
-/* ===== Booking page polish round 2: contrast, focus, the belt ===== */
-
-/* Keyboard focus. The site-wide .btn ring is gold, which is right on the dark
-   hero and dead wrong on the pale venue cards (gold on white is 1.5:1). On this
-   page's paper and apron, the ring is drawn in green ink instead. */
-.venue-card-cta:focus-visible,
-.venue-card-fine a:focus-visible,
-a.venue-card-fine:focus-visible,
-.book-menu-note a:focus-visible {
-    outline: 3px solid var(--pe-green-dark);
-    outline-offset: 3px;
-    border-radius: 6px;
-}
-
-/* On the gold apron the link is already green ink, so the ring goes black. */
-.first-visit-fine a:focus-visible {
-    outline: 3px solid var(--pe-black);
-    outline-offset: 3px;
-    border-radius: 4px;
+    .book-about-title { font-size: 1.8rem; }
 }
 
 /* Today's card was losing a pixel of lift on hover: .venue-card:hover outranks
@@ -3375,15 +3013,7 @@ a.venue-card-fine:focus-visible,
     transform: translateY(-9px);
 }
 
-/* Hustle House keeps the Square link inside the button group, so its foot rule
-   was floating a full rem below the sublabel while the other two sat tight
-   against the card foot. Same anatomy, same spacing. */
-.venue-card-actions a.venue-card-fine {
-    margin-top: var(--space-sm);
-    padding-top: var(--space-sm);
-}
-
-/* SIGNATURE: the champion's belt. Today's venue gets one slow pass of polished
+/* SIGNATURE: the champion's belt. Today's place gets one slow pass of polished
    gold along its accent bar and then holds the glint where the light landed.
    It happens once, in one place, on the whole page. */
 .venue-card-today .venue-card-accent::after {
@@ -3415,7 +3045,7 @@ a.venue-card-fine:focus-visible,
 }
 
 /* Narrow phones. The marquee stacks one chip per row down here, so the gaps and
-   the chip padding come in to keep four chips from becoming a scroll. */
+   the chip padding come in to keep three chips from becoming a scroll. */
 @media (max-width: 420px) {
     .day-strip { gap: var(--space-sm); }
 
@@ -3447,16 +3077,14 @@ a.venue-card-fine:focus-visible,
 
     .day-chip,
     .venue-card,
-    .venue-card-cta,
-    .book-menu-card {
+    .venue-card-cta {
         transition: none;
     }
 
     .venue-card:hover,
     .venue-card-today:hover,
     .venue-card-cta:hover,
-    .venue-card-cta:active,
-    .book-menu-card:hover {
+    .venue-card-cta:active {
         transform: none;
     }
 

@@ -1,82 +1,61 @@
-"""Square lifecycle controls: synthetic script only; no booking network."""
+"""Booking page: two places, one button each, today's place lit. No booking network."""
 import unittest
-from playwright.sync_api import expect
 from browser_support import BrowserFixture
 
-WIDGET = 'https://square.site/appointments/buyer/widget/**'
-SCRIPT = "window.fixtureSquareLoads=(window.fixtureSquareLoads||0)+1; const frame=document.createElement('iframe');frame.id='fixture-square';frame.title='Synthetic booking calendar';document.querySelector('#book-widget-container').appendChild(frame);"
+# Date#getDay -> the card that should light up (None: Monday, the day off).
+PLACES = {0: 'venue-hh', 1: None, 2: 'venue-ccc', 3: 'venue-hh', 4: 'venue-ccc', 5: 'venue-ccc', 6: 'venue-hh'}
+NOTES = {None: 'day off', 'venue-hh': 'Hustle House', 'venue-ccc': 'Cherokee Center for Change'}
 
 class BookingChecks(BrowserFixture):
-    def test_missing_status_keeps_direct_link_usable_without_a_click_exception(self):
-        page = self.new_page()
-        errors = []
-        page.on('pageerror', lambda error: errors.append(str(error)))
-        def without_status(route):
-            from browser_support import SITE
-            html = (SITE / 'book.html').read_text(encoding='utf-8')
-            html = html.replace('id="hh-widget-status"', 'id="fixture-removed-status"')
-            route.fulfill(status=200, content_type='text/html', body=html)
-        page.route(self.origin + '/book.html', without_status)
-        page.goto(self.origin + '/book.html', wait_until='networkidle')
-        page.locator('#hh-reveal').click()
-        expect(page.locator('a[href="https://peoples-elbow.square.site"]').first).to_be_visible()
-        self.assertEqual(errors, [], 'An incomplete optional widget must not throw on interaction')
-        self.assertEqual(page.locator('#book-widget-container script').count(), 0)
-        self.assertFalse(self.submissions)
-        page.close()
+    def test_every_day_lights_its_own_place_and_monday_rests(self):
+        for day, card in PLACES.items():
+            with self.subTest(day=day):
+                page = self.new_page(reduced_motion='reduce')
+                errors = []
+                page.on('pageerror', lambda error: errors.append(str(error)))
+                page.add_init_script('Date.prototype.getDay = () => %d;' % day)
+                page.goto(self.origin + '/book.html', wait_until='domcontentloaded')
+                lit = page.locator('.venue-card-today')
+                if card:
+                    self.assertEqual(lit.count(), 1)
+                    self.assertEqual(lit.get_attribute('id'), card)
+                    self.assertEqual(page.locator('.chip-today').get_attribute('data-place'), card)
+                    self.assertEqual(page.locator('#' + card + ' .today-tag').inner_text().strip().lower(), 'today')
+                else:
+                    self.assertEqual(lit.count(), 0)
+                    self.assertEqual(page.locator('.chip-off.chip-today-off').count(), 1)
+                # The cue is printed, never color alone: one tag on the chip, one on the card.
+                self.assertEqual(page.locator('.today-tag').count(), 2 if card else 1)
+                note = page.locator('#day-strip-note')
+                self.assertIn(NOTES[card], note.inner_text())
+                if '(770) 928-7300' in note.inner_text():
+                    self.assertEqual(note.locator('.nowrap').inner_text(), '(770) 928-7300', 'the phone number never breaks at its hyphen')
+                self.assertEqual(errors, [])
+                page.close()
 
-    def test_failure_displays_an_accessible_retry_instruction(self):
-        page = self.new_page()
-        page.route(WIDGET, lambda route: route.abort())
+    def test_one_working_button_per_place_and_no_embedded_calendar(self):
+        page = self.new_page(viewport={'width': 390, 'height': 844}, reduced_motion='reduce')
+        requested = []
+        page.on('request', lambda request: requested.append(request.url))
         page.goto(self.origin + '/book.html', wait_until='networkidle')
-        page.locator('#hh-reveal').click()
-        expect(page.locator('#hh-widget-wrap [role="status"]')).to_contain_text('close and reopen', timeout=1500)
-        page.close()
-
-    def test_loading_toggles_never_inject_a_second_script(self):
-        page = self.new_page()
-        held = []
-        page.route(WIDGET, lambda route: held.append(route))
-        page.goto(self.origin + '/book.html', wait_until='networkidle')
-        reveal = page.locator('#hh-reveal')
-        reveal.click()
-        for _ in range(3):
-            reveal.click()
-            reveal.click()
-        self.assertEqual(len(held), 1)
-        self.assertEqual(page.locator('#book-widget-container script').count(), 1)
-        held[0].fulfill(status=200, content_type='text/javascript', body=SCRIPT)
-        expect(page.locator('#fixture-square')).to_have_count(1, timeout=1500)
-        reveal.focus()
-        page.keyboard.press('Tab')
-        self.assertEqual(page.evaluate('document.activeElement.href'), 'https://peoples-elbow.square.site/')
-        self.assertFalse(self.submissions)
-        page.close()
-
-    def test_failed_script_can_retry_on_reopen_and_success_survives_toggle(self):
-        page = self.new_page(viewport={'width':390,'height':844})
-        attempts = []
-        def widget(route):
-            attempts.append(route.request.url)
-            if len(attempts) == 1:
-                route.abort()
-            else:
-                route.fulfill(status=200, content_type='text/javascript', body=SCRIPT)
-        page.route(WIDGET, widget)
-        page.goto(self.origin + '/book.html', wait_until='networkidle')
-        reveal = page.locator('#hh-reveal')
-        with page.expect_event('requestfailed', predicate=lambda r: 'square.site/appointments/buyer/widget/' in r.url):
-            reveal.click()
-        reveal.click()  # close failed widget
-        reveal.click()  # explicit user retry, never automatic
-        expect(page.locator('#fixture-square')).to_have_count(1, timeout=2000)
-        self.assertEqual(len(attempts), 2)
-        reveal.click()
-        reveal.click()
-        self.assertEqual(page.evaluate('window.fixtureSquareLoads'), 1)
-        self.assertEqual(len(attempts), 2)
-        self.assertEqual(page.locator('#book-widget-container script').count(), 1)
-        self.assertEqual(page.locator('a[href="https://peoples-elbow.square.site"]').count(), 1)
+        buttons = page.locator('.venue-card-cta')
+        self.assertEqual(buttons.count(), 2)
+        self.assertEqual(page.locator('#venue-ccc .venue-card-cta').get_attribute('href'), 'tel:+17709287300')
+        online = page.locator('#venue-hh .venue-card-cta')
+        self.assertEqual(online.get_attribute('href'), 'https://elbowroommassage.com/book')
+        self.assertEqual(online.get_attribute('target'), '_blank')
+        self.assertIn('noopener', online.get_attribute('rel'))
+        for index in range(2):
+            box = buttons.nth(index).bounding_box()
+            self.assertGreaterEqual(box['height'], 44)
+            self.assertGreaterEqual(box['x'], 0)
+            self.assertLessEqual(box['x'] + box['width'], 390)
+        self.assertEqual(page.evaluate('document.documentElement.scrollWidth'), 390, 'no sideways scroll on a phone')
+        self.assertEqual(page.locator('iframe').count(), 0)
+        self.assertFalse(any('square' in url for url in requested), 'Hustle House books on elbowroommassage.com, not an embed')
+        page.locator('.book-hero-aside a[href="#about"]').click()
+        page.wait_for_function("location.hash === '#about'")
+        self.assertTrue(page.locator('#about').is_visible())
         self.assertFalse(self.submissions)
         page.close()
 
