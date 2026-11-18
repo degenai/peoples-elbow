@@ -39,23 +39,31 @@
             </div>
         </section>
 
-        <!-- Day strip: the week at a glance. Today's chip lights up via JS. -->
+        <!-- Day strip: the week at a glance. Today's chip lights up via JS. Each plate is a real control: one tap
+             arms it ("Tap again to book"), the second tap goes. Without JS the links work on the first tap. -->
         <section class="day-strip-section" aria-label="The week at a glance">
             <div class="container">
                 <ul class="day-strip" id="day-strip">
                     <li class="day-chip chip-ccc" data-days="2,4,5" data-place="venue-ccc">
-                        <span class="chip-days">TUE THU FRI</span>
-                        <span class="chip-venue">CHEROKEE CENTER FOR CHANGE</span>
+                        <a class="chip-hit" href="tel:+17709287300" data-armed="TAP AGAIN TO CALL THE DESK">
+                            <span class="chip-days">TUE THU FRI</span>
+                            <span class="chip-venue">CHEROKEE CENTER FOR CHANGE</span>
+                        </a>
                     </li>
                     <li class="day-chip chip-hh" data-days="3,6,0" data-place="venue-hh">
-                        <span class="chip-days">WED SAT SUN</span>
-                        <span class="chip-venue">HUSTLE HOUSE</span>
+                        <a class="chip-hit" href="https://elbowroommassage.com/book" target="_blank" rel="noopener noreferrer" data-armed="TAP AGAIN TO BOOK">
+                            <span class="chip-days">WED SAT SUN</span>
+                            <span class="chip-venue">HUSTLE HOUSE</span>
+                        </a>
                     </li>
                     <li class="day-chip chip-off" data-days="1">
-                        <span class="chip-days">MON</span>
-                        <span class="chip-venue">DAY OFF. THE ELBOW RESTS.</span>
+                        <button class="chip-hit" type="button" data-nope="NOTHING TO BOOK. BACK TUESDAY.">
+                            <span class="chip-days">MON</span>
+                            <span class="chip-venue">DAY OFF. THE ELBOW RESTS.</span>
+                        </button>
                     </li>
                 </ul>
+                <p class="chip-status" id="chip-status" role="status" aria-live="polite"></p>
                 <p class="day-strip-note" id="day-strip-note">Tuesday, Thursday and Friday at the Center. Wednesday, Saturday and Sunday at Hustle House. Monday off.</p>
             </div>
         </section>
@@ -166,6 +174,58 @@
             label.textContent = 'Today';
             target.insertBefore(label, target.firstChild);
         }
+        // The day plates. A finger tap arms the plate and swaps its bottom line for "Tap again to ..."; the
+        // second tap follows the link. The keyboard goes straight through. Monday has nothing to open.
+        var ARM_MS = 5000, NOPE_MS = 2600;
+        var armed = null, armTimer = 0;
+        function venueLine(hit) { return hit.querySelector('.chip-venue'); }
+        function say(words) {
+            var status = document.getElementById('chip-status');
+            if (status) { status.textContent = words; }
+        }
+        function restore(hit) {
+            var line = venueLine(hit);
+            if (line && hit.hasAttribute('data-rest')) { line.textContent = hit.getAttribute('data-rest'); }
+            hit.removeAttribute('data-rest');
+            hit.parentNode.classList.remove('chip-armed', 'chip-nope');
+        }
+        function swap(hit, words, cls) {
+            var line = venueLine(hit);
+            if (!hit.hasAttribute('data-rest')) { hit.setAttribute('data-rest', line.textContent); }
+            line.textContent = words;
+            hit.parentNode.classList.add(cls);
+            say(words);
+        }
+        function disarm() {
+            clearTimeout(armTimer);
+            if (armed) { restore(armed); }
+            armed = null;
+        }
+        function onChip(event) {
+            var hit = event.currentTarget;
+            if (hit.hasAttribute('data-nope')) {
+                disarm();
+                swap(hit, hit.getAttribute('data-nope'), 'chip-nope');
+                armed = hit;
+                armTimer = setTimeout(disarm, NOPE_MS);
+                return;
+            }
+            if (event.detail === 0) { return; }            // keyboard or a screen reader: go on the first press
+            if (armed === hit) { disarm(); say(''); return; } // second tap: let the link go
+            event.preventDefault();
+            disarm();
+            swap(hit, hit.getAttribute('data-armed'), 'chip-armed');
+            armed = hit;
+            armTimer = setTimeout(disarm, ARM_MS);
+        }
+        function wireChips() {
+            var hits = document.querySelectorAll('#day-strip .chip-hit');
+            for (var i = 0; i < hits.length; i++) { hits[i].addEventListener('click', onChip); }
+            document.addEventListener('click', function (event) {
+                if (armed && !armed.contains(event.target)) { disarm(); }
+            });
+            window.addEventListener('pageshow', disarm);
+        }
         function applyDay() {
             var today = new Date().getDay(); // 0 Sun, 1 Mon ... 6 Sat
             var chips = document.querySelectorAll('#day-strip .day-chip');
@@ -173,7 +233,7 @@
                 var chip = chips[i];
                 if ((chip.getAttribute('data-days') || '').split(',').indexOf(String(today)) === -1) { continue; }
                 chip.classList.add(chip.classList.contains('chip-off') ? 'chip-today-off' : 'chip-today');
-                tag(chip);
+                tag(chip.querySelector('.chip-hit') || chip);
                 var card = document.getElementById(chip.getAttribute('data-place') || '');
                 if (card) {
                     card.classList.add('venue-card-today');
@@ -183,10 +243,11 @@
             var note = document.getElementById('day-strip-note');
             if (note) { setNote(note, LINES[today]); }
         }
+        function start() { applyDay(); wireChips(); }
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', applyDay);
+            document.addEventListener('DOMContentLoaded', start);
         } else {
-            applyDay();
+            start();
         }
     })();
     </script>

@@ -34,6 +34,11 @@ test('booking page sends paid sessions to Elbow Room at exactly two places, Mond
     const book = read('book.html');
     const chips = [...book.matchAll(/class="day-chip ([^"]+)" data-days="([^"]+)"/g)].map(m => [m[1], m[2]]);
     assert.deepEqual(chips, [['chip-ccc', '2,4,5'], ['chip-hh', '3,6,0'], ['chip-off', '1']]);
+    // Each day plate is a real control (a visitor took the plate for a button, 2026-11-18): the two places
+    // are links that work without scripts, and Monday is a button that opens nothing.
+    const hits = [...book.matchAll(/<(a|button) class="chip-hit"([^>]*)>/g)].map(m => [m[1], (m[2].match(/href="([^"]+)"/) || [])[1] || null]);
+    assert.deepEqual(hits, [['a', 'tel:+17709287300'], ['a', 'https://elbowroommassage.com/book'], ['button', null]]);
+    assert.equal([...book.matchAll(/data-armed="TAP AGAIN TO (CALL THE DESK|BOOK)"/g)].length, 2);
     assert.equal(book.match(/<article class="venue-card /g).length, 2);
     const buttons = [...book.matchAll(/class="btn btn-primary venue-card-cta" href="([^"]+)"/g)].map(m => m[1]);
     assert.deepEqual(buttons, ['tel:+17709287300', 'https://elbowroommassage.com/book'], 'one button per place');

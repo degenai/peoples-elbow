@@ -2441,6 +2441,120 @@ nav ul li a.active {
 .day-chip.chip-ccc { --chip-rgb: 0, 138, 71; }
 .day-chip.chip-hh { --chip-rgb: 255, 204, 0; }
 
+/* The whole plate is the control. The link or button inside keeps the plate's own type and stretches
+   over it, so a tap anywhere on the plate lands. */
+.chip-hit {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    text-align: inherit;
+    text-decoration: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.chip-hit::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+}
+
+.chip-hit:focus-visible { outline: none; }
+
+.chip-hit:focus-visible::after {
+    outline: 3px solid var(--pe-gold);
+    outline-offset: 3px;
+}
+
+.day-chip:not(.chip-off):hover { transform: translateY(-3px); }
+.day-chip.chip-today:hover { transform: translateY(-6px); }
+.day-chip:active { transform: translateY(1px) scale(0.98); }
+
+/* Armed: the first tap landed. The plate jumps, takes a gold ring, a light crosses it, and the bottom
+   line says what the second tap does. The words carry the cue; the gold and the motion are extra. */
+.day-strip .day-chip.chip-armed {
+    --chip-rgb: 255, 204, 0;
+    border-color: var(--pe-gold);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.35),
+        0 0 0 3px var(--pe-gold),
+        0 18px 36px rgba(0, 0, 0, 0.55);
+    transform: translateY(-7px);
+}
+
+.day-chip.chip-armed::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(105deg, rgba(255, 255, 255, 0) 38%, rgba(255, 255, 255, 0.3) 50%, rgba(255, 255, 255, 0) 62%) no-repeat;
+    background-size: 260% 100%;
+    background-position: 130% 0;
+    pointer-events: none;
+}
+
+.day-chip.chip-armed .chip-days { color: var(--pe-gold); }
+
+.day-chip.chip-armed .chip-venue,
+.day-chip.chip-nope .chip-venue {
+    color: var(--pe-white);
+    font-size: 0.86rem;
+    letter-spacing: 0.12em;
+}
+
+.day-chip.chip-armed .chip-venue::after {
+    content: ' \203A';
+    display: inline-block;
+    margin-left: 0.3em;
+    color: var(--pe-gold);
+    font-size: 1.3em;
+    line-height: 0;
+}
+
+.chip-status {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}
+
+@keyframes pe-chip-pop {
+    0% { transform: translateY(1px) scale(0.96); }
+    55% { transform: translateY(-11px) scale(1.03); }
+    100% { transform: translateY(-7px) scale(1); }
+}
+
+@keyframes pe-chip-sweep {
+    from { background-position: 130% 0; }
+    to { background-position: -30% 0; }
+}
+
+@keyframes pe-chip-nudge {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(5px); }
+}
+
+@keyframes pe-chip-nope {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-7px); }
+    40%, 80% { transform: translateX(7px); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .day-chip.chip-armed { animation: pe-chip-pop 0.42s cubic-bezier(0.3, 1.5, 0.5, 1) 1 both; }
+    .day-chip.chip-armed::after { animation: pe-chip-sweep 0.9s ease-out 0.12s 1 both; }
+    .day-chip.chip-armed .chip-venue::after { animation: pe-chip-nudge 0.7s ease-in-out infinite; }
+    .day-chip.chip-nope { animation: pe-chip-nope 0.4s ease-in-out 1; }
+}
+
 /* Day off: the house lights are down on this one. */
 .day-chip.chip-off {
     --chip-rgb: 148, 168, 156;
